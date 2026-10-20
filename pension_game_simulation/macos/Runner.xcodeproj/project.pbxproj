@@ -1,0 +1,228 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 54;
+	objects = {
+
+/* Begin PBXBuildFile section */
+		331C80D8294A63A400263BE5 /* RunnerTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 331C80D7294A63A400263BE5 /* RunnerTests.swift */; };
+		335B24FC2FF7D7FE00323100 /* MainFlutterWindow.swift in Sources */ = {isa = PBXBuildFile; fileRef = 335B24FB2FF7D7FE00323100 /* MainFlutterWindow.swift */; };
+		335B24FE2FF7D7FE00323100 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 335B24FD2FF7D7FE00323100 /* AppDelegate.swift */; };
+		335B25002FF7D7FE00323100 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 335B24FF2FF7D7FE00323100 /* Assets.xcassets */; };
+		335B25032FF7D7FE00323100 /* MainMenu.xib in Resources */ = {isa = PBXBuildFile; fileRef = 335B25012FF7D7FE00323100 /* MainMenu.xib */; };
+/* End PBXBuildFile section */
+
+/* Begin PBXContainerItemProxy section */
+		331C80D9294A63A400263BE5 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 33E4514E2FF7D70000323100 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 335B24F02FF7D7FE00323100;
+			remoteInfo = Runner;
+		};
+/* End PBXContainerItemProxy section */
+
+/* Begin PBXFileReference section */
+		331C80D5294A63A400263BE5 /* RunnerTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = RunnerTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		331C80D7294A63A400263BE5 /* RunnerTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RunnerTests.swift; sourceTree = "<group>"; };
+		335B24F12FF7D7FE00323100 /* pension_game_simulation.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "pension_game_simulation.app"; sourceTree = BUILT_PRODUCTS_DIR; };
+		335B24FB2FF7D7FE00323100 /* MainFlutterWindow.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MainFlutterWindow.swift; sourceTree = "<group>"; };
+		335B24FD2FF7D7FE00323100 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
+		335B24FF2FF7D7FE00323100 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
+		335B25022FF7D7FE00323100 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = Base; path = Base.lproj/MainMenu.xib; sourceTree = "<group>"; };
+		335B25042FF7D7FE00323100 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+/* End PBXFileReference section */
+
+/* Begin PBXGroup section */
+		335B24EA2FF7D7FE00323100 = {
+			isa = PBXGroup;
+			children = (
+				335B24FA2FF7D7FE00323100 /* Runner */,
+				335B24F22FF7D7FE00323100 /* Products */,
+			);
+			sourceTree = "<group>";
+		};
+		335B24F22FF7D7FE00323100 /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				335B24F12FF7D7FE00323100 /* pension_game_simulation.app */,
+				331C80D5294A63A400263BE5 /* RunnerTests.xctest */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+		335B24FA2FF7D7FE00323100 /* Runner */ = {
+			isa = PBXGroup;
+			children = (
+				335B24FD2FF7D7FE00323100 /* AppDelegate.swift */,
+				335B24FB2FF7D7FE00323100 /* MainFlutterWindow.swift */,
+				335B24FF2FF7D7FE00323100 /* Assets.xcassets */,
+				335B25012FF7D7FE00323100 /* MainMenu.xib */,
+				335B25042FF7D7FE00323100 /* Info.plist */,
+			);
+			path = Runner;
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXNativeTarget section */
+		335B24F02FF7D7FE00323100 /* Runner */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 335B25072FF7D7FE00323100 /* Build configuration list for PBXNativeTarget "Runner" */;
+			buildPhases = (
+				335B24ED2FF7D7FE00323100 /* Sources */,
+				335B24EE2FF7D7FE00323100 /* Frameworks */,
+				335B24EF2FF7D7FE00323100 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = Runner;
+			productName = Runner;
+			productReference = 335B24F12FF7D7FE00323100 /* pension_game_simulation.app */;
+			productType = "com.apple.product-type.application";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		33E4514E2FF7D70000323100 /* Project object */ = {
+			isa = PBXProject;
+			attributes = {
+				LastSwiftUpdateCheck = 1430;
+				LastUpgradeCheck = 1510;
+				ORGANIZATIONNAME = "com.jacobglathe";
+				TargetAttributes = {
+					335B24F02FF7D7FE00323100 = {
+						CreatedOnToolsVersion = 14.3.1;
+					};
+				};
+			};
+			buildConfigurationList = 33E451512FF7D70000323100 /* Build configuration list for PBXProject "Runner" */;
+			compatibilityVersion = "Xcode 14.0";
+			developmentRegion = de;
+			hasScannedForEncodings = 0;
+			knownRegions = (
+				de,
+				Base,
+			);
+			mainGroup = 335B24EA2FF7D7FE00323100;
+			productRefGroup = 335B24F22FF7D7FE00323100 /* Products */;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (
+				335B24F02FF7D7FE00323100 /* Runner */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXResourcesBuildPhase section */
+		335B24EF2FF7D7FE00323100 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				335B25002FF7D7FE00323100 /* Assets.xcassets in Resources */,
+				335B25032FF7D7FE00323100 /* MainMenu.xib in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXResourcesBuildPhase section */
+
+/* Begin PBXSourcesBuildPhase section */
+		335B24ED2FF7D7FE00323100 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				335B24FC2FF7D7FE00323100 /* MainFlutterWindow.swift in Sources */,
+				335B24FE2FF7D7FE00323100 /* AppDelegate.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin XCBuildConfiguration section */
+		335B25052FF7D7FE00323100 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_NONNULL = YES;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = dwarf;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_TESTABILITY = YES;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"DEBUG=1",
+					"$(inherited)",
+				);
+				MACOSX_DEPLOYMENT_TARGET = 10.15;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+				SWIFT_VERSION = 5.0;
+			};
+			name = Debug;
+		};
+		335B25062FF7D7FE00323100 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_NONNULL = YES;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_NS_ASSERTIONS = NO;
+				GCC_NO_COMMON_BLOCKS = YES;
+				MACOSX_DEPLOYMENT_TARGET = 10.15;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_COMPILATION_MODE = wholemodule;
+				SWIFT_OPTIMIZATION_LEVEL = "-O";
+				SWIFT_VERSION = 5.0;
+			};
+			name = Release;
+		};
+		33E451522FF7D70000323100 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				PRODUCT_BUNDLE_IDENTIFIER = com.jacobglathe.pensionGameSimulation;
+				PRODUCT_NAME = "pension_game_simulation";
+			};
+			name = Debug;
+		};
+		33E451532FF7D70000323100 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				PRODUCT_BUNDLE_IDENTIFIER = com.jacobglathe.pensionGameSimulation;
+				PRODUCT_NAME = "pension_game_simulation";
+			};
+			name = Release;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		335B25072FF7D7FE00323100 /* Build configuration list for PBXNativeTarget "Runner" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				33E451522FF7D70000323100 /* Debug */,
+				33E451532FF7D70000323100 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		33E451512FF7D70000323100 /* Build configuration list for PBXProject "Runner" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				335B25052FF7D7FE00323100 /* Debug */,
+				335B25062FF7D7FE00323100 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+/* End XCConfigurationList section */
+
+	};
+	rootObject = 33E4514E2FF7D70000323100 /* Project object */;
+}

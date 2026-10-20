@@ -1,0 +1,6 @@
+{
+  "name": "Generation Zukunft - Renten-Simulation (econo=me)",
+  "description": "Interaktive Simulations- und Gameplay-Grundlage zur deutschen Rentenversicherung, dem Rentenpaket II und dem Generationenkapital für macOS, Windows und Xcode.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
