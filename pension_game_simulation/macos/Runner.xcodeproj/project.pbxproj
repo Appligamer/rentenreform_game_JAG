@@ -7,39 +7,47 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		331C80D8294A63A400263BE5 /* RunnerTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 331C80D7294A63A400263BE5 /* RunnerTests.swift */; };
 		335B24FC2FF7D7FE00323100 /* MainFlutterWindow.swift in Sources */ = {isa = PBXBuildFile; fileRef = 335B24FB2FF7D7FE00323100 /* MainFlutterWindow.swift */; };
 		335B24FE2FF7D7FE00323100 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 335B24FD2FF7D7FE00323100 /* AppDelegate.swift */; };
 		335B25002FF7D7FE00323100 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 335B24FF2FF7D7FE00323100 /* Assets.xcassets */; };
 		335B25032FF7D7FE00323100 /* MainMenu.xib in Resources */ = {isa = PBXBuildFile; fileRef = 335B25012FF7D7FE00323100 /* MainMenu.xib */; };
+		33A11A122FF8000200123456 /* GeneratedPluginRegistrant.swift in Sources */ = {isa = PBXBuildFile; fileRef = 33A11A112FF8000200123456 /* GeneratedPluginRegistrant.swift */; };
 /* End PBXBuildFile section */
 
-/* Begin PBXContainerItemProxy section */
-		331C80D9294A63A400263BE5 /* PBXContainerItemProxy */ = {
-			isa = PBXContainerItemProxy;
-			containerPortal = 33E4514E2FF7D70000323100 /* Project object */;
-			proxyType = 1;
-			remoteGlobalIDString = 335B24F02FF7D7FE00323100;
-			remoteInfo = Runner;
-		};
-/* End PBXContainerItemProxy section */
-
 /* Begin PBXFileReference section */
-		331C80D5294A63A400263BE5 /* RunnerTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = RunnerTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
-		331C80D7294A63A400263BE5 /* RunnerTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RunnerTests.swift; sourceTree = "<group>"; };
 		335B24F12FF7D7FE00323100 /* pension_game_simulation.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "pension_game_simulation.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 		335B24FB2FF7D7FE00323100 /* MainFlutterWindow.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MainFlutterWindow.swift; sourceTree = "<group>"; };
 		335B24FD2FF7D7FE00323100 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		335B24FF2FF7D7FE00323100 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		335B25022FF7D7FE00323100 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = Base; path = Base.lproj/MainMenu.xib; sourceTree = "<group>"; };
 		335B25042FF7D7FE00323100 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		33A11A012FF8000100123456 /* DebugProfile.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = DebugProfile.entitlements; sourceTree = "<group>"; };
+		33A11A022FF8000100123456 /* Release.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = Release.entitlements; sourceTree = "<group>"; };
+		33A11A032FF8000100123456 /* AppInfo.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = AppInfo.xcconfig; sourceTree = "<group>"; };
+		33A11A042FF8000100123456 /* Debug.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = Debug.xcconfig; sourceTree = "<group>"; };
+		33A11A052FF8000100123456 /* Release.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = Release.xcconfig; sourceTree = "<group>"; };
+		33A11A062FF8000100123456 /* Warnings.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = Warnings.xcconfig; sourceTree = "<group>"; };
+		33A11A112FF8000200123456 /* GeneratedPluginRegistrant.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GeneratedPluginRegistrant.swift; sourceTree = "<group>"; };
+		33A11A132FF8000200123456 /* Flutter-Debug.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = "Flutter-Debug.xcconfig"; sourceTree = "<group>"; };
+		33A11A142FF8000200123456 /* Flutter-Release.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = "Flutter-Release.xcconfig"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
+
+/* Begin PBXFrameworksBuildPhase section */
+		335B24EE2FF7D7FE00323100 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
 		335B24EA2FF7D7FE00323100 = {
 			isa = PBXGroup;
 			children = (
 				335B24FA2FF7D7FE00323100 /* Runner */,
+				33A11A102FF8000200123456 /* Flutter */,
 				335B24F22FF7D7FE00323100 /* Products */,
 			);
 			sourceTree = "<group>";
@@ -48,7 +56,6 @@
 			isa = PBXGroup;
 			children = (
 				335B24F12FF7D7FE00323100 /* pension_game_simulation.app */,
-				331C80D5294A63A400263BE5 /* RunnerTests.xctest */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -61,8 +68,40 @@
 				335B24FF2FF7D7FE00323100 /* Assets.xcassets */,
 				335B25012FF7D7FE00323100 /* MainMenu.xib */,
 				335B25042FF7D7FE00323100 /* Info.plist */,
+				33A11A012FF8000100123456 /* DebugProfile.entitlements */,
+				33A11A022FF8000100123456 /* Release.entitlements */,
+				33A11A072FF8000100123456 /* Configs */,
 			);
 			path = Runner;
+			sourceTree = "<group>";
+		};
+		33A11A102FF8000200123456 /* Flutter */ = {
+			isa = PBXGroup;
+			children = (
+				33A11A112FF8000200123456 /* GeneratedPluginRegistrant.swift */,
+				33A11A132FF8000200123456 /* Flutter-Debug.xcconfig */,
+				33A11A142FF8000200123456 /* Flutter-Release.xcconfig */,
+			);
+			path = Flutter;
+			sourceTree = "<group>";
+		};
+		33A11A072FF8000100123456 /* Configs */ = {
+			isa = PBXGroup;
+			children = (
+				33A11A032FF8000100123456 /* AppInfo.xcconfig */,
+				33A11A042FF8000100123456 /* Debug.xcconfig */,
+				33A11A052FF8000100123456 /* Release.xcconfig */,
+				33A11A062FF8000100123456 /* Warnings.xcconfig */,
+			);
+			path = Configs;
+			sourceTree = "<group>";
+		};
+		335B25012FF7D7FE00323100 /* MainMenu.xib */ = {
+			isa = PBXVariantGroup;
+			children = (
+				335B25022FF7D7FE00323100 /* Base */,
+			);
+			name = MainMenu.xib;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -91,12 +130,13 @@
 		33E4514E2FF7D70000323100 /* Project object */ = {
 			isa = PBXProject;
 			attributes = {
-				LastSwiftUpdateCheck = 1430;
+				BuildIndependentTargetsInParallel = YES;
+				LastSwiftUpdateCheck = 1500;
 				LastUpgradeCheck = 1510;
-				ORGANIZATIONNAME = "com.jacobglathe";
+				ORGANIZATIONNAME = "com.appligamer";
 				TargetAttributes = {
 					335B24F02FF7D7FE00323100 = {
-						CreatedOnToolsVersion = 14.3.1;
+						CreatedOnToolsVersion = 15.0;
 					};
 				};
 			};
@@ -137,6 +177,7 @@
 			files = (
 				335B24FC2FF7D7FE00323100 /* MainFlutterWindow.swift in Sources */,
 				335B24FE2FF7D7FE00323100 /* AppDelegate.swift in Sources */,
+				33A11A122FF8000200123456 /* GeneratedPluginRegistrant.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -145,9 +186,15 @@
 /* Begin XCBuildConfiguration section */
 		335B25052FF7D7FE00323100 /* Debug */ = {
 			isa = XCBuildConfiguration;
+			baseConfigurationReference = 33A11A042FF8000100123456 /* Debug.xcconfig */;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CLANG_ANALYZER_NONNULL = YES;
+				CODE_SIGN_ENTITLEMENTS = "Runner/DebugProfile.entitlements";
+				CODE_SIGN_IDENTITY = "-";
+				CODE_SIGN_STYLE = Automatic;
+				COMBINE_HIDPI_IMAGES = YES;
 				COPY_PHASE_STRIP = NO;
 				DEBUG_INFORMATION_FORMAT = dwarf;
 				ENABLE_STRICT_OBJC_MSGSEND = YES;
@@ -159,8 +206,12 @@
 					"DEBUG=1",
 					"$(inherited)",
 				);
-				MACOSX_DEPLOYMENT_TARGET = 10.15;
+				GENERATE_INFOPLIST_FILE = NO;
+				INFOPLIST_FILE = "Runner/Info.plist";
+				MACOSX_DEPLOYMENT_TARGET = 12.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.appligamer.rentenreformGameJAG;
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = DEBUG;
 				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
 				SWIFT_VERSION = 5.0;
 			};
@@ -168,15 +219,24 @@
 		};
 		335B25062FF7D7FE00323100 /* Release */ = {
 			isa = XCBuildConfiguration;
+			baseConfigurationReference = 33A11A052FF8000100123456 /* Release.xcconfig */;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CLANG_ANALYZER_NONNULL = YES;
+				CODE_SIGN_ENTITLEMENTS = "Runner/Release.entitlements";
+				CODE_SIGN_IDENTITY = "-";
+				CODE_SIGN_STYLE = Automatic;
+				COMBINE_HIDPI_IMAGES = YES;
 				COPY_PHASE_STRIP = NO;
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
 				ENABLE_STRICT_OBJC_MSGSEND = YES;
 				ENABLE_NS_ASSERTIONS = NO;
 				GCC_NO_COMMON_BLOCKS = YES;
-				MACOSX_DEPLOYMENT_TARGET = 10.15;
+				GENERATE_INFOPLIST_FILE = NO;
+				INFOPLIST_FILE = "Runner/Info.plist";
+				MACOSX_DEPLOYMENT_TARGET = 12.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.appligamer.rentenreformGameJAG;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_COMPILATION_MODE = wholemodule;
 				SWIFT_OPTIMIZATION_LEVEL = "-O";
@@ -187,16 +247,45 @@
 		33E451522FF7D70000323100 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				PRODUCT_BUNDLE_IDENTIFIER = com.jacobglathe.pensionGameSimulation;
-				PRODUCT_NAME = "pension_game_simulation";
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++17";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = dwarf;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_TESTABILITY = YES;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				MACOSX_DEPLOYMENT_TARGET = 12.0;
+				ONLY_ACTIVE_ARCH = YES;
+				SDKROOT = macosx;
 			};
 			name = Debug;
 		};
 		33E451532FF7D70000323100 /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				PRODUCT_BUNDLE_IDENTIFIER = com.jacobglathe.pensionGameSimulation;
-				PRODUCT_NAME = "pension_game_simulation";
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++17";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				ENABLE_NS_ASSERTIONS = NO;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				MACOSX_DEPLOYMENT_TARGET = 12.0;
+				SDKROOT = macosx;
 			};
 			name = Release;
 		};
@@ -206,8 +295,8 @@
 		335B25072FF7D7FE00323100 /* Build configuration list for PBXNativeTarget "Runner" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
-				33E451522FF7D70000323100 /* Debug */,
-				33E451532FF7D70000323100 /* Release */,
+				335B25052FF7D7FE00323100 /* Debug */,
+				335B25062FF7D7FE00323100 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
@@ -215,8 +304,8 @@
 		33E451512FF7D70000323100 /* Build configuration list for PBXProject "Runner" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
-				335B25052FF7D7FE00323100 /* Debug */,
-				335B25062FF7D7FE00323100 /* Release */,
+				33E451522FF7D70000323100 /* Debug */,
+				33E451532FF7D70000323100 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;

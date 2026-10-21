@@ -1,0 +1,17 @@
+// Application-level settings for the Runner target.
+//
+// This may be replaced with something auto-generated from metadata (e.g., pubspec.yaml) in the
+// future. If not, the values below would default to using the project name.
+
+// The application's name. By default this is also the title of the Flutter window.
+PRODUCT_NAME = pension_game_simulation
+
+// The application's bundle identifier
+PRODUCT_BUNDLE_IDENTIFIER = com.appligamer.rentenreformGameJAG
+
+// The copyright displayed in application information
+PRODUCT_COPYRIGHT = Copyright © 2026 Jacob Glathe & Team. All rights reserved.
+
+// Flutter build name and number fallbacks
+FLUTTER_BUILD_NAME = 1.0.0
+FLUTTER_BUILD_NUMBER = 1

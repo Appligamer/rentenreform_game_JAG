@@ -75,7 +75,7 @@ export const CitizenSimulation: React.FC<CitizenSimulationProps> = ({ macro }) =
       {/* 3 Pillars Overview (Result Cards) */}
       <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
         {/* Säule 1: Gesetzliche Rente */}
-        <div className="p-5 rounded-2xl bg-[#161617] border border-white/10 flex flex-col justify-between">
+        <div className="p-5 rounded-3xl apple-glass-card flex flex-col justify-between">
           <div className="text-xs text-[#86868b] mb-2 flex items-center justify-between">
             <span>1. Säule: Gesetzlich (GRV)</span>
             <ShieldCheck className="w-3.5 h-3.5 text-sky-400" />
@@ -89,7 +89,7 @@ export const CitizenSimulation: React.FC<CitizenSimulationProps> = ({ macro }) =
         </div>
 
         {/* Säule 2: Betriebsrente (bAV) */}
-        <div className="p-5 rounded-2xl bg-[#161617] border border-white/10 flex flex-col justify-between">
+        <div className="p-5 rounded-3xl apple-glass-card flex flex-col justify-between">
           <div className="text-xs text-[#86868b] mb-2 flex items-center justify-between">
             <span>2. Säule: Betrieblich (bAV)</span>
             <Wallet className="w-3.5 h-3.5 text-white/60" />
@@ -103,7 +103,7 @@ export const CitizenSimulation: React.FC<CitizenSimulationProps> = ({ macro }) =
         </div>
 
         {/* Säule 3: Private Aktien/ETF Rente */}
-        <div className="p-5 rounded-2xl bg-[#161617] border border-white/10 flex flex-col justify-between">
+        <div className="p-5 rounded-3xl apple-glass-card flex flex-col justify-between">
           <div className="text-xs text-[#86868b] mb-2 flex items-center justify-between">
             <span>3. Säule: Eigener ETF-Sparplan</span>
             <PiggyBank className="w-3.5 h-3.5 text-amber-400" />
@@ -149,7 +149,7 @@ export const CitizenSimulation: React.FC<CitizenSimulationProps> = ({ macro }) =
       </div>
 
       {/* Parameter Sliders */}
-      <div className="p-6 rounded-2xl bg-[#161617] border border-white/10">
+      <div className="p-6 rounded-3xl apple-glass shadow-xl">
         <h3 className="text-sm font-bold tracking-wide uppercase text-white mb-6">
           Eigene Karriere- & Sparparameter anpassen
         </h3>

@@ -12,6 +12,7 @@ export const DECISION_CARDS: DecisionCard[] = [
     designerNotes:
       'Handzeichnung: Golden schimmernder Setzling, der aus einem Tresor mit Bundesadler wächst und Kurscharts trägt.',
     dimensions: '600 × 900 px (2:3 Ratio)',
+    politicalCapitalCost: 35,
     deltaContributionRate: -0.4,
     deltaPensionLevel: 0.0,
     deltaGenerationFundMrd: 25.0,
@@ -23,12 +24,13 @@ export const DECISION_CARDS: DecisionCard[] = [
     title: 'Haltelinie 48% garantieren',
     subtitle: 'Rentenpaket II Kernversprechen',
     description:
-      'Sichert das gesetzliche Rentenniveau bis mindestens 2039 gesetzlich ab. Verhindert Kaufkraftverlust für Standardrentner.',
+      'Sichert das gesetzliche Rentenniveau bis mindestens 2039 gesetzlich ab. Verhindert Kaufkraftverlust für Standardrentner, belastet aber den Bundeshaushalt.',
     category: 'macro',
     artworkAssetPath: 'assets/images/cards/card_haltelinie_48.png',
     designerNotes:
       'Handzeichnung: Robuster antiker Leuchtturm mit "48%" Gravur, der tosenden Meereswellen standhält.',
     dimensions: '600 × 900 px (2:3 Ratio)',
+    politicalCapitalCost: 30,
     deltaContributionRate: 0.2,
     deltaPensionLevel: 0.8,
     deltaGenerationFundMrd: 0,
@@ -40,12 +42,13 @@ export const DECISION_CARDS: DecisionCard[] = [
     title: 'Renteneintrittsalter auf 68',
     subtitle: 'Demografischer Ausgleich',
     description:
-      'Schrittweise Anhebung des Regelalters um 12 Monate. Erhöht die Zahl aktiver Beitragszahler und verringert die Rentenbezugsdauer.',
+      'Schrittweise Anhebung des Regelalters um 12 Monate. Erhöht die Zahl aktiver Beitragszahler und verringert die Rentenbezugsdauer, erfordert aber hohen politischen Einsatz.',
     category: 'macro',
     artworkAssetPath: 'assets/images/cards/card_retirement_age_68.png',
     designerNotes:
       'Handzeichnung: Kalenderblatt, das nach vorne geblättert wird, daneben Wanderstock und Wegweiser in die Zukunft.',
     dimensions: '600 × 900 px (2:3 Ratio)',
+    politicalCapitalCost: 45,
     deltaContributionRate: -0.7,
     deltaPensionLevel: 0.0,
     deltaGenerationFundMrd: 0,
@@ -63,6 +66,7 @@ export const DECISION_CARDS: DecisionCard[] = [
     designerNotes:
       'Handzeichnung: Vertrauensvoller Handschlag zwischen Arbeitnehmer und Werksleiter vor Fabriksilhouette mit Sparschwein.',
     dimensions: '600 × 900 px (2:3 Ratio)',
+    politicalCapitalCost: 25,
     deltaContributionRate: 0.0,
     deltaPensionLevel: 0.0,
     deltaGenerationFundMrd: 0,
@@ -80,6 +84,7 @@ export const DECISION_CARDS: DecisionCard[] = [
     designerNotes:
       'Handzeichnung: Dynamischer, eleganter Bulle aus Licht- und Chartlinien, der nach oben stürmt.',
     dimensions: '600 × 900 px (2:3 Ratio)',
+    politicalCapitalCost: 20,
     deltaContributionRate: -0.3,
     deltaPensionLevel: 0.0,
     deltaGenerationFundMrd: 15.0,
@@ -97,6 +102,7 @@ export const DECISION_CARDS: DecisionCard[] = [
     designerNotes:
       'Handzeichnung: Gewaltige Meereswelle aus Jahreszahlen (1960–1965), die auf eine schmale Hängebrücke zurollt.',
     dimensions: '600 × 900 px (2:3 Ratio)',
+    politicalCapitalCost: 10,
     deltaContributionRate: 0.5,
     deltaPensionLevel: 0.0,
     deltaGenerationFundMrd: 0,

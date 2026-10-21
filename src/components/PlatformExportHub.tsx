@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Apple, Monitor, Terminal, Copy, Check, FolderGit2, Sparkles } from 'lucide-react';
+import { Apple, Monitor, Terminal, Copy, Check, FolderGit2, Play, Sparkles } from 'lucide-react';
 
 export const PlatformExportHub: React.FC = () => {
   const [copiedKey, setCopiedKey] = useState<string | null>(null);
@@ -10,9 +10,9 @@ export const PlatformExportHub: React.FC = () => {
     setTimeout(() => setCopiedKey(null), 2500);
   };
 
-  const xcodeCmd = `cd ~/pension_game_simulation && open macos/Runner.xcodeproj`;
-  const windowsCmd = `cd %USERPROFILE%\\pension_game_simulation && flutter run -d windows`;
-  const fullGitSyncCmd = `cd ~ && rm -rf pension_game_simulation && git clone https://github.com/JacobGlathe/pension_game_simulation.git pension_game_simulation && cd pension_game_simulation && (open macos/Runner.xcodeproj 2>/dev/null || open .)`;
+  const macCommand = `./START_GAME_MAC.command`;
+  const winCommand = `START_GAME_WINDOWS.exe`;
+  const fullGitSyncCmd = `cd ~ && rm -rf rentenreform_game_JAG && git clone https://github.com/Appligamer/rentenreform_game_JAG.git rentenreform_game_JAG && cd rentenreform_game_JAG && (open macos/Runner.xcodeproj 2>/dev/null || open .)`;
 
   return (
     <div className="space-y-8">
@@ -21,48 +21,52 @@ export const PlatformExportHub: React.FC = () => {
         <div className="flex items-center gap-2 text-xs text-[#86868b] mb-1 font-mono">
           <span>Multiplattform-Architektur</span>
           <span>·</span>
-          <span>Flutter (Dart) & Xcode Runner</span>
+          <span>1-Klick Executables im Überordner</span>
         </div>
         <h1 className="text-3xl font-extrabold tracking-tight text-white">
-          Plattform-Export & Xcode Hub
+          Direktstart für Apple macOS & Windows
         </h1>
         <p className="text-sm text-[#86868b] max-w-2xl mt-1">
-          Das Projekt ist so aufgebaut, dass es nativ auf macOS in Xcode kompiliert,
-          auf Windows als Desktop-App gebaut und live im Web getestet werden kann.
+          Im Hauptordner des Projekts liegen sofort ausführbare Starter für beide Betriebssysteme.
+          Einfach doppelklicken, um das Spiel sofort zu booten.
         </p>
       </div>
 
-      {/* 2 Platform Cards: macOS (Xcode) vs Windows */}
+      {/* Prominent Launchers Row */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-        {/* macOS & Xcode Card */}
-        <div className="p-6 rounded-2xl bg-[#161617] border border-white/10 flex flex-col justify-between">
+        {/* Apple Executable */}
+        <div className="p-6 rounded-3xl bg-gradient-to-br from-[#1c1c1f] via-[#161617] to-[#111113] border border-amber-400/40 flex flex-col justify-between shadow-xl">
           <div>
-            <div className="flex items-center gap-3 mb-4">
-              <div className="p-2.5 rounded-xl bg-white/10 text-white">
-                <Apple className="w-6 h-6" />
+            <div className="flex items-center justify-between mb-4">
+              <div className="flex items-center gap-3">
+                <div className="p-3 rounded-2xl bg-white/10 text-white">
+                  <Apple className="w-6 h-6" />
+                </div>
+                <div>
+                  <h3 className="text-base font-bold text-white">Apple macOS Starter</h3>
+                  <span className="text-xs text-amber-400 font-mono">
+                    START_GAME_MAC.command & .app
+                  </span>
+                </div>
               </div>
-              <div>
-                <h3 className="text-base font-bold text-white">macOS & Xcode</h3>
-                <span className="text-xs text-[#86868b]">
-                  Natives Apple Runner Projekt (Swift / Cocoa)
-                </span>
-              </div>
+              <span className="text-[10px] font-mono bg-amber-400/10 text-amber-400 px-2 py-0.5 rounded font-bold">
+                Nativ macOS
+              </span>
             </div>
 
             <p className="text-xs text-[#86868b] leading-relaxed mb-4">
-              Das Projekt enthält den vollständig konfigurierten Ordner{' '}
-              <code className="text-amber-400 font-mono text-[11px]">macos/Runner.xcodeproj</code>.
-              Du kannst das Projekt mit einem Klick in Xcode öffnen, App-Icons einbinden,
-              Signieren und als native Mac-App deployen.
+              Liegt direkt im Hauptverzeichnis. Durch Doppelklick im macOS Finder wird
+              automatisch das korrigierte Xcode-Projekt <code className="text-white font-mono text-[11px]">macos/Runner.xcodeproj</code> geöffnet
+              oder das Spiel im Desktop-Modus gestartet.
             </p>
 
-            <div className="p-3.5 rounded-xl bg-black border border-white/10 font-mono text-xs text-[#f5f5f7] mb-4 flex items-center justify-between">
-              <span className="truncate">{xcodeCmd}</span>
+            <div className="p-3.5 rounded-xl bg-black border border-white/10 font-mono text-xs text-amber-400 mb-4 flex items-center justify-between">
+              <span className="truncate">{macCommand}</span>
               <button
-                onClick={() => copyCommand(xcodeCmd, 'xcode')}
+                onClick={() => copyCommand(macCommand, 'mac')}
                 className="ml-2 p-1.5 text-[#86868b] hover:text-white rounded"
               >
-                {copiedKey === 'xcode' ? (
+                {copiedKey === 'mac' ? (
                   <Check className="w-4 h-4 text-emerald-400" />
                 ) : (
                   <Copy className="w-4 h-4" />
@@ -72,36 +76,40 @@ export const PlatformExportHub: React.FC = () => {
           </div>
 
           <div className="text-[11px] text-[#6e6e73] space-y-1">
-            <div>1. In Terminal ausführen oder direkt im Finder doppelklicken.</div>
-            <div>2. Target "Runner" auswählen und mit <kbd className="text-white">Cmd + R</kbd> starten.</div>
+            <div>· Doppelklick auf <strong className="text-white">START_GAME_MAC.command</strong> im Finder.</div>
+            <div>· Alternativ: <strong className="text-white">GenerationZukunft.app</strong> direkt starten.</div>
           </div>
         </div>
 
-        {/* Windows Card */}
-        <div className="p-6 rounded-2xl bg-[#161617] border border-white/10 flex flex-col justify-between">
+        {/* Windows Executable */}
+        <div className="p-6 rounded-3xl bg-gradient-to-br from-[#1c1c1f] via-[#161617] to-[#111113] border border-sky-400/40 flex flex-col justify-between shadow-xl">
           <div>
-            <div className="flex items-center gap-3 mb-4">
-              <div className="p-2.5 rounded-xl bg-white/10 text-white">
-                <Monitor className="w-6 h-6" />
+            <div className="flex items-center justify-between mb-4">
+              <div className="flex items-center gap-3">
+                <div className="p-3 rounded-2xl bg-white/10 text-white">
+                  <Monitor className="w-6 h-6 text-sky-400" />
+                </div>
+                <div>
+                  <h3 className="text-base font-bold text-white">Windows Starter</h3>
+                  <span className="text-xs text-sky-400 font-mono">
+                    START_GAME_WINDOWS.exe & .bat
+                  </span>
+                </div>
               </div>
-              <div>
-                <h3 className="text-base font-bold text-white">Windows Desktop</h3>
-                <span className="text-xs text-[#86868b]">
-                  C++ Desktop Runner via CMake
-                </span>
-              </div>
+              <span className="text-[10px] font-mono bg-sky-400/10 text-sky-400 px-2 py-0.5 rounded font-bold">
+                Nativ Windows .exe
+              </span>
             </div>
 
             <p className="text-xs text-[#86868b] leading-relaxed mb-4">
-              Die Windows-Version nutzt den nativen C++-Desktop-Runner unter{' '}
-              <code className="text-amber-400 font-mono text-[11px]">windows/CMakeLists.txt</code>.
-              Kompiliert für Windows 10/11 mit 60/120 FPS ohne Browser-Overhead.
+              Liegt als eigenständige Binärdatei <code className="text-white font-mono text-[11px]">START_GAME_WINDOWS.exe</code> direkt
+              im Hauptverzeichnis. Ein Doppelklick bootet das Spiel auf Windows 10/11 sofort.
             </p>
 
-            <div className="p-3.5 rounded-xl bg-black border border-white/10 font-mono text-xs text-[#f5f5f7] mb-4 flex items-center justify-between">
-              <span className="truncate">{windowsCmd}</span>
+            <div className="p-3.5 rounded-xl bg-black border border-white/10 font-mono text-xs text-sky-400 mb-4 flex items-center justify-between">
+              <span className="truncate">{winCommand}</span>
               <button
-                onClick={() => copyCommand(windowsCmd, 'win')}
+                onClick={() => copyCommand(winCommand, 'win')}
                 className="ml-2 p-1.5 text-[#86868b] hover:text-white rounded"
               >
                 {copiedKey === 'win' ? (
@@ -114,8 +122,8 @@ export const PlatformExportHub: React.FC = () => {
           </div>
 
           <div className="text-[11px] text-[#6e6e73] space-y-1">
-            <div>1. Visual Studio mit C++ Workload installiert.</div>
-            <div>2. <code className="text-white">flutter run -d windows</code> ausführen.</div>
+            <div>· Doppelklick auf <strong className="text-white">START_GAME_WINDOWS.exe</strong> in Windows.</div>
+            <div>· Alternativ: <strong className="text-white">start_game_windows.bat</strong> ausführen.</div>
           </div>
         </div>
       </div>
@@ -162,25 +170,23 @@ export const PlatformExportHub: React.FC = () => {
         <div className="flex items-center gap-2 mb-4">
           <FolderGit2 className="w-4 h-4 text-white" />
           <h3 className="text-sm font-bold text-white tracking-tight">
-            Projektstruktur im Repository
+            Projektstruktur im Hauptordner (Root)
           </h3>
         </div>
 
         <pre className="font-mono text-xs text-[#86868b] leading-relaxed bg-black/50 p-4 rounded-xl border border-white/5 overflow-x-auto">
-{`pension_game_simulation/
+{`rentenreform_game_JAG/
+├── START_GAME_MAC.command             # 🍎 Apple macOS 1-Klick-Starter (Doppelklickbar)
+├── GenerationZukunft.app              # 🍎 Nativer macOS App-Bundle Ordner
+├── START_GAME_WINDOWS.exe             # 🪟 Windows PE 1-Klick-Starter (Nativ .exe)
+├── start_game_windows.bat             # 🪟 Windows Batch Starter
+├── macos/                             # 🍎 Xcode Runner Projekt (MACOSX_DEPLOYMENT_TARGET 11.0 & Info.plist)
+│   └── Runner.xcodeproj
+├── windows/                           # 🪟 C++ Windows Desktop Runner
+│   └── runner/
 ├── system_prompt.md                   # Dauerhafter System-Prompt des Teams
 ├── graphic_designer_briefing.md       # Vollständiges Handzeichnungs-Briefing
-├── pubspec.yaml                       # Flutter Multiplattform Dependencies
-├── README.md                          # Dokumentation & Quickstart
-├── macos/                             # Natives macOS Xcode Projekt
-│   └── Runner.xcodeproj               # Direkt mit 'open macos/Runner.xcodeproj' öffenbar
-├── windows/                           # C++ Windows Desktop Runner
-│   └── CMakeLists.txt
-└── lib/                               # Dart Spiel- & Simulationscode
-    ├── main.dart                      # Einstiegspunkt
-    ├── simulation/                    # Rentenpaket II & Generationenkapital Formeln
-    ├── models/                        # MacroState, CitizenProfile, DecisionCards
-    └── ui/screens/                    # GameBoardScreen & HandDrawnSlots`}
+└── pension_game_simulation/           # Flutter Multiplattform Quellcode`}
         </pre>
       </div>
     </div>

@@ -1,1 +1,42 @@
 @import "tailwindcss";
+
+@layer utilities {
+  .apple-glass {
+    background: rgba(22, 22, 24, 0.65);
+    backdrop-filter: blur(24px);
+    -webkit-backdrop-filter: blur(24px);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    box-shadow: 0 16px 32px rgba(0, 0, 0, 0.5), inset 0 1px 0 rgba(255, 255, 255, 0.12);
+  }
+
+  .apple-glass-card {
+    background: linear-gradient(135deg, rgba(255, 255, 255, 0.04) 0%, rgba(255, 255, 255, 0.01) 100%);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    box-shadow: 0 12px 28px rgba(0, 0, 0, 0.4), inset 0 1px 0 rgba(255, 255, 255, 0.1);
+  }
+
+  .apple-glass-card:hover {
+    border-color: rgba(255, 255, 255, 0.18);
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.6), inset 0 1px 0 rgba(255, 255, 255, 0.2);
+  }
+
+  .apple-hud-ring {
+    stroke-dasharray: 251.2;
+    transform: rotate(-90deg);
+    transform-origin: 50% 50%;
+    transition: stroke-dashoffset 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+  }
+}
+
+/* Apple Obsidian Canvas */
+body {
+  background-color: #000000;
+  background-image: 
+    radial-gradient(circle at 50% -10%, rgba(245, 158, 11, 0.09) 0%, transparent 60%),
+    radial-gradient(circle at 10% 80%, rgba(56, 189, 248, 0.04) 0%, transparent 40%);
+  background-attachment: fixed;
+  color: #f5f5f7;
+  font-feature-settings: "cv02", "cv03", "cv04", "cv11";
+}

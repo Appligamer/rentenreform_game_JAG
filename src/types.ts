@@ -12,6 +12,49 @@ export interface MacroState {
   fundPayoutToGRV: number; // In Mrd. €
 }
 
+export type GameStatus = 'playing' | 'victory' | 'game_over';
+
+export type GameOverReason =
+  | 'youth_revolt' // Beitragssatz > 22.4% -> Jugend streikt / wandert ab
+  | 'pensioner_poverty' // Haltelinie gebrochen, Rentenniveau < 46.5% -> Massenproteste
+  | 'state_insolvency' // Nachhaltigkeitsrücklage auf 0 -> Zahlungsunfähigkeit
+  | null;
+
+export type DifficultyLevel = 'normal' | 'hard' | 'hardcore';
+
+export interface GameMetrics {
+  youthSatisfaction: number; // 0 - 100 %
+  retireeSatisfaction: number; // 0 - 100 %
+  reserveMonths: number; // 0.0 - 3.0 Monate Nachhaltigkeitsrücklage
+  politicalCapital: number; // 0 - 100 Aktionspunkte
+  score: number;
+  difficulty: DifficultyLevel;
+}
+
+export interface DilemmaOption {
+  id: string;
+  label: string;
+  summary: string;
+  consequences: {
+    contributionRateDelta?: number;
+    pensionLevelDelta?: number;
+    generationCapitalDeltaMrd?: number;
+    retirementAgeDeltaMonths?: number;
+    youthDelta?: number;
+    retireeDelta?: number;
+    reserveDeltaMonths?: number;
+    capitalCost?: number;
+  };
+}
+
+export interface AnnualDilemma {
+  year: number;
+  title: string;
+  context: string;
+  historicalContext: string;
+  options: DilemmaOption[];
+}
+
 export interface CitizenProfile {
   name: string;
   age: number;
@@ -33,6 +76,7 @@ export interface DecisionCard {
   artworkAssetPath: string;
   designerNotes: string;
   dimensions: string;
+  politicalCapitalCost: number; // Kostet Aktionspunkte!
   deltaContributionRate: number;
   deltaPensionLevel: number;
   deltaGenerationFundMrd: number;
