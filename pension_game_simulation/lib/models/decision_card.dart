@@ -12,15 +12,20 @@ class DecisionCard {
   final String subtitle;
   final String description;
   final CardCategory category;
-  final String artworkAssetPath; // z.B. assets/images/cards/card_generationenkapital_boost.png
-  final String requiredSketchNotes; // Anweisung für den Illustrator solange Handzeichnung fehlt
+  final String artworkAssetPath;
+  final String requiredSketchNotes;
 
-  // Mathematische Effekte auf die Simulation
-  final double deltaContributionRate; // Veränderung Beitragssatz (z.B. -0.4 %)
-  final double deltaPensionLevel;     // Veränderung Rentenniveau (z.B. +0.5 %)
-  final double deltaGenerationFundMrd; // Einzahlung in Mrd. € ins Generationenkapital
-  final double deltaRetirementAge;    // Verschiebung Rentenalter
-  final double deltaFederalSubsidyMrd; // Bundeszuschuss-Änderung in Mrd. €
+  // Kosten & strategische Wirkung
+  final int politicalCapitalCost;
+  final double deltaContributionRate;
+  final double deltaPensionLevel;
+  final double deltaGenerationFundMrd;
+  final double deltaRetirementAge;
+  final double deltaFederalSubsidyMrd;
+  final int deltaYouthSatisfaction;
+  final int deltaRetireeSatisfaction;
+  final int marketBoostYears;
+  final double marketBoostPercent;
 
   const DecisionCard({
     required this.id,
@@ -30,10 +35,15 @@ class DecisionCard {
     required this.category,
     required this.artworkAssetPath,
     required this.requiredSketchNotes,
+    this.politicalCapitalCost = 20,
     this.deltaContributionRate = 0.0,
     this.deltaPensionLevel = 0.0,
     this.deltaGenerationFundMrd = 0.0,
     this.deltaRetirementAge = 0.0,
     this.deltaFederalSubsidyMrd = 0.0,
+    this.deltaYouthSatisfaction = 0,
+    this.deltaRetireeSatisfaction = 0,
+    this.marketBoostYears = 0,
+    this.marketBoostPercent = 0.0,
   });
 }

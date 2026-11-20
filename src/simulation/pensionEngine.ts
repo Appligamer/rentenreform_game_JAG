@@ -1,10 +1,17 @@
-import { MacroState, CitizenProfile } from '../types';
+import { MacroState, CitizenProfile, PolicyModifiers } from '../types';
+import { DemographyModel } from './demographyModel';
+import { GenerationCapitalEngine } from './generationCapitalEngine';
+
+/**
+ * Kalibrierungsfaktoren für die Deutsche Rentenversicherung (2026):
+ * - Erwerbstätige gesamt (45,5 Mio.) vs. beitragspflichtiges Entgeltvolumen (~84,6 % Anteil)
+ * - Gesamtausgaben GRV inkl. KVdR, Reha und Hinterbliebenenrenten (~1,215x Standardrenten-Basis)
+ * Damit startet 2026 exakt bei 18,6 % Beitragssatz und steigt ohne Reformen bis Mitte 2030er auf > 22,3 %.
+ */
+const GRV_EXPENSE_CALIBRATION = 1.215;
+const EFFECTIVE_WAGE_SHARE = 0.846;
 
 export class PensionMathEngine {
-  /**
-   * Startzustand für 2026 basierend auf Daten der Deutschen Rentenversicherung
-   * und den Annahmen des Bundesfinanzministeriums zum Rentenpaket II.
-   */
   static getInitialState(): MacroState {
     return {
       year: 2026,
@@ -21,112 +28,122 @@ export class PensionMathEngine {
     };
   }
 
-  /**
-   * Berechnet den demografischen Verlauf für Beitragszahler & Rentner
-   */
-  static getDemography(year: number): { contributors: number; pensioners: number } {
-    if (year <= 2026) return { contributors: 45.5, pensioners: 21.2 };
-    const progress = Math.min(1.0, Math.max(0.0, (year - 2026) / 14.0));
-    // Sigmoider Übergang durch den Ruhestand der geburtenstarken Jahrgänge 1955-1969
-    const sigmoid = 1 / (1 + Math.exp(-6 * (progress - 0.5)));
-    const contributors = 45.5 - 4.3 * sigmoid;
-    const pensioners = 21.2 + 4.6 * sigmoid;
-    return { contributors, pensioners };
+  static getInitialModifiers(): PolicyModifiers {
+    return {
+      extraCapitalCreditMrd: 0,
+      retirementShiftMonths: 0,
+      structuralContributionDelta: 0,
+      structuralPensionLevelDelta: 0,
+      recurringFederalSubsidyDeltaMrd: 0,
+      marketBoostYearsRemaining: 0,
+      marketBoostPercent: 0,
+      forceHaltelinie48: true,
+    };
   }
 
-  /**
-   * Führt einen Runden-Schritt um 1 Jahr aus
-   */
+  static getDemography(year: number): { contributors: number; pensioners: number } {
+    const d = DemographyModel.getDemography(year);
+    return { contributors: d.contributors, pensioners: d.pensioners };
+  }
+
   static stepYear(
     current: MacroState,
     options: {
       extraCapitalCreditMrd: number;
       marketReturnOverride?: number;
+      loanInterestRatePercent?: number;
       retirementAgeShiftMonths: number;
       federalSubsidyDeltaMrd: number;
+      structuralContributionDelta?: number;
+      structuralPensionLevelDelta?: number;
       forceHaltelinie48: boolean;
     }
   ): MacroState {
     const nextYear = current.year + 1;
-    const { contributors: rawContributors, pensioners: rawPensioners } =
-      this.getDemography(nextYear);
+    const rawDemo = DemographyModel.getDemography(nextYear);
 
-    // Auswirkung einer Anhebung des Rentenalters
-    const shiftEffect = (options.retirementAgeShiftMonths / 12.0) * 0.45;
-    const contributors = rawContributors + shiftEffect;
-    const pensioners = Math.max(18.0, rawPensioners - shiftEffect);
-
-    // Generationenkapital Berechnung
-    const yearsSince2024 = Math.max(0, nextYear - 2024);
-    // Gesetzliche 12 Mrd. € + 3% Dynamik
-    const legalCredit = 12.0 * Math.pow(1.03, yearsSince2024);
-    const totalCreditInflow = legalCredit + options.extraCapitalCreditMrd;
+    // Anhebung des Rentenalters erhöht Beitragszahler und reduziert Rentenbezieher
+    const shiftEffect = (options.retirementAgeShiftMonths / 12.0) * 0.55;
+    const contributors = Math.max(36.0, rawDemo.contributors + shiftEffect);
+    const pensioners = Math.max(18.0, rawDemo.pensioners - shiftEffect);
 
     const marketReturn = options.marketReturnOverride ?? current.marketReturnPercent;
-    const loanInterestRate = 2.6; // Refinanzierung Bund
-    const netReturnRate = (marketReturn - loanInterestRate) / 100.0;
-    const fundGrowth = current.generationCapitalFund * netReturnRate;
+    const loanRate = options.loanInterestRatePercent ?? 2.6;
 
-    // Ausschüttung an die GRV zur Beitragsdämpfung ab 2035
-    let payoutToGRV = 0.0;
-    if (nextYear >= 2035 && current.generationCapitalFund > 70.0) {
-      payoutToGRV = Math.min(10.0, current.generationCapitalFund * 0.045);
-    }
+    const fundResult = GenerationCapitalEngine.stepFund({
+      currentFundMrd: current.generationCapitalFund,
+      nextYear,
+      marketReturnPercent: marketReturn,
+      loanInterestRatePercent: loanRate,
+      extraCreditMrd: options.extraCapitalCreditMrd,
+    });
 
-    const nextFund = Math.max(
-      0.0,
-      current.generationCapitalFund + fundGrowth + totalCreditInflow - payoutToGRV
-    );
-
-    // Lohn- und Rentenwertentwicklung (+2.2% p.a.)
+    // Lohn- und Rentenwertentwicklung (+2,2 % p.a.)
     const nextSalary = Math.round(current.averageGrossSalary * 1.022);
     const nextPensionValue = Number((current.currentPensionValue * 1.022).toFixed(2));
 
-    // Bundeszuschuss
+    // Bundeszuschuss folgt gemäß § 213 SGB VI (~3,0 % p.a.) plus einmalige gesetzliche Erhöhungsstufe
     const nextFederalSubsidy = Number(
-      (current.federalSubsidy * 1.025 + options.federalSubsidyDeltaMrd).toFixed(1)
+      Math.max(80.0, current.federalSubsidy * 1.030 + options.federalSubsidyDeltaMrd).toFixed(1)
     );
 
-    // Gesamtausgaben der Rentenversicherung (in Mrd. €)
-    const annualSpendMrd =
+    // Gesamtausgaben der GRV (in Mrd. €)
+    const rawPensionSpendMrd =
       (pensioners * (nextPensionValue * 36.0 * 12.0)) / 1000.0;
+    const annualSpendMrd = rawPensionSpendMrd * GRV_EXPENSE_CALIBRATION;
 
     // Zu deckende Ausgaben über Beiträge
     const neededContributionSpend = Math.max(
-      100.0,
-      annualSpendMrd - nextFederalSubsidy - payoutToGRV
+      120.0,
+      annualSpendMrd - nextFederalSubsidy - fundResult.payoutToGRVMrd
     );
 
-    // Beitragsbemessungsgrundlage
-    const wageBaseMrd = (contributors * nextSalary) / 1000.0;
+    // Beitragspflichtige Lohnsumme (in Mrd. €)
+    const wageBaseMrd = (contributors * nextSalary * EFFECTIVE_WAGE_SHARE) / 1000.0;
 
-    // Erforderlicher mathematischer Beitragssatz
-    let calculatedRate = (neededContributionSpend / wageBaseMrd) * 100.0;
+    // Basis-Beitragssatz + strukturelle politische Modifikatoren
+    const rawRate = (neededContributionSpend / wageBaseMrd) * 100.0;
+    const structuralRateDelta = options.structuralContributionDelta ?? 0;
 
-    // Haltelinie Rentenniveau
-    let nextPensionLevel = 48.0;
-    if (!options.forceHaltelinie48 && nextYear > 2039) {
-      nextPensionLevel = Number((48.0 - 0.2 * (nextYear - 2039)).toFixed(1));
+    // Haltelinie & Niveau-Berechnung
+    let basePensionLevel = 48.0;
+    if (!options.forceHaltelinie48) {
+      // Ohne Haltelinie wirkt der Nachhaltigkeitsfaktor ab sofort leicht dämpfend auf das Niveau (senkt Beitragssatz)
+      const yearsWithoutLock = Math.max(1, nextYear - 2026);
+      basePensionLevel = Math.max(44.5, 48.0 - 0.16 * Math.min(12, yearsWithoutLock));
+    } else if (nextYear > 2039) {
+      basePensionLevel = Math.max(45.5, 48.0 - 0.15 * (nextYear - 2039));
     }
+
+    const finalPensionLevel = Number(
+      Math.max(
+        42.0,
+        Math.min(52.0, basePensionLevel + (options.structuralPensionLevelDelta ?? 0))
+      ).toFixed(1)
+    );
+
+    // Wenn Haltelinie deaktiviert ist, dämpft das sinkende Rentenniveau den Beitragssatz
+    const haltelinieSavingsRate = (48.0 - finalPensionLevel) * 0.38;
+    const calculatedRate = Math.max(
+      16.0,
+      rawRate + structuralRateDelta - haltelinieSavingsRate
+    );
 
     return {
       year: nextYear,
       contributorsCount: Number(contributors.toFixed(2)),
       pensionersCount: Number(pensioners.toFixed(2)),
       contributionRate: Number(calculatedRate.toFixed(2)),
-      pensionLevel: nextPensionLevel,
-      generationCapitalFund: Number(nextFund.toFixed(1)),
-      marketReturnPercent: marketReturn,
+      pensionLevel: finalPensionLevel,
+      generationCapitalFund: fundResult.nextFundMrd,
+      marketReturnPercent: Number(marketReturn.toFixed(1)),
       federalSubsidy: nextFederalSubsidy,
       averageGrossSalary: nextSalary,
       currentPensionValue: nextPensionValue,
-      fundPayoutToGRV: Number(payoutToGRV.toFixed(2)),
+      fundPayoutToGRV: fundResult.payoutToGRVMrd,
     };
   }
 
-  /**
-   * Berechnet den individuellen Rentenstatus für einen Bürger
-   */
   static calculateCitizen(
     profile: CitizenProfile,
     macro: MacroState
@@ -138,29 +155,22 @@ export class PensionMathEngine {
     targetPensionMonthly: number;
     pensionGapMonthly: number;
   } {
-    // Gesetzliche Rente = Entgeltpunkte × Rentenwert
+    // Gesetzliche Rente berücksichtigt auch aktuelles Rentenniveau relativ zu 48%
+    const levelAdjustment = macro.pensionLevel / 48.0;
     const statutoryPensionMonthly = Math.round(
-      profile.accumulatedPoints * macro.currentPensionValue
+      profile.accumulatedPoints * macro.currentPensionValue * levelAdjustment
     );
 
-    // Privatrente aus Depot (4% Entnahmerate)
     const privatePensionMonthly = Math.round(
       (profile.etfPortfolioValue * 0.04) / 12.0
     );
 
-    // Betriebsrente
-    const bavPensionMonthly = Math.round(
-      profile.bavMonthlySavings * 3.2
-    );
+    const bavPensionMonthly = Math.round(profile.bavMonthlySavings * 3.2);
 
     const totalPensionMonthly =
       statutoryPensionMonthly + privatePensionMonthly + bavPensionMonthly;
 
-    // Ziel: 75% des aktuellen Nettogehalts (ca. 60% vom Brutto)
-    const targetPensionMonthly = Math.round(
-      (profile.grossIncome * 0.58) / 12.0
-    );
-
+    const targetPensionMonthly = Math.round((profile.grossIncome * 0.58) / 12.0);
     const pensionGapMonthly = targetPensionMonthly - totalPensionMonthly;
 
     return {

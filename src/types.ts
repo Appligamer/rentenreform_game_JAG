@@ -15,12 +15,45 @@ export interface MacroState {
 export type GameStatus = 'playing' | 'victory' | 'game_over';
 
 export type GameOverReason =
-  | 'youth_revolt' // Beitragssatz > 22.4% -> Jugend streikt / wandert ab
-  | 'pensioner_poverty' // Haltelinie gebrochen, Rentenniveau < 46.5% -> Massenproteste
-  | 'state_insolvency' // Nachhaltigkeitsrücklage auf 0 -> Zahlungsunfähigkeit
+  | 'youth_revolt'
+  | 'pensioner_poverty'
+  | 'state_insolvency'
   | null;
 
 export type DifficultyLevel = 'normal' | 'hard' | 'hardcore';
+
+export type AwardTier = 'gold' | 'silver' | 'bronze';
+
+export interface DifficultyConfig {
+  id: DifficultyLevel;
+  label: string;
+  shortDescription: string;
+  startingPoliticalCapital: number;
+  startingReserveMonths: number;
+  startingYouthSatisfaction: number;
+  startingRetireeSatisfaction: number;
+  maxContributionRate: number;
+  minPensionLevel: number;
+  ratePenaltyThreshold: number;
+  youthPenaltyMultiplier: number;
+  retireePenaltyMultiplier: number;
+  reserveBurnBase: number;
+  capitalRegenGood: number;
+  capitalRegenLow: number;
+  loanInterestRate: number;
+  marketShocks: Record<number, { returnPercent: number; label: string }>;
+}
+
+export interface PolicyModifiers {
+  extraCapitalCreditMrd: number; // Einmaliger Zusatzkredit für die nächste Runde
+  retirementShiftMonths: number; // Kumulierte Erhöhung Renteneintrittsalter (Monate)
+  structuralContributionDelta: number; // Dauerhafte Entlastung/Belastung (%-Punkte)
+  structuralPensionLevelDelta: number; // Dauerhafte Niveau-Verschiebung (%-Punkte)
+  recurringFederalSubsidyDeltaMrd: number; // Jährlicher Zusatz-Bundeszuschuss
+  marketBoostYearsRemaining: number; // Temporärer Rendite-Boost (z. B. Tech-Boom)
+  marketBoostPercent: number;
+  forceHaltelinie48: boolean;
+}
 
 export interface GameMetrics {
   youthSatisfaction: number; // 0 - 100 %
@@ -31,20 +64,23 @@ export interface GameMetrics {
   difficulty: DifficultyLevel;
 }
 
+export interface DilemmaConsequences {
+  contributionRateDelta?: number; // Strukturell wirksam über Folgejahre (abgeschwächt) + Soforteffekt
+  pensionLevelDelta?: number;
+  generationCapitalDeltaMrd?: number;
+  retirementAgeDeltaMonths?: number;
+  federalSubsidyDeltaMrd?: number;
+  youthDelta?: number;
+  retireeDelta?: number;
+  reserveDeltaMonths?: number;
+  capitalCost?: number;
+}
+
 export interface DilemmaOption {
   id: string;
   label: string;
   summary: string;
-  consequences: {
-    contributionRateDelta?: number;
-    pensionLevelDelta?: number;
-    generationCapitalDeltaMrd?: number;
-    retirementAgeDeltaMonths?: number;
-    youthDelta?: number;
-    retireeDelta?: number;
-    reserveDeltaMonths?: number;
-    capitalCost?: number;
-  };
+  consequences: DilemmaConsequences;
 }
 
 export interface AnnualDilemma {
@@ -52,7 +88,15 @@ export interface AnnualDilemma {
   title: string;
   context: string;
   historicalContext: string;
+  isMilestone?: boolean;
   options: DilemmaOption[];
+}
+
+export interface TurnFeedback {
+  year: number;
+  headline: string;
+  marketNote?: string;
+  severity: 'info' | 'warning' | 'positive';
 }
 
 export interface CitizenProfile {
@@ -76,12 +120,16 @@ export interface DecisionCard {
   artworkAssetPath: string;
   designerNotes: string;
   dimensions: string;
-  politicalCapitalCost: number; // Kostet Aktionspunkte!
+  politicalCapitalCost: number;
   deltaContributionRate: number;
   deltaPensionLevel: number;
   deltaGenerationFundMrd: number;
   deltaRetirementAgeMonths: number;
   deltaFederalSubsidyMrd: number;
+  deltaYouthSatisfaction?: number;
+  deltaRetireeSatisfaction?: number;
+  marketBoostYears?: number;
+  marketBoostPercent?: number;
 }
 
 export interface DesignerAssetSpec {
@@ -94,4 +142,10 @@ export interface DesignerAssetSpec {
   format: string;
   mood: string;
   instruction: string;
+}
+
+export interface ToastNotice {
+  id: number;
+  message: string;
+  type: 'info' | 'warning' | 'success';
 }

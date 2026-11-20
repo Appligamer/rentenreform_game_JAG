@@ -26,6 +26,9 @@ class HandDrawnSlot extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final effectiveRadius = borderRadius ?? BorderRadius.circular(12);
+    final sizeLabel = (width.isFinite && height.isFinite)
+        ? '${width.toInt()}×${height.toInt()} px · Handzeichnung'
+        : 'Responsive · Handzeichnung';
 
     return ClipRRect(
       borderRadius: effectiveRadius,
@@ -44,13 +47,13 @@ class HandDrawnSlot extends StatelessWidget {
             // Blueprint-Wireframe für den Grafikdesigner
             return Container(
               padding: const EdgeInsets.all(12),
-              decoration: BoxDecoration(
+              decoration: const BoxDecoration(
                 gradient: LinearGradient(
                   begin: Alignment.topLeft,
                   end: Alignment.bottomRight,
                   colors: [
-                    const Color(0xFF161619),
-                    const Color(0xFF0D0D0F),
+                    Color(0xFF161619),
+                    Color(0xFF0D0D0F),
                   ],
                 ),
               ),
@@ -61,7 +64,7 @@ class HandDrawnSlot extends StatelessWidget {
                   Icon(
                     Icons.brush_outlined,
                     size: 28,
-                    color: AppTheme.goldAccent.withOpacity(0.8),
+                    color: AppTheme.goldAccent.withAlpha(204),
                   ),
                   const SizedBox(height: 8),
                   Text(
@@ -75,7 +78,7 @@ class HandDrawnSlot extends StatelessWidget {
                   ),
                   const SizedBox(height: 4),
                   Text(
-                    '${width.toInt()}×${height.toInt()} px · Handzeichnung',
+                    sizeLabel,
                     style: const TextStyle(
                       fontSize: 10,
                       fontFamily: 'monospace',
@@ -90,7 +93,7 @@ class HandDrawnSlot extends StatelessWidget {
                     overflow: TextOverflow.ellipsis,
                     style: TextStyle(
                       fontSize: 9,
-                      color: AppTheme.textSecondary.withOpacity(0.9),
+                      color: AppTheme.textSecondary.withAlpha(230),
                     ),
                   ),
                 ],

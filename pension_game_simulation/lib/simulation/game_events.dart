@@ -1,82 +1,107 @@
 import '../models/decision_card.dart';
 
-/// Vordefinierte Ereignis-, Reform- und Stresstest-Karten für den Spielverlauf.
+/// Vordefinierte strategische Reformkarten für den Spielverlauf (econo=me Kampagne).
 class GameEventsCatalog {
   static List<DecisionCard> getAvailableCards() {
-    return [
-      const DecisionCard(
-        id: 'gen_kapital_turbo',
+    return const [
+      DecisionCard(
+        id: 'card_gen_turbo',
         title: 'Generationenkapital-Turbo',
-        subtitle: 'Kreditvolumen verdoppeln',
+        subtitle: '+25 Mrd. € Fondsvolumen sofort',
         description:
-            'Der Bund nimmt zusätzliche 20 Mrd. € Kredite auf, um den globalen Aktienstock rascher aufzubauen.',
+            'Zusätzliche Bundesanleihen dotieren den globalen Aktienfonds frühzeitig. Maximiert die Entlastungs-Ausschüttung ab 2035.',
         category: CardCategory.generationCapital,
         artworkAssetPath: 'assets/images/cards/card_generationenkapital_boost.png',
         requiredSketchNotes:
             'Handzeichnung: Stilisierter Baum aus Bundesadler-Tresor mit wachsenden Goldmünzen/Charts.',
-        deltaGenerationFundMrd: 20.0,
-        deltaContributionRate: -0.3,
+        politicalCapitalCost: 24,
+        deltaGenerationFundMrd: 25.0,
+        deltaContributionRate: -0.25,
+        deltaYouthSatisfaction: 5,
       ),
-      const DecisionCard(
-        id: 'haltelinie_garantie',
-        title: 'Haltelinie 48% zementieren',
+      DecisionCard(
+        id: 'card_haltelinie_48',
+        title: 'Haltelinie 48 % absichern',
         subtitle: 'Rentenpaket II Kernversprechen',
         description:
-            'Verhindert Absinken des Rentenniveaus unter 48%. Schützt Rentner vor Kaufkraftverlust, erfordert aber höhere Deckung.',
+            'Garantiert Kaufkraftschutz für Standardrentner durch gezielten Bundeszuschuss (+6 Mrd. €/Jahr) und +0,6 % Niveau-Puffer.',
         category: CardCategory.macroReform,
         artworkAssetPath: 'assets/images/cards/card_haltelinie_48.png',
         requiredSketchNotes:
             'Handzeichnung: Majestätischer Leuchtturm mit 48%-Markierung, der Wellen trotzt.',
-        deltaPensionLevel: 0.5,
+        politicalCapitalCost: 22,
+        deltaContributionRate: 0.1,
+        deltaPensionLevel: 0.6,
+        deltaFederalSubsidyMrd: 6.0,
+        deltaYouthSatisfaction: -2,
+        deltaRetireeSatisfaction: 10,
       ),
-      const DecisionCard(
-        id: 'rente_mit_68',
-        title: 'Renteneintrittsalter auf 68',
-        subtitle: 'Demografische Anpassung',
+      DecisionCard(
+        id: 'card_retirement_68',
+        title: 'Lebensarbeitszeit koppeln',
+        subtitle: '+12 Monate Eintrittsalter & -0,55 % Beitrag',
         description:
-            'Kopplung der Lebensarbeitszeit an die steigende Lebenserwartung entlastet die Rentenkasse spürbar.',
+            'Schrittweise Anpassung der Regelaltersgrenze an die steigende Lebenserwartung. Enorme Entlastung der Beitragszahler.',
         category: CardCategory.macroReform,
         artworkAssetPath: 'assets/images/cards/card_retirement_age_68.png',
         requiredSketchNotes:
             'Handzeichnung: Kalender mit Jahreszahlen 2030+ und Wegweiser zu längerem Erwerbsleben.',
+        politicalCapitalCost: 30,
         deltaRetirementAge: 12.0,
-        deltaContributionRate: -0.6,
+        deltaContributionRate: -0.55,
+        deltaYouthSatisfaction: 9,
+        deltaRetireeSatisfaction: -10,
       ),
-      const DecisionCard(
-        id: 'boersen_rallye',
-        title: 'Globaler Tech-Boom',
-        subtitle: 'Kapitalmarktrendite springt auf 9.5%',
+      DecisionCard(
+        id: 'card_bav_matching',
+        title: 'Betriebsrenten-Pflichtzuschuss',
+        subtitle: 'Stärkung der 2. & 3. Säule',
         description:
-            'Hohe Kursgewinne an den Weltbörsen lassen das Generationenkapital überdurchschnittlich stark wachsen.',
-        category: CardCategory.externalEvent,
-        artworkAssetPath: 'assets/images/cards/card_market_bull.png',
-        requiredSketchNotes:
-            'Handzeichnung: Leuchtender Bulle aus Kurven und Datenpunkten.',
-        deltaContributionRate: -0.2,
-      ),
-      const DecisionCard(
-        id: 'finanzkrise_stresstest',
-        title: 'Börsen-Korrektur (-4.0% Rendite)',
-        subtitle: 'Stresstest für Aktienrente',
-        description:
-            'Geopolitische Spannungen dämpfen die Aktienrendite für 2 Jahre. Beweist die Notwendigkeit breiter Diversifikation.',
-        category: CardCategory.externalEvent,
-        artworkAssetPath: 'assets/images/cards/card_market_bear.png',
-        requiredSketchNotes:
-            'Handzeichnung: Trotziger Bär im Sturm vor abwärts zeigenden Diagrammen.',
-        deltaContributionRate: 0.2,
-      ),
-      const DecisionCard(
-        id: 'bav_offensive',
-        title: 'Betriebsrenten-Offensive',
-        subtitle: '2. Säule verpflichtend bezuschussen',
-        description:
-            'Arbeitgeber zahlen 20% Pflichtzuschuss zur bAV. Schließt individuelle Rentenlücken breiter Bevölkerungsschichten.',
+            'Arbeitgeber verdoppeln freiwillige Vorsorgebeiträge bis 150 €/Monat. Senkt den Druck auf die gesetzliche Rente spürbar.',
         category: CardCategory.lifeChoice,
         artworkAssetPath: 'assets/images/cards/card_bav_matching.png',
         requiredSketchNotes:
             'Handzeichnung: Solider Handschlag vor Werkstoren mit Sparschwein.',
-        deltaContributionRate: 0.0,
+        politicalCapitalCost: 18,
+        deltaContributionRate: -0.2,
+        deltaPensionLevel: 0.2,
+        deltaYouthSatisfaction: 7,
+        deltaRetireeSatisfaction: 5,
+      ),
+      DecisionCard(
+        id: 'card_market_bull',
+        title: 'Globale Wachstums-Offensive',
+        subtitle: '3 Jahre mind. 9,8 % Fondsrendite',
+        description:
+            'Öffnung des Generationenkapitals für internationale Wachstums- & Infrastrukturfonds. Hebelt den Zinseszinseffekt enorm.',
+        category: CardCategory.generationCapital,
+        artworkAssetPath: 'assets/images/cards/card_market_bull.png',
+        requiredSketchNotes:
+            'Handzeichnung: Leuchtender Bulle aus Kurven und Datenpunkten.',
+        politicalCapitalCost: 20,
+        deltaGenerationFundMrd: 12.0,
+        deltaContributionRate: -0.15,
+        deltaYouthSatisfaction: 4,
+        deltaRetireeSatisfaction: 2,
+        marketBoostYears: 3,
+        marketBoostPercent: 9.8,
+      ),
+      DecisionCard(
+        id: 'card_skilled_migration',
+        title: 'Fachkräfte- & Erwerbspakt',
+        subtitle: 'Stabile Beitragsbasis durch Zuwanderung',
+        description:
+            'Schnellere Anerkennung von Abschlüssen und höhere Erwerbsbeteiligung federn die Boomer-Ruhestandswelle aktiv ab (-0,45 % Beitrag).',
+        category: CardCategory.macroReform,
+        artworkAssetPath: 'assets/images/cards/card_boomer_wave.png',
+        requiredSketchNotes:
+            'Handzeichnung: Meereswelle aus Jahreszahlen (1960–1965), abgefangen durch eine stabile Brücke.',
+        politicalCapitalCost: 24,
+        deltaContributionRate: -0.45,
+        deltaRetirementAge: 4.0,
+        deltaFederalSubsidyMrd: 2.0,
+        deltaYouthSatisfaction: 6,
+        deltaRetireeSatisfaction: 3,
       ),
     ];
   }
