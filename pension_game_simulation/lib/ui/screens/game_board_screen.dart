@@ -276,23 +276,26 @@ class _GameBoardScreenState extends State<GameBoardScreen> {
             const Icon(Icons.account_balance_rounded,
                 color: AppTheme.goldAccent, size: 20),
             const SizedBox(width: 8),
-            const Text(
-              'GENERATION ZUKUNFT',
-              style: TextStyle(
-                fontSize: 16,
-                fontWeight: FontWeight.w800,
-                letterSpacing: 0.5,
+            const Flexible(
+              child: Text(
+                'GENERATION ZUKUNFT',
+                overflow: TextOverflow.ellipsis,
+                style: TextStyle(
+                  fontSize: 15,
+                  fontWeight: FontWeight.w800,
+                  letterSpacing: 0.4,
+                ),
               ),
             ),
-            const SizedBox(width: 12),
+            const SizedBox(width: 8),
             Container(
-              padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+              padding: const EdgeInsets.symmetric(horizontal: 7, vertical: 3),
               decoration: BoxDecoration(
                 color: Colors.white.withAlpha(15),
                 borderRadius: BorderRadius.circular(6),
               ),
               child: Text(
-                'econo=me · ${cfg.label}',
+                cfg.label,
                 style: const TextStyle(
                     fontSize: 11, color: AppTheme.textSecondary),
               ),
@@ -300,421 +303,456 @@ class _GameBoardScreenState extends State<GameBoardScreen> {
           ],
         ),
         actions: [
-          for (final level in DifficultyLevel.values)
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 3, vertical: 10),
-              child: TextButton(
-                style: TextButton.styleFrom(
-                  backgroundColor: _difficulty == level
-                      ? AppTheme.goldAccent
-                      : Colors.white.withAlpha(13),
-                  foregroundColor:
-                      _difficulty == level ? Colors.black : AppTheme.textSecondary,
-                  padding: const EdgeInsets.symmetric(horizontal: 10),
-                  shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(8)),
+          PopupMenuButton<DifficultyLevel>(
+            tooltip: 'Schwierigkeitsgrad wählen',
+            icon: const Icon(Icons.tune_rounded, color: AppTheme.goldAccent),
+            color: AppTheme.surfaceCard,
+            initialValue: _difficulty,
+            onSelected: _switchDifficulty,
+            itemBuilder: (ctx) => [
+              for (final level in DifficultyLevel.values)
+                PopupMenuItem(
+                  value: level,
+                  child: Text(
+                    DifficultyConfigs.get(level).label,
+                    style: TextStyle(
+                      fontWeight: _difficulty == level
+                          ? FontWeight.w800
+                          : FontWeight.w500,
+                      color: _difficulty == level
+                          ? AppTheme.goldAccent
+                          : AppTheme.textPrimary,
+                    ),
+                  ),
                 ),
-                onPressed: () => _switchDifficulty(level),
-                child: Text(
-                  DifficultyConfigs.get(level).label,
-                  style: const TextStyle(
-                      fontSize: 11, fontWeight: FontWeight.w700),
-                ),
-              ),
-            ),
+            ],
+          ),
           IconButton(
             icon: const Icon(Icons.refresh_rounded,
                 color: AppTheme.textSecondary),
             tooltip: 'Simulation zurücksetzen (2026)',
             onPressed: _resetSimulation,
           ),
-          const SizedBox(width: 8),
+          const SizedBox(width: 4),
         ],
       ),
-      body: Row(
-        crossAxisAlignment: CrossAxisAlignment.stretch,
-        children: [
-          // LINKE SPALTE: Makro-Status & Reform-Hebel
-          Expanded(
-            flex: 4,
-            child: Container(
-              padding: const EdgeInsets.all(20),
-              decoration: const BoxDecoration(
-                border: Border(right: BorderSide(color: AppTheme.borderHairline)),
+      body: SafeArea(
+        child: LayoutBuilder(
+          builder: (context, constraints) {
+            final isDesktop = constraints.maxWidth >= 820;
+            if (isDesktop) {
+              return Row(
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: [
+                  Expanded(
+                    flex: 4,
+                    child: Container(
+                      padding: const EdgeInsets.all(20),
+                      decoration: const BoxDecoration(
+                        border: Border(
+                            right: BorderSide(color: AppTheme.borderHairline)),
+                      ),
+                      child: _buildMacroColumn(cfg),
+                    ),
+                  ),
+                  Expanded(
+                    flex: 6,
+                    child: Padding(
+                      padding: const EdgeInsets.all(24),
+                      child: _buildCardsColumn(crossAxisCount: 2),
+                    ),
+                  ),
+                ],
+              );
+            }
+
+            // iOS / iPhone / schmales Tablet Layout
+            return DefaultTabController(
+              length: 2,
+              child: Column(
+                children: [
+                  Container(
+                    color: AppTheme.surfaceCard,
+                    child: const TabBar(
+                      indicatorColor: AppTheme.goldAccent,
+                      labelColor: AppTheme.goldAccent,
+                      unselectedLabelColor: AppTheme.textSecondary,
+                      tabs: [
+                        Tab(text: 'Cockpit & Hebel'),
+                        Tab(text: 'Reformkarten'),
+                      ],
+                    ),
+                  ),
+                  Expanded(
+                    child: TabBarView(
+                      children: [
+                        Padding(
+                          padding: const EdgeInsets.all(16),
+                          child: _buildMacroColumn(cfg),
+                        ),
+                        Padding(
+                          padding: const EdgeInsets.all(16),
+                          child: _buildCardsColumn(
+                            crossAxisCount:
+                                constraints.maxWidth >= 560 ? 2 : 1,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ],
               ),
-              child: SingleChildScrollView(
+            );
+          },
+        ),
+      ),
+    );
+  }
+
+  Widget _buildMacroColumn(DifficultyConfig cfg) {
+    return SingleChildScrollView(
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    'JAHR ${_state.year}',
+                    style: const TextStyle(
+                      fontSize: 26,
+                      fontWeight: FontWeight.w800,
+                      letterSpacing: -0.5,
+                      color: AppTheme.goldAccent,
+                    ),
+                  ),
+                  Text(
+                    'Kapital: $_politicalCapital Pkt · Rücklage: ${_reserveMonths.toStringAsFixed(2)} Mon.',
+                    style: const TextStyle(
+                        fontSize: 11, color: AppTheme.textSecondary),
+                  ),
+                ],
+              ),
+              ElevatedButton.icon(
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: _status == GameStatus.playing
+                      ? AppTheme.goldAccent
+                      : Colors.white.withAlpha(20),
+                  foregroundColor: _status == GameStatus.playing
+                      ? Colors.black
+                      : AppTheme.textSecondary,
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 14, vertical: 11),
+                  shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(8)),
+                ),
+                onPressed:
+                    _status == GameStatus.playing ? _nextTurn : _resetSimulation,
+                icon: Icon(
+                  _status == GameStatus.playing
+                      ? Icons.fast_forward_rounded
+                      : Icons.replay_rounded,
+                  size: 18,
+                ),
+                label: Text(
+                  _status == GameStatus.playing ? '+1 Jahr' : 'Neu starten',
+                  style: const TextStyle(fontWeight: FontWeight.w700),
+                ),
+              ),
+            ],
+          ),
+          if (_statusMessage != null) ...[
+            const SizedBox(height: 12),
+            Container(
+              width: double.infinity,
+              padding: const EdgeInsets.all(12),
+              decoration: BoxDecoration(
+                color: (_status == GameStatus.victory
+                        ? AppTheme.greenAccent
+                        : AppTheme.redAccent)
+                    .withAlpha(28),
+                borderRadius: BorderRadius.circular(10),
+                border: Border.all(
+                  color: _status == GameStatus.victory
+                      ? AppTheme.greenAccent
+                      : AppTheme.redAccent,
+                ),
+              ),
+              child: Text(
+                _statusMessage!,
+                style: TextStyle(
+                  fontSize: 12,
+                  fontWeight: FontWeight.w700,
+                  color: _status == GameStatus.victory
+                      ? AppTheme.greenAccent
+                      : AppTheme.redAccent,
+                ),
+              ),
+            ),
+          ],
+          const SizedBox(height: 16),
+          _buildMetricCard(
+            label: 'Beitragssatz Rentenkasse (Limit ${cfg.maxContributionRate}%)',
+            value: '${_state.contributionRate.toStringAsFixed(2)} %',
+            subtext: _state.contributionRate > cfg.ratePenaltyThreshold
+                ? 'Erhöhte Belastung für Beitragszahler'
+                : 'Stabil im Zielkorridor',
+            accentColor: _state.contributionRate > cfg.ratePenaltyThreshold
+                ? AppTheme.redAccent
+                : AppTheme.blueAccent,
+          ),
+          const SizedBox(height: 12),
+          _buildMetricCard(
+            label: 'Generationenkapital (Aktienfonds)',
+            value: '${_state.generationCapitalFund.toStringAsFixed(1)} Mrd. €',
+            subtext: _state.year >= 2035
+                ? 'Ausschüttung an GRV: ${_state.fundPayoutToGRV.toStringAsFixed(1)} Mrd. €/Jahr'
+                : 'Aufbauphase bis 2035 (Ziel: ~200 Mrd. €)',
+            accentColor: AppTheme.goldAccent,
+          ),
+          const SizedBox(height: 12),
+          _buildMetricCard(
+            label: 'Altenquotient & Zufriedenheit',
+            value: '${_state.dependencyRatio.toStringAsFixed(2)} : 1',
+            subtext:
+                'Jugend: $_youthSatisfaction% · Rentner: $_retireeSatisfaction%',
+            accentColor: _state.dependencyRatio < 1.6
+                ? AppTheme.redAccent
+                : AppTheme.greenAccent,
+          ),
+          const SizedBox(height: 12),
+          _buildMetricCard(
+            label: 'Rentenniveau (Min. ${cfg.minPensionLevel}%)',
+            value: '${_state.pensionLevel.toStringAsFixed(1)} %',
+            subtext: _forceHaltelinie
+                ? 'Haltelinie 48% aktiv (bis 2039)'
+                : 'Nachhaltigkeitsfaktor aktiv',
+            accentColor: _state.pensionLevel < cfg.minPensionLevel + 0.5
+                ? AppTheme.redAccent
+                : AppTheme.greenAccent,
+          ),
+          const SizedBox(height: 20),
+          const Text(
+            'POLITISCHE STELLSCHRAUBEN',
+            style: TextStyle(
+              fontSize: 12,
+              fontWeight: FontWeight.w700,
+              color: AppTheme.textSecondary,
+              letterSpacing: 0.5,
+            ),
+          ),
+          const SizedBox(height: 10),
+          Row(
+            children: [
+              const Expanded(
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text(
-                              'JAHR ${_state.year}',
-                              style: const TextStyle(
-                                fontSize: 28,
-                                fontWeight: FontWeight.w800,
-                                letterSpacing: -0.5,
-                                color: AppTheme.goldAccent,
-                              ),
-                            ),
-                            Text(
-                              'Kapital: $_politicalCapital Pkt · Rücklage: ${_reserveMonths.toStringAsFixed(2)} Mon.',
-                              style: const TextStyle(
-                                  fontSize: 11, color: AppTheme.textSecondary),
-                            ),
-                          ],
-                        ),
-                        ElevatedButton.icon(
-                          style: ElevatedButton.styleFrom(
-                            backgroundColor: _status == GameStatus.playing
-                                ? AppTheme.goldAccent
-                                : Colors.white.withAlpha(20),
-                            foregroundColor: _status == GameStatus.playing
-                                ? Colors.black
-                                : AppTheme.textSecondary,
-                            padding: const EdgeInsets.symmetric(
-                                horizontal: 16, vertical: 12),
-                            shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(8)),
-                          ),
-                          onPressed:
-                              _status == GameStatus.playing ? _nextTurn : _resetSimulation,
-                          icon: Icon(
-                            _status == GameStatus.playing
-                                ? Icons.fast_forward_rounded
-                                : Icons.replay_rounded,
-                            size: 18,
-                          ),
-                          label: Text(
-                            _status == GameStatus.playing ? '+1 Jahr' : 'Neu starten',
-                            style: const TextStyle(fontWeight: FontWeight.w700),
-                          ),
-                        ),
-                      ],
-                    ),
-                    if (_statusMessage != null) ...[
-                      const SizedBox(height: 12),
-                      Container(
-                        width: double.infinity,
-                        padding: const EdgeInsets.all(12),
-                        decoration: BoxDecoration(
-                          color: (_status == GameStatus.victory
-                                  ? AppTheme.greenAccent
-                                  : AppTheme.redAccent)
-                              .withAlpha(28),
-                          borderRadius: BorderRadius.circular(10),
-                          border: Border.all(
-                            color: _status == GameStatus.victory
-                                ? AppTheme.greenAccent
-                                : AppTheme.redAccent,
-                          ),
-                        ),
-                        child: Text(
-                          _statusMessage!,
-                          style: TextStyle(
-                            fontSize: 12,
-                            fontWeight: FontWeight.w700,
-                            color: _status == GameStatus.victory
-                                ? AppTheme.greenAccent
-                                : AppTheme.redAccent,
-                          ),
-                        ),
-                      ),
-                    ],
-                    const SizedBox(height: 16),
-
-                    // Kennzahlen-Grid
-                    _buildMetricCard(
-                      label: 'Beitragssatz Rentenkasse (Limit ${cfg.maxContributionRate}%)',
-                      value: '${_state.contributionRate.toStringAsFixed(2)} %',
-                      subtext: _state.contributionRate > cfg.ratePenaltyThreshold
-                          ? 'Erhöhte Belastung für Beitragszahler'
-                          : 'Stabil im Zielkorridor',
-                      accentColor:
-                          _state.contributionRate > cfg.ratePenaltyThreshold
-                              ? AppTheme.redAccent
-                              : AppTheme.blueAccent,
-                    ),
-                    const SizedBox(height: 12),
-
-                    _buildMetricCard(
-                      label: 'Generationenkapital (Aktienfonds)',
-                      value:
-                          '${_state.generationCapitalFund.toStringAsFixed(1)} Mrd. €',
-                      subtext: _state.year >= 2035
-                          ? 'Ausschüttung an GRV: ${_state.fundPayoutToGRV.toStringAsFixed(1)} Mrd. €/Jahr'
-                          : 'Aufbauphase bis 2035 (Ziel: ~200 Mrd. €)',
-                      accentColor: AppTheme.goldAccent,
-                    ),
-                    const SizedBox(height: 12),
-
-                    _buildMetricCard(
-                      label: 'Altenquotient & Zufriedenheit',
-                      value: '${_state.dependencyRatio.toStringAsFixed(2)} : 1',
-                      subtext:
-                          'Jugend: $_youthSatisfaction% · Rentner: $_retireeSatisfaction%',
-                      accentColor: _state.dependencyRatio < 1.6
-                          ? AppTheme.redAccent
-                          : AppTheme.greenAccent,
-                    ),
-                    const SizedBox(height: 12),
-
-                    _buildMetricCard(
-                      label: 'Rentenniveau (Min. ${cfg.minPensionLevel}%)',
-                      value: '${_state.pensionLevel.toStringAsFixed(1)} %',
-                      subtext: _forceHaltelinie
-                          ? 'Haltelinie 48% aktiv (bis 2039)'
-                          : 'Nachhaltigkeitsfaktor aktiv',
-                      accentColor: _state.pensionLevel < cfg.minPensionLevel + 0.5
-                          ? AppTheme.redAccent
-                          : AppTheme.greenAccent,
-                    ),
-                    const SizedBox(height: 20),
-
-                    const Text(
-                      'POLITISCHE STELLSCHRAUBEN',
-                      style: TextStyle(
-                        fontSize: 12,
-                        fontWeight: FontWeight.w700,
-                        color: AppTheme.textSecondary,
-                        letterSpacing: 0.5,
-                      ),
-                    ),
-                    const SizedBox(height: 10),
-
-                    Row(
-                      children: [
-                        const Expanded(
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Text('Haltelinie 48% erzwingen',
-                                  style: TextStyle(
-                                      fontSize: 13,
-                                      fontWeight: FontWeight.w600)),
-                              Text(
-                                'Rentenpaket II: Garantiert Niveau bis 2039',
-                                style: TextStyle(
-                                    fontSize: 11,
-                                    color: AppTheme.textSecondary),
-                              ),
-                            ],
-                          ),
-                        ),
-                        Switch(
-                          value: _forceHaltelinie,
-                          activeTrackColor: AppTheme.goldAccent.withAlpha(140),
-                          thumbColor: WidgetStateProperty.resolveWith((states) {
-                            if (states.contains(WidgetState.selected)) {
-                              return AppTheme.goldAccent;
-                            }
-                            return AppTheme.textSecondary;
-                          }),
-                          onChanged: _status == GameStatus.playing
-                              ? (val) => setState(() => _forceHaltelinie = val)
-                              : null,
-                        ),
-                      ],
-                    ),
-
-                    const SizedBox(height: 12),
+                    Text('Haltelinie 48% erzwingen',
+                        style: TextStyle(
+                            fontSize: 13, fontWeight: FontWeight.w600)),
                     Text(
-                      'Zusatzkredit Generationenkapital: +${_extraCredit.toInt()} Mrd. €',
-                      style: const TextStyle(
-                          fontSize: 13, fontWeight: FontWeight.w600),
-                    ),
-                    Slider(
-                      value: _extraCredit,
-                      min: 0,
-                      max: 30,
-                      divisions: 6,
-                      activeColor: AppTheme.goldAccent,
-                      onChanged: _status == GameStatus.playing
-                          ? (v) => setState(() => _extraCredit = v)
-                          : null,
+                      'Rentenpaket II: Garantiert Niveau bis 2039',
+                      style: TextStyle(
+                          fontSize: 11, color: AppTheme.textSecondary),
                     ),
                   ],
                 ),
               ),
-            ),
+              Switch(
+                value: _forceHaltelinie,
+                activeTrackColor: AppTheme.goldAccent.withAlpha(140),
+                thumbColor: WidgetStateProperty.resolveWith((states) {
+                  if (states.contains(WidgetState.selected)) {
+                    return AppTheme.goldAccent;
+                  }
+                  return AppTheme.textSecondary;
+                }),
+                onChanged: _status == GameStatus.playing
+                    ? (val) => setState(() => _forceHaltelinie = val)
+                    : null,
+              ),
+            ],
           ),
+          const SizedBox(height: 12),
+          Text(
+            'Zusatzkredit Generationenkapital: +${_extraCredit.toInt()} Mrd. €',
+            style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w600),
+          ),
+          Slider(
+            value: _extraCredit,
+            min: 0,
+            max: 30,
+            divisions: 6,
+            activeColor: AppTheme.goldAccent,
+            onChanged: _status == GameStatus.playing
+                ? (v) => setState(() => _extraCredit = v)
+                : null,
+          ),
+        ],
+      ),
+    );
+  }
 
-          // RECHTE SPALTE: Spielfeld, Artworks & Entscheidungskarten
-          Expanded(
-            flex: 6,
-            child: Container(
-              padding: const EdgeInsets.all(24),
-              child: SingleChildScrollView(
+  Widget _buildCardsColumn({required int crossAxisCount}) {
+    return SingleChildScrollView(
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          const HandDrawnSlot(
+            assetPath: 'assets/images/backgrounds/bg_berlin_future_skyline.png',
+            title: 'Szenario-Hintergrund: Berlin 2026–2060',
+            designerInstruction:
+                'Reichstag & Zukunftsskyline mit Solar und Finanzviertel. Stil: Hand-Drawn Ink & Wash, Dark Mode tauglich.',
+            width: double.infinity,
+            height: 150,
+          ),
+          const SizedBox(height: 20),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              const Text(
+                'REFORMKARTEN',
+                style: TextStyle(
+                  fontSize: 14,
+                  fontWeight: FontWeight.w800,
+                  letterSpacing: 0.5,
+                ),
+              ),
+              Text(
+                '${_playedCardIds.length}/${_availableCards.length} aktiv · $_politicalCapital Pkt',
+                style:
+                    const TextStyle(fontSize: 12, color: AppTheme.textSecondary),
+              ),
+            ],
+          ),
+          const SizedBox(height: 14),
+          GridView.builder(
+            shrinkWrap: true,
+            physics: const NeverScrollableScrollPhysics(),
+            gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+              crossAxisCount: crossAxisCount,
+              crossAxisSpacing: 14,
+              mainAxisSpacing: 14,
+              childAspectRatio: crossAxisCount == 1 ? 1.25 : 0.90,
+            ),
+            itemCount: _availableCards.length,
+            itemBuilder: (context, index) {
+              final card = _availableCards[index];
+              final isPlayed = _playedCardIds.contains(card.id);
+              final canAfford = _politicalCapital >= card.politicalCapitalCost;
+
+              return Container(
+                decoration: BoxDecoration(
+                  color: AppTheme.surfaceCard,
+                  borderRadius: BorderRadius.circular(12),
+                  border: Border.all(
+                    color: isPlayed
+                        ? AppTheme.goldAccent
+                        : AppTheme.borderHairline,
+                    width: isPlayed ? 1.5 : 1,
+                  ),
+                ),
                 child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
                   children: [
-                    const HandDrawnSlot(
-                      assetPath:
-                          'assets/images/backgrounds/bg_berlin_future_skyline.png',
-                      title: 'Szenario-Hintergrund: Berlin 2026–2060',
-                      designerInstruction:
-                          'Reichstag & Zukunftsskyline mit Solar und Finanzviertel. Stil: Hand-Drawn Ink & Wash, Dark Mode tauglich.',
+                    HandDrawnSlot(
+                      assetPath: card.artworkAssetPath,
+                      title: card.title,
+                      designerInstruction: card.requiredSketchNotes,
                       width: double.infinity,
-                      height: 160,
+                      height: 100,
+                      borderRadius:
+                          const BorderRadius.vertical(top: Radius.circular(11)),
                     ),
-                    const SizedBox(height: 24),
-
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        const Text(
-                          'ENTSCHEIDUNGS- & REFORMKARTEN',
-                          style: TextStyle(
-                            fontSize: 14,
-                            fontWeight: FontWeight.w800,
-                            letterSpacing: 0.5,
-                          ),
-                        ),
-                        Text(
-                          '${_playedCardIds.length}/${_availableCards.length} ausgespielt · Kapital: $_politicalCapital Pkt',
-                          style: const TextStyle(
-                              fontSize: 12, color: AppTheme.textSecondary),
-                        ),
-                      ],
-                    ),
-                    const SizedBox(height: 16),
-
-                    GridView.builder(
-                      shrinkWrap: true,
-                      physics: const NeverScrollableScrollPhysics(),
-                      gridDelegate:
-                          const SliverGridDelegateWithFixedCrossAxisCount(
-                        crossAxisCount: 2,
-                        crossAxisSpacing: 16,
-                        mainAxisSpacing: 16,
-                        childAspectRatio: 0.92,
-                      ),
-                      itemCount: _availableCards.length,
-                      itemBuilder: (context, index) {
-                        final card = _availableCards[index];
-                        final isPlayed = _playedCardIds.contains(card.id);
-                        final canAfford =
-                            _politicalCapital >= card.politicalCapitalCost;
-
-                        return Container(
-                          decoration: BoxDecoration(
-                            color: AppTheme.surfaceCard,
-                            borderRadius: BorderRadius.circular(12),
-                            border: Border.all(
-                              color: isPlayed
-                                  ? AppTheme.goldAccent
-                                  : AppTheme.borderHairline,
-                              width: isPlayed ? 1.5 : 1,
-                            ),
-                          ),
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.stretch,
+                    Padding(
+                      padding: const EdgeInsets.all(12),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
                             children: [
-                              HandDrawnSlot(
-                                assetPath: card.artworkAssetPath,
-                                title: card.title,
-                                designerInstruction: card.requiredSketchNotes,
-                                width: double.infinity,
-                                height: 105,
-                                borderRadius: const BorderRadius.vertical(
-                                    top: Radius.circular(11)),
+                              Expanded(
+                                child: Text(
+                                  card.title,
+                                  overflow: TextOverflow.ellipsis,
+                                  style: const TextStyle(
+                                    fontSize: 13,
+                                    fontWeight: FontWeight.w700,
+                                  ),
+                                ),
                               ),
-                              Padding(
-                                padding: const EdgeInsets.all(12),
-                                child: Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    Row(
-                                      mainAxisAlignment:
-                                          MainAxisAlignment.spaceBetween,
-                                      children: [
-                                        Expanded(
-                                          child: Text(
-                                            card.title,
-                                            overflow: TextOverflow.ellipsis,
-                                            style: const TextStyle(
-                                              fontSize: 13,
-                                              fontWeight: FontWeight.w700,
-                                            ),
-                                          ),
-                                        ),
-                                        Text(
-                                          '${card.politicalCapitalCost} Pkt',
-                                          style: TextStyle(
-                                            fontSize: 11,
-                                            fontWeight: FontWeight.w700,
-                                            color: canAfford
-                                                ? AppTheme.goldAccent
-                                                : AppTheme.redAccent,
-                                          ),
-                                        ),
-                                      ],
-                                    ),
-                                    const SizedBox(height: 2),
-                                    Text(
-                                      card.subtitle,
-                                      style: const TextStyle(
-                                        fontSize: 11,
-                                        color: AppTheme.goldAccent,
-                                      ),
-                                    ),
-                                    const SizedBox(height: 6),
-                                    Text(
-                                      card.description,
-                                      maxLines: 2,
-                                      overflow: TextOverflow.ellipsis,
-                                      style: const TextStyle(
-                                        fontSize: 11,
-                                        color: AppTheme.textSecondary,
-                                      ),
-                                    ),
-                                    const SizedBox(height: 10),
-                                    SizedBox(
-                                      width: double.infinity,
-                                      child: ElevatedButton(
-                                        style: ElevatedButton.styleFrom(
-                                          backgroundColor: isPlayed
-                                              ? Colors.white.withAlpha(20)
-                                              : canAfford
-                                                  ? AppTheme.goldAccent
-                                                  : Colors.white.withAlpha(15),
-                                          foregroundColor: isPlayed || !canAfford
-                                              ? AppTheme.textSecondary
-                                              : Colors.black,
-                                          padding: const EdgeInsets.symmetric(
-                                              vertical: 8),
-                                        ),
-                                        onPressed: isPlayed || !canAfford
-                                            ? null
-                                            : () => _playCard(card),
-                                        child: Text(
-                                          isPlayed
-                                              ? 'Bereits aktiv'
-                                              : canAfford
-                                                  ? 'Ausspielen'
-                                                  : 'Zu wenig Kapital',
-                                          style: const TextStyle(
-                                              fontSize: 11,
-                                              fontWeight: FontWeight.w700),
-                                        ),
-                                      ),
-                                    ),
-                                  ],
+                              Text(
+                                '${card.politicalCapitalCost} Pkt',
+                                style: TextStyle(
+                                  fontSize: 11,
+                                  fontWeight: FontWeight.w700,
+                                  color: canAfford
+                                      ? AppTheme.goldAccent
+                                      : AppTheme.redAccent,
                                 ),
                               ),
                             ],
                           ),
-                        );
-                      },
+                          const SizedBox(height: 2),
+                          Text(
+                            card.subtitle,
+                            style: const TextStyle(
+                              fontSize: 11,
+                              color: AppTheme.goldAccent,
+                            ),
+                          ),
+                          const SizedBox(height: 6),
+                          Text(
+                            card.description,
+                            maxLines: 2,
+                            overflow: TextOverflow.ellipsis,
+                            style: const TextStyle(
+                              fontSize: 11,
+                              color: AppTheme.textSecondary,
+                            ),
+                          ),
+                          const SizedBox(height: 10),
+                          SizedBox(
+                            width: double.infinity,
+                            child: ElevatedButton(
+                              style: ElevatedButton.styleFrom(
+                                backgroundColor: isPlayed
+                                    ? Colors.white.withAlpha(20)
+                                    : canAfford
+                                        ? AppTheme.goldAccent
+                                        : Colors.white.withAlpha(15),
+                                foregroundColor: isPlayed || !canAfford
+                                    ? AppTheme.textSecondary
+                                    : Colors.black,
+                                padding:
+                                    const EdgeInsets.symmetric(vertical: 8),
+                              ),
+                              onPressed: isPlayed || !canAfford
+                                  ? null
+                                  : () => _playCard(card),
+                              child: Text(
+                                isPlayed
+                                    ? 'Bereits aktiv'
+                                    : canAfford
+                                        ? 'Ausspielen'
+                                        : 'Zu wenig Kapital',
+                                style: const TextStyle(
+                                    fontSize: 11, fontWeight: FontWeight.w700),
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
                     ),
                   ],
                 ),
-              ),
-            ),
+              );
+            },
           ),
         ],
       ),

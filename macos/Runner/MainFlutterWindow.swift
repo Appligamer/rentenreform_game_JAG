@@ -20,38 +20,62 @@ class MainFlutterWindow: NSWindow {
 }
 #else
 class MainFlutterWindow: NSWindow, WKNavigationDelegate {
-  var webView: WKWebView!
+  private var webView: WKWebView!
+  private let schemeHandler = BundleSchemeHandler()
 
   override func awakeFromNib() {
-    let config = WKWebViewConfiguration()
+    let config = BundleSchemeHandler.makeConfiguration(schemeHandler: schemeHandler)
+    #if DEBUG
     config.preferences.setValue(true, forKey: "developerExtrasEnabled")
+    #endif
 
     self.title = "Generation Zukunft — Renten-Simulation (econo=me)"
     self.styleMask.insert([.titled, .closable, .miniaturizable, .resizable, .fullSizeContentView])
     self.titlebarAppearsTransparent = true
     self.titleVisibility = .hidden
     self.backgroundColor = NSColor(red: 0.0, green: 0.0, blue: 0.0, alpha: 1.0)
+    self.isOpaque = true
 
-    let contentView = self.contentView ?? NSView(frame: NSRect(x: 0, y: 0, width: 1280, height: 800))
-    self.contentView = contentView
+    let container = self.contentView ?? NSView(frame: NSRect(x: 0, y: 0, width: 1280, height: 800))
+    self.contentView = container
 
-    webView = WKWebView(frame: contentView.bounds, configuration: config)
+    webView = WKWebView(frame: container.bounds, configuration: config)
     webView.autoresizingMask = [.width, .height]
     webView.navigationDelegate = self
-    webView.setValue(false, forKey: "drawsBackground")
-    
-    contentView.addSubview(webView)
-
-    // Load web dist if available, else connect to local dev server
-    if let htmlPath = Bundle.main.path(forResource: "index", ofType: "html", inDirectory: "dist") {
-      let fileUrl = URL(fileURLWithPath: htmlPath)
-      webView.loadFileURL(fileUrl, allowingReadAccessTo: fileUrl.deletingLastPathComponent())
-    } else if let localUrl = URL(string: "http://localhost:3000") {
-      let request = URLRequest(url: localUrl)
-      webView.load(request)
+    if #available(macOS 12.0, *) {
+      webView.underPageBackgroundColor = NSColor.black
     }
 
+    container.addSubview(webView)
+    loadApp()
+
     super.awakeFromNib()
+  }
+
+  private func loadApp() {
+    if schemeHandler.hasBundledApp {
+      webView.load(URLRequest(url: BundleSchemeHandler.entryURL))
+    } else {
+      webView.loadHTMLString(
+        BundleSchemeHandler.fallbackHTML(reason: "Das lokale Spielpaket (WebBundle) wurde im App-Bundle nicht gefunden."),
+        baseURL: nil
+      )
+    }
+  }
+
+  func webView(_ webView: WKWebView, didFail navigation: WKNavigation!, withError error: Error) {
+    renderError(error)
+  }
+
+  func webView(_ webView: WKWebView, didFailProvisionalNavigation navigation: WKNavigation!, withError error: Error) {
+    renderError(error)
+  }
+
+  private func renderError(_ error: Error) {
+    webView.loadHTMLString(
+      BundleSchemeHandler.fallbackHTML(reason: "Ladefehler: \(error.localizedDescription)"),
+      baseURL: nil
+    )
   }
 }
 #endif

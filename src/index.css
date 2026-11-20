@@ -30,13 +30,28 @@
   }
 }
 
-/* Apple Obsidian Canvas */
-body {
+/* Apple Obsidian Canvas (macOS, iOS, Web) */
+html, body {
   background-color: #000000;
+  color: #f5f5f7;
+  font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'Helvetica Neue', sans-serif;
+  -webkit-text-size-adjust: 100%;
+  -webkit-tap-highlight-color: transparent;
+  overflow-x: hidden;
+}
+
+body {
   background-image: 
     radial-gradient(circle at 50% -10%, rgba(245, 158, 11, 0.09) 0%, transparent 60%),
     radial-gradient(circle at 10% 80%, rgba(56, 189, 248, 0.04) 0%, transparent 40%);
   background-attachment: fixed;
-  color: #f5f5f7;
+  padding-top: env(safe-area-inset-top);
+  padding-bottom: env(safe-area-inset-bottom);
+  padding-left: env(safe-area-inset-left);
+  padding-right: env(safe-area-inset-right);
   font-feature-settings: "cv02", "cv03", "cv04", "cv11";
+}
+
+button, input, select {
+  touch-action: manipulation;
 }
