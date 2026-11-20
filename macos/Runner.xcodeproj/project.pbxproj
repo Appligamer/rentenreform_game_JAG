@@ -19,6 +19,7 @@
 		440000132FF8000100123456 /* BundleSchemeHandler.swift in Sources */ = {isa = PBXBuildFile; fileRef = 440000032FF8000100123456 /* BundleSchemeHandler.swift */; };
 		440000142FF8000100123456 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 335B24FF2FF7D7FE00323100 /* Assets.xcassets */; };
 		440000152FF8000100123456 /* WebBundle in Resources */ = {isa = PBXBuildFile; fileRef = 440000042FF8000100123456 /* WebBundle */; };
+		440000232FF8000100123456 /* SceneDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 440000242FF8000100123456 /* SceneDelegate.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -43,6 +44,7 @@
 		440000082FF8000100123456 /* GameViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GameViewController.swift; sourceTree = "<group>"; };
 		440000092FF8000100123456 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		440000102FF8000100123456 /* GenerationZukunft_iOS.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = GenerationZukunft_iOS.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		440000242FF8000100123456 /* SceneDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SceneDelegate.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -103,6 +105,7 @@
 			isa = PBXGroup;
 			children = (
 				440000072FF8000100123456 /* AppDelegate.swift */,
+				440000242FF8000100123456 /* SceneDelegate.swift */,
 				440000082FF8000100123456 /* GameViewController.swift */,
 				440000092FF8000100123456 /* Info.plist */,
 			);
@@ -260,6 +263,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				440000112FF8000100123456 /* AppDelegate.swift in Sources */,
+				440000232FF8000100123456 /* SceneDelegate.swift in Sources */,
 				440000122FF8000100123456 /* GameViewController.swift in Sources */,
 				440000132FF8000100123456 /* BundleSchemeHandler.swift in Sources */,
 			);

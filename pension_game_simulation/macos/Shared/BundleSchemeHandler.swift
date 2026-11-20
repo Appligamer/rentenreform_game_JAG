@@ -31,6 +31,23 @@ final class BundleSchemeHandler: NSObject, WKURLSchemeHandler {
       return
     }
 
+    if urlSchemeTask.request.httpMethod?.uppercased() == "OPTIONS" {
+      let headers: [String: String] = [
+        "Access-Control-Allow-Origin": "*",
+        "Access-Control-Allow-Methods": "GET, HEAD, OPTIONS",
+        "Access-Control-Allow-Headers": "*"
+      ]
+      let response = HTTPURLResponse(
+        url: requestURL,
+        statusCode: 204,
+        httpVersion: "HTTP/1.1",
+        headerFields: headers
+      )!
+      urlSchemeTask.didReceive(response)
+      urlSchemeTask.didFinish()
+      return
+    }
+
     var relativePath = requestURL.path
     if relativePath.isEmpty || relativePath == "/" {
       relativePath = "/index.html"
@@ -59,7 +76,10 @@ final class BundleSchemeHandler: NSObject, WKURLSchemeHandler {
         url: requestURL,
         statusCode: 404,
         httpVersion: "HTTP/1.1",
-        headerFields: ["Content-Type": "text/plain; charset=utf-8"]
+        headerFields: [
+          "Content-Type": "text/plain; charset=utf-8",
+          "Access-Control-Allow-Origin": "*"
+        ]
       )!
       urlSchemeTask.didReceive(response)
       urlSchemeTask.didReceive(notFound)
@@ -78,6 +98,8 @@ final class BundleSchemeHandler: NSObject, WKURLSchemeHandler {
       "Content-Type": mimeType,
       "Content-Length": "\(data.count)",
       "Access-Control-Allow-Origin": "*",
+      "Access-Control-Allow-Methods": "GET, HEAD, OPTIONS",
+      "Access-Control-Allow-Headers": "*",
       "Cache-Control": "no-cache"
     ]
     let response = HTTPURLResponse(
@@ -128,6 +150,19 @@ final class BundleSchemeHandler: NSObject, WKURLSchemeHandler {
     if #available(macOS 11.3, iOS 14.5, *) {
       config.preferences.isFraudulentWebsiteWarningEnabled = false
     }
+    let errorGuardJS = """
+    (function() {
+      function showErr(msg) {
+        var root = document.getElementById('root');
+        if (!root || root.childElementCount > 0) return;
+        root.innerHTML = '<div style="min-height:100vh;background:#000;color:#f5f5f7;font-family:-apple-system,sans-serif;display:flex;align-items:center;justify-content:center;padding:24px;text-align:center"><div style="max-width:440px;background:#161617;border:1px solid rgba(255,255,255,0.12);border-radius:16px;padding:24px"><h2 style="color:#f59e0b;margin:0 0 8px;font-size:18px">Generation Zukunft</h2><p style="color:#86868b;font-size:13px;margin:0">' + String(msg) + '</p></div></div>';
+      }
+      window.addEventListener('error', function(e) { showErr(e.message || 'Unbekannter Fehler'); });
+      window.addEventListener('unhandledrejection', function(e) { showErr(e.reason && e.reason.message ? e.reason.message : String(e.reason)); });
+    })();
+    """
+    let script = WKUserScript(source: errorGuardJS, injectionTime: .atDocumentStart, forMainFrameOnly: true)
+    config.userContentController.addUserScript(script)
     #if os(iOS)
     config.allowsInlineMediaPlayback = true
     config.mediaTypesRequiringUserActionForPlayback = []

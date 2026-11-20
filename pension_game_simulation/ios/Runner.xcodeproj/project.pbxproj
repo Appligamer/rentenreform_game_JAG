@@ -12,6 +12,7 @@
 		550000032FF8000100123456 /* BundleSchemeHandler.swift in Sources */ = {isa = PBXBuildFile; fileRef = 550000122FF8000100123456 /* BundleSchemeHandler.swift */; };
 		550000042FF8000100123456 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 550000132FF8000100123456 /* Assets.xcassets */; };
 		550000052FF8000100123456 /* WebBundle in Resources */ = {isa = PBXBuildFile; fileRef = 550000142FF8000100123456 /* WebBundle */; };
+		550000062FF8000100123456 /* SceneDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 550000162FF8000100123456 /* SceneDelegate.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -22,6 +23,7 @@
 		550000132FF8000100123456 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		550000142FF8000100123456 /* WebBundle */ = {isa = PBXFileReference; lastKnownFileType = folder; path = WebBundle; sourceTree = "<group>"; };
 		550000152FF8000100123456 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		550000162FF8000100123456 /* SceneDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SceneDelegate.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -47,6 +49,7 @@
 			isa = PBXGroup;
 			children = (
 				550000102FF8000100123456 /* AppDelegate.swift */,
+				550000162FF8000100123456 /* SceneDelegate.swift */,
 				550000112FF8000100123456 /* GameViewController.swift */,
 				550000122FF8000100123456 /* BundleSchemeHandler.swift */,
 				550000132FF8000100123456 /* Assets.xcassets */,
@@ -136,6 +139,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				550000012FF8000100123456 /* AppDelegate.swift in Sources */,
+				550000062FF8000100123456 /* SceneDelegate.swift in Sources */,
 				550000022FF8000100123456 /* GameViewController.swift in Sources */,
 				550000032FF8000100123456 /* BundleSchemeHandler.swift in Sources */,
 			);
