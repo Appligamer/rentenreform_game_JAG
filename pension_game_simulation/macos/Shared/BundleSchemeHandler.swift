@@ -145,7 +145,7 @@ final class BundleSchemeHandler: NSObject, WKURLSchemeHandler {
   static func makeConfiguration(schemeHandler: BundleSchemeHandler) -> WKWebViewConfiguration {
     let config = WKWebViewConfiguration()
     config.setURLSchemeHandler(schemeHandler, forURLScheme: Self.scheme)
-    config.websiteDataStore = WKWebsiteDataStore.nonPersistent()
+    config.websiteDataStore = WKWebsiteDataStore.default()
     config.defaultWebpagePreferences.allowsContentJavaScript = true
     if #available(macOS 11.3, iOS 14.5, *) {
       config.preferences.isFraudulentWebsiteWarningEnabled = false

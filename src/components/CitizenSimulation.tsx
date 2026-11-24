@@ -63,7 +63,7 @@ export const CitizenSimulation: React.FC<CitizenSimulationProps> = ({ macro }) =
         {/* Character Portrait Slot */}
         <div className="w-24 h-24 shrink-0">
           <HandDrawnFrame
-            assetPath="assets/images/characters/char_worker_young_neutral.png"
+            assetPath="artworks/characters/char_worker_young_neutral.png"
             title="Berufseinsteiger"
             designerInstruction="Gen Z/Alpha, 22 J., optimistisch mit Laptop & Rucksack."
             dimensions="512 × 512 px"

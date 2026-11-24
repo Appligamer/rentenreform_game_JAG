@@ -7,6 +7,7 @@ export type AppTab = 'game' | 'citizen' | 'rules' | 'briefing' | 'export' | 'con
 interface NavbarProps {
   currentTab: AppTab;
   onSelectTab: (tab: AppTab) => void;
+  onOpenWelcome?: () => void;
   currentYear: number;
   devMode: boolean;
   onToggleDevMode: () => void;
@@ -17,6 +18,7 @@ interface NavbarProps {
 export const Navbar: React.FC<NavbarProps> = ({
   currentTab,
   onSelectTab,
+  onOpenWelcome,
   currentYear,
   devMode,
   onToggleDevMode,
@@ -98,6 +100,15 @@ export const Navbar: React.FC<NavbarProps> = ({
 
           {/* Zone 2: Navigationslinks */}
           <nav className="flex items-center gap-6 text-xs font-medium text-[#86868b] overflow-x-auto">
+            {onOpenWelcome && (
+              <button
+                onClick={onOpenWelcome}
+                className="hover:text-white transition-colors whitespace-nowrap shrink-0 pb-1 cursor-pointer"
+              >
+                Start
+              </button>
+            )}
+
             <button
               onClick={() => onSelectTab('game')}
               className={`hover:text-white transition-colors whitespace-nowrap shrink-0 pb-1 cursor-pointer ${

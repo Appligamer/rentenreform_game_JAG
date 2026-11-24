@@ -7,6 +7,7 @@ import '../../simulation/game_events.dart';
 import '../../simulation/difficulty_config.dart';
 import '../theme/app_theme.dart';
 import '../widgets/hand_drawn_slot.dart';
+import '../../utils/score_history.dart';
 
 enum GameStatus { playing, victory, gameOver }
 
@@ -42,6 +43,9 @@ class _GameBoardScreenState extends State<GameBoardScreen> {
   double _marketBoostPercent = 0.0;
   bool _forceHaltelinie = true;
 
+  // Lauf-ID für Score-Verlauf (ohne Einfluss auf die Balance)
+  String _runId = 'run_${DateTime.now().millisecondsSinceEpoch}';
+
   @override
   void initState() {
     super.initState();
@@ -50,6 +54,7 @@ class _GameBoardScreenState extends State<GameBoardScreen> {
 
   void _initCampaign(DifficultyLevel level) {
     final cfg = DifficultyConfigs.get(level);
+    _runId = 'run_${DateTime.now().millisecondsSinceEpoch}';
     _difficulty = level;
     _state = PensionEngine.createInitialState();
     _history
@@ -70,6 +75,27 @@ class _GameBoardScreenState extends State<GameBoardScreen> {
     _marketBoostYearsRemaining = 0;
     _marketBoostPercent = 0.0;
     _forceHaltelinie = true;
+  }
+
+  void _persistRunScore() {
+    if (_state.year <= 2026 && _status == GameStatus.playing) return;
+    final cfg = DifficultyConfigs.get(_difficulty);
+    final computedScore =
+        ((_state.year - 2026) * 120 + (_youthSatisfaction + _retireeSatisfaction) * 2)
+            .clamp(0, 99999);
+    ScoreHistoryStore.upsert(
+      SavedRunScore(
+        id: _runId,
+        updatedAt: DateTime.now().toIso8601String(),
+        difficultyLabel: cfg.label,
+        status: _status.name,
+        year: _state.year,
+        score: computedScore,
+        contributionRate: _state.contributionRate,
+        pensionLevel: _state.pensionLevel,
+        generationCapitalFund: _state.generationCapitalFund,
+      ),
+    );
   }
 
   void _switchDifficulty(DifficultyLevel level) {
@@ -180,6 +206,8 @@ class _GameBoardScreenState extends State<GameBoardScreen> {
         snackMsg = '${shock.label} in $nextYear';
       }
     });
+
+    _persistRunScore();
 
     if (snackMsg != null && mounted) {
       ScaffoldMessenger.of(context)

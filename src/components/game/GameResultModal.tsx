@@ -109,7 +109,7 @@ export const GameResultModal: React.FC<GameResultModalProps> = ({
 
         <div className="w-28 h-28 mx-auto">
           <HandDrawnFrame
-            assetPath="assets/images/awards/trophy_generation_justice.png"
+            assetPath="artworks/awards/trophy_generation_justice.png"
             title={tierLabel}
             designerInstruction="Goldmedaille mit zwei ineinandergreifenden Händen."
             dimensions="512 × 512 px"

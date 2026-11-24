@@ -65,5 +65,5 @@ Die fertige Windows-App liegt anschließend in:
 > **Wichtig:** Die `.exe` funktioniert nur zusammen mit den `.dll`-Dateien und dem `data\`-Ordner im selben Verzeichnis.
 
 ### 3. Als EINE Datei verpacken & verschicken
-- **Per ZIP (empfohlen & sofort startklar):** Den kompletten `Release\`-Ordner zippen (`GenerationZukunft_Windows.zip`) oder im Hauptverzeichnis `powershell -ExecutionPolicy Bypass -File scripts\build_windows_portable.ps1` ausführen. Der Empfänger entpackt die ZIP und startet `pension_game_simulation.exe`.
-- **Als einzelne Installer-`.exe` (`Setup.exe`):** Mit dem kostenlosen Tool **[Inno Setup](https://jrsoftware.org/isinfo.php)** den kompletten Inhalt von `build\windows\x64\runner\Release\` (inkl. Unterordner `data\`) zu einer einzigen `GenerationZukunft_Setup.exe` kompilieren.
+- **Ein-Klick-Skript (im Hauptordner):** `powershell -ExecutionPolicy Bypass -File scripts\build_windows_portable.ps1` erzeugt automatisch **`GenerationZukunft_Windows_Portable.zip`** sowie **`GenerationZukunft_Setup.iss`** (und kompiliert mit installiertem Inno Setup 6 direkt **`GenerationZukunft_Windows_Setup.exe`**).
+- **Manuell mit Inno Setup:** Den kompletten Inhalt von `build\windows\x64\runner\Release\` (inkl. Unterordner `data\`) über **[Inno Setup](https://jrsoftware.org/isinfo.php)** zu einer einzigen `GenerationZukunft_Windows_Setup.exe` kompilieren.
