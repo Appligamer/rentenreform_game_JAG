@@ -18,31 +18,33 @@ Das Projekt enthält ein vorkompiliertes Offline-`WebBundle` und einen eigenen `
 
 ## 🪟 Windows: Eine versandfertige `.exe` erstellen (Schritt-für-Schritt)
 
-Eine kompilierte Flutter-App besteht unter Windows aus einem **Release-Ordner** (`pension_game_simulation.exe` + `flutter_windows.dll` + `data\`). **Wichtig:** Wenn du nur die nackte `.exe` ohne `flutter_windows.dll` und `data\` verschickst, startet sie auf anderen PCs nicht!
+### Methode 1 (Am einfachsten — nur Windows-Bordmittel, **ohne** Flutter & Visual Studio)
 
-Hier sind die **zwei fertigen Wege**, damit du das Spiel als komplettes Paket oder als **eine einzige Setup-`.exe`** verschicken kannst:
+Auf jedem Windows-10/11-PC ist bereits alles vorinstalliert (PowerShell, .NET-Compiler `csc.exe`, Microsoft Edge).
+
+1. Öffne **Windows PowerShell** und wechsle in deinen geklonten Projektordner (wichtig: **Anführungszeichen**, falls dein Benutzername ein Leerzeichen enthält):
+   ```powershell
+   cd "$HOME\rentenreform_game_JAG"
+   ```
+2. Starte das Packaging-Skript:
+   ```powershell
+   powershell -ExecutionPolicy Bypass -File scripts\build_windows_portable.ps1
+   ```
+3. Fertig! Im neuen Ordner **`dist_windows\`** liegen sofort:
+   - **`dist_windows\GenerationZukunft.exe`** → **Eine einzige, direkt startbare & versendbare `.exe`-Datei** (mit App-Icon und eingebettetem Offline-Spielpaket).
+   - **`dist_windows\GenerationZukunft_Windows_Portable.zip`** → Komplettes Offline-Paket als ZIP.
 
 ---
 
-### Methode 1 (Empfohlen): Ein-Klick-Build per Skript (`GenerationZukunft_Windows_Portable.zip` + `Setup.exe`)
+### Methode 2 (Optional): Nativ mit Flutter & Visual Studio kompilieren
 
-#### Schritt 1: Einmalige Voraussetzungen auf Windows installieren
+Falls du eine native C++/Flutter-`.exe` statt des Offline-WebBundles bauen möchtest:
+
 1. **[Git for Windows](https://git-scm.com/download/win)** installieren.
-2. **[Flutter SDK für Windows](https://docs.flutter.dev/get-started/install/windows)** installieren (`flutter\bin` in den Windows-`PATH` eintragen).
-3. **[Visual Studio 2022 Community](https://visualstudio.microsoft.com/de/downloads/)** installieren und bei der Installation zwingend den Workload **„Desktopentwicklung mit C++“** (inkl. Windows 10/11 SDK und CMake) anhaken.
-4. *(Optional für eine einzige Installer-`.exe`)*: **[Inno Setup 6](https://jrsoftware.org/isinfo.php)** installieren (kostenlos, ohne Adminrechte beim Ziel-PC nutzbar).
-
-#### Schritt 2: Automatisch bauen & verpacken
-Öffne die **Windows PowerShell** im Hauptordner des Projekts (`rentenreform_game_JAG`) und führe aus:
-
-```powershell
-powershell -ExecutionPolicy Bypass -File scripts\build_windows_portable.ps1
-```
-
-Das Skript erledigt alles automatisch (mit nativem Flutter-Build — oder falls Flutter fehlt, automatisch mit dem Offline-WebBundle):
-1. Baut den Release-Build (`GenerationZukunft.exe` + `flutter_windows.dll` + `data\`).
-2. Erstellt die direkt versandfertige ZIP-Datei **`dist_windows\GenerationZukunft_Windows_Portable.zip`**.
-3. Erzeugt automatisch **`dist_windows\GenerationZukunft_Setup.iss`** und kompiliert — sofern Inno Setup installiert ist — sofort die **eine einzige Datei `dist_windows\GenerationZukunft_Windows_Setup.exe`**.
+2. **[Flutter SDK für Windows](https://docs.flutter.dev/get-started/install/windows)** als ZIP herunterladen, nach `C:\src\flutter` entpacken und `C:\src\flutter\bin` in den Windows-`PATH` eintragen.
+3. **[Visual Studio 2022 Community](https://visualstudio.microsoft.com/de/downloads/)** mit dem Workload **„Desktopentwicklung mit C++“** installieren.
+4. *(Optional für Installer)*: **[Inno Setup 6](https://jrsoftware.org/isinfo.php)** installieren.
+5. Danach denselben Befehl wie oben ausführen (`powershell -ExecutionPolicy Bypass -File scripts\build_windows_portable.ps1`) — das Skript erkennt Flutter automatisch.
 
 ---
 
