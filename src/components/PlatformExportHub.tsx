@@ -180,12 +180,12 @@ export const PlatformExportHub: React.FC = () => {
 ├── GenerationZukunft.app              # 🍎 Nativer macOS App-Bundle Ordner
 ├── START_GAME_WINDOWS.exe             # 🪟 Windows PE 1-Klick-Starter (Nativ .exe)
 ├── start_game_windows.bat             # 🪟 Windows Batch Starter
-├── macos/                             # 🍎 Xcode Runner Projekt (MACOSX_DEPLOYMENT_TARGET 11.0 & Info.plist)
+├── artworks/                          # Eindeutiger Zielordner für optionale Artworks
+├── macos/                             # Apple Xcode Projekt (macOS & iOS)
 │   └── Runner.xcodeproj
-├── windows/                           # 🪟 C++ Windows Desktop Runner
+├── windows/                           # C++ Windows Desktop Runner
 │   └── runner/
-├── system_prompt.md                   # Dauerhafter System-Prompt des Teams
-├── graphic_designer_briefing.md       # Vollständiges Handzeichnungs-Briefing
+├── graphic_designer_briefing.md       # Vollständiges Grafik-Briefing
 └── pension_game_simulation/           # Flutter Multiplattform Quellcode`}
         </pre>
       </div>

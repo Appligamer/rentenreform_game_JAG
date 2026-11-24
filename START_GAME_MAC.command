@@ -19,8 +19,6 @@ if [ ! -f "macos/Runner/AppDelegate.swift" ] || [ ! -f "macos/Runner/Info.plist"
         mkdir -p macos
         cp -r pension_game_simulation/macos/* macos/ 2>/dev/null
     fi
-    # Falls online, Tarball beziehen
-    curl -fsSL "https://ais-dev-6rd3ufs7e3xca5ruygcd56-729708878252.europe-west2.run.app/download/macos_full_fix.tar.gz" 2>/dev/null | tar -xz 2>/dev/null
 fi
 
 echo "[1/3] Prüfe macOS Application Bundle..."

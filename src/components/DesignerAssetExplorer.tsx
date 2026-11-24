@@ -26,15 +26,15 @@ export const DesignerAssetExplorer: React.FC = () => {
           <div className="flex items-center gap-2 text-xs text-[#86868b] mb-1 font-mono">
             <span>Art Direction & Asset-Pipeline</span>
             <span>·</span>
-            <span>graphic_designer_briefing.md</span>
+            <span>Ordner: artworks/</span>
           </div>
           <h1 className="text-3xl font-extrabold tracking-tight text-white">
-            Asset-Katalog für den Illustrator / Grafikdesigner
+            Asset-Katalog für Grafik &amp; Illustration
           </h1>
           <p className="text-sm text-[#86868b] max-w-2xl mt-1">
-            Übersicht aller benötigten handgezeichneten Komponenten mit exakten
-            Pixel-Maßen, Stimmungen und Design-Anweisungen. Alle Slots verfügen über
-            einen automatischen Blueprint-Wireframe, bis die finale Handzeichnung geliefert wird.
+            Lege fertige Grafiken mit dem exakten Dateinamen einfach in den Ordner{' '}
+            <code className="text-amber-400 font-mono">artworks/</code>. Alle Dateien sind
+            optional — fehlt ein Bild, nutzt das Spiel automatisch die eingebauten Vektor-Illustrationen.
           </p>
         </div>
 
@@ -44,14 +44,14 @@ export const DesignerAssetExplorer: React.FC = () => {
             onClick={(e) => {
               e.preventDefault();
               copyToClipboard(
-                'Siehe graphic_designer_briefing.md im Repository Root für die vollständige Dokumentation.',
+                'Siehe artworks/README.md und graphic_designer_briefing.md im Projekt-Hauptordner.',
                 'full_doc'
               );
             }}
             className="flex items-center gap-2 px-4 py-2 text-xs font-semibold rounded-lg bg-white/10 hover:bg-white/15 text-white transition-colors"
           >
             <FileText className="w-3.5 h-3.5 text-amber-400" />
-            <span>{copiedId === 'full_doc' ? 'Kopiert!' : 'Briefing-Link kopieren'}</span>
+            <span>{copiedId === 'full_doc' ? 'Kopiert!' : 'Briefing-Pfad kopieren'}</span>
           </a>
         </div>
       </div>
@@ -88,13 +88,14 @@ export const DesignerAssetExplorer: React.FC = () => {
             className="p-5 rounded-2xl bg-[#161617] border border-white/10 flex flex-col justify-between"
           >
             <div>
-              {/* Visual Blueprint / Hand-Drawn Frame */}
+              {/* Designer Blueprint / Custom Artwork Preview */}
               <HandDrawnFrame
                 assetPath={asset.filePath}
                 title={asset.title}
                 designerInstruction={asset.instruction}
                 dimensions={asset.dimensions}
                 heightClass="h-44 mb-4"
+                variant="blueprint"
               />
 
               <div className="flex items-center justify-between gap-2 mb-1">
@@ -107,7 +108,7 @@ export const DesignerAssetExplorer: React.FC = () => {
               </div>
 
               <div className="text-[11px] text-[#86868b] font-mono mb-3">
-                {asset.filePath}
+                Ablageort (optional): <span className="text-amber-300">{asset.filePath}</span>
               </div>
 
               <div className="space-y-2 text-xs mb-4">

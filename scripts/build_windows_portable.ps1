@@ -15,6 +15,21 @@ New-Item -ItemType Directory -Path $BundleDir | Out-Null
 
 $BuiltNative = $false
 
+# 0. Optionale fertige Artworks aus dem eindeutigen Ordner artworks/ synchronisieren
+$ArtworksDir = Join-Path $RootDir "artworks"
+$FlutterImagesDir = Join-Path $FlutterDir "assets\images"
+if (Test-Path $ArtworksDir) {
+    Get-ChildItem -Path $ArtworksDir -Recurse -File | Where-Object {
+        $_.Extension -match '^\.(png|jpg|jpeg|webp|svg)$'
+    } | ForEach-Object {
+        $rel = $_.FullName.Substring($ArtworksDir.Length).TrimStart('\', '/')
+        $dest = Join-Path $FlutterImagesDir $rel
+        $destParent = Split-Path -Parent $dest
+        if (-not (Test-Path $destParent)) { New-Item -ItemType Directory -Path $destParent -Force | Out-Null }
+        Copy-Item -Path $_.FullName -Destination $dest -Force
+    }
+}
+
 # 1. Bevorzugt: Echter nativer Flutter Windows Release-Build
 if ((Get-Command flutter -ErrorAction SilentlyContinue) -and (Test-Path (Join-Path $FlutterDir "pubspec.yaml"))) {
     Write-Host "[1/3] Baue native Flutter Windows Release-App..." -ForegroundColor Cyan
@@ -59,6 +74,10 @@ if (-not $BuiltNative) {
     $SourceAssets = Join-Path $WebSource "assets"
     if (Test-Path $SourceAssets) {
         Get-ChildItem -Path $SourceAssets -File | Copy-Item -Destination $TargetAssets -Force
+    }
+    $SourceArtworks = Join-Path $WebSource "artworks"
+    if (Test-Path $SourceArtworks) {
+        Copy-Item -Path $SourceArtworks -Destination (Join-Path $TargetWeb "artworks") -Recurse -Force
     }
     Copy-Item -Path (Join-Path $RootDir "start_game_windows.bat") -Destination $BundleDir -Force
     Copy-Item -Path (Join-Path $RootDir "START_GAME_WINDOWS.exe") -Destination $BundleDir -Force

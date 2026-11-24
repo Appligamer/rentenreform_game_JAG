@@ -8,7 +8,7 @@ export const DECISION_CARDS: DecisionCard[] = [
     description:
       'Zusätzliche Bundesanleihen dotieren den globalen Aktienfonds frühzeitig. Maximiert die Entlastungs-Ausschüttung ab 2035.',
     category: 'generation_capital',
-    artworkAssetPath: 'assets/images/cards/card_generationenkapital_boost.png',
+    artworkAssetPath: 'artworks/cards/card_generationenkapital_boost.png',
     designerNotes:
       'Handzeichnung: Golden schimmernder Setzling, der aus einem Tresor mit Bundesadler wächst und Kurscharts trägt.',
     dimensions: '600 × 900 px (2:3 Ratio)',
@@ -28,7 +28,7 @@ export const DECISION_CARDS: DecisionCard[] = [
     description:
       'Garantiert Kaufkraftschutz für Standardrentner durch gezielten Bundeszuschuss (+6 Mrd. €/Jahr) und +0,6 % Niveau-Puffer.',
     category: 'macro',
-    artworkAssetPath: 'assets/images/cards/card_haltelinie_48.png',
+    artworkAssetPath: 'artworks/cards/card_haltelinie_48.png',
     designerNotes:
       'Handzeichnung: Robuster antiker Leuchtturm mit "48%" Gravur, der tosenden Meereswellen standhält.',
     dimensions: '600 × 900 px (2:3 Ratio)',
@@ -48,7 +48,7 @@ export const DECISION_CARDS: DecisionCard[] = [
     description:
       'Schrittweise Anpassung der Regelaltersgrenze an die Lebenserwartung. Enorme Entlastung der Beitragszahler, aber unpopulär bei Senioren.',
     category: 'macro',
-    artworkAssetPath: 'assets/images/cards/card_retirement_age_68.png',
+    artworkAssetPath: 'artworks/cards/card_retirement_age_68.png',
     designerNotes:
       'Handzeichnung: Kalenderblatt, das nach vorne geblättert wird, daneben Wanderstock und Wegweiser in die Zukunft.',
     dimensions: '600 × 900 px (2:3 Ratio)',
@@ -68,7 +68,7 @@ export const DECISION_CARDS: DecisionCard[] = [
     description:
       'Arbeitgeber verdoppeln freiwillige Vorsorgebeiträge bis 150 €/Monat. Senkt den politischen Druck auf die gesetzliche Rente spürbar.',
     category: 'life',
-    artworkAssetPath: 'assets/images/cards/card_bav_matching.png',
+    artworkAssetPath: 'artworks/cards/card_bav_matching.png',
     designerNotes:
       'Handzeichnung: Vertrauensvoller Handschlag zwischen Arbeitnehmer und Werksleiter vor Fabriksilhouette mit Sparschwein.',
     dimensions: '600 × 900 px (2:3 Ratio)',
@@ -88,7 +88,7 @@ export const DECISION_CARDS: DecisionCard[] = [
     description:
       'Öffnung des Generationenkapitals für internationale Wachstums- & Infrastrukturfonds. Hebelt den Zinseszinseffekt enorm.',
     category: 'generation_capital',
-    artworkAssetPath: 'assets/images/cards/card_market_bull.png',
+    artworkAssetPath: 'artworks/cards/card_market_bull.png',
     designerNotes:
       'Handzeichnung: Dynamischer, eleganter Bulle aus Licht- und Chartlinien, der nach oben stürmt.',
     dimensions: '600 × 900 px (2:3 Ratio)',
@@ -110,7 +110,7 @@ export const DECISION_CARDS: DecisionCard[] = [
     description:
       'Schnellere Anerkennung von Abschlüssen und höhere Erwerbsbeteiligung federn die Boomer-Ruhestandswelle aktiv ab (-0,45 % Beitrag).',
     category: 'macro',
-    artworkAssetPath: 'assets/images/cards/card_boomer_wave.png',
+    artworkAssetPath: 'artworks/cards/card_boomer_wave.png',
     designerNotes:
       'Handzeichnung: Gewaltige Meereswelle aus Jahreszahlen (1960–1965), die durch eine stabile Brücke abgefangen wird.',
     dimensions: '600 × 900 px (2:3 Ratio)',
