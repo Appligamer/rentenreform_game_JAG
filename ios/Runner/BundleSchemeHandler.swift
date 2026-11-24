@@ -152,13 +152,32 @@ final class BundleSchemeHandler: NSObject, WKURLSchemeHandler {
     }
     let errorGuardJS = """
     (function() {
+      window.__EARLY_LOGS__ = window.__EARLY_LOGS__ || [];
+      function pushEarly(level, source, msg) {
+        var now = new Date();
+        var ts = now.toTimeString().slice(0, 8) + '.' + String(now.getMilliseconds()).padStart(3, '0');
+        window.__EARLY_LOGS__.push({ timestamp: ts, level: level, source: source, message: String(msg) });
+      }
       function showErr(msg) {
         var root = document.getElementById('root');
         if (!root || root.childElementCount > 0) return;
         root.innerHTML = '<div style="min-height:100vh;background:#000;color:#f5f5f7;font-family:-apple-system,sans-serif;display:flex;align-items:center;justify-content:center;padding:24px;text-align:center"><div style="max-width:440px;background:#161617;border:1px solid rgba(255,255,255,0.12);border-radius:16px;padding:24px"><h2 style="color:#f59e0b;margin:0 0 8px;font-size:18px">Generation Zukunft</h2><p style="color:#86868b;font-size:13px;margin:0">' + String(msg) + '</p></div></div>';
       }
-      window.addEventListener('error', function(e) { showErr(e.message || 'Unbekannter Fehler'); });
-      window.addEventListener('unhandledrejection', function(e) { showErr(e.reason && e.reason.message ? e.reason.message : String(e.reason)); });
+      window.addEventListener('error', function(e) {
+        if (e && e.message) {
+          pushEarly('error', 'early-onerror', e.message + (e.filename ? ' (' + e.filename + ':' + e.lineno + ')' : ''));
+          showErr(e.message);
+        } else if (e && e.target && e.target.tagName) {
+          var src = e.target.src || e.target.href || '';
+          pushEarly('error', 'early-resource', '<' + e.target.tagName.toLowerCase() + '> Ladefehler: ' + src);
+        }
+      }, true);
+      window.addEventListener('unhandledrejection', function(e) {
+        var msg = e && e.reason && e.reason.message ? e.reason.message : String(e && e.reason);
+        pushEarly('error', 'early-promise', msg);
+        showErr(msg);
+      });
+      pushEarly('info', 'webkit-init', 'WKWebView early-boot hook aktiv');
     })();
     """
     let script = WKUserScript(source: errorGuardJS, injectionTime: .atDocumentStart, forMainFrameOnly: true)

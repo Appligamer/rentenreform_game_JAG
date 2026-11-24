@@ -1,0 +1,427 @@
+-------------------------------------
+Translated Report (Full Report Below)
+-------------------------------------
+Process:             GenerationZukunft_iOS [40544]
+Path:                /Users/USER/Library/Developer/CoreSimulator/Devices/B3CF1D93-C3C3-4BAF-9FDB-79F3C957F6CC/data/Containers/Bundle/Application/14B76499-1984-4380-B4DE-AB51470EF018/GenerationZukunft_iOS.app/GenerationZukunft_iOS
+Identifier:          com.appligamer.rentenreformGameJAG.ios
+Version:             1.0.0 (1)
+Code Type:           ARM-64 (Native)
+Role:                Foreground
+Parent Process:      launchd_sim [40173]
+Coalition:           com.apple.CoreSimulator.SimDevice.B3CF1D93-C3C3-4BAF-9FDB-79F3C957F6CC [10269]
+Responsible Process: SimulatorTrampoline [38843]
+User ID:             501
+
+Date/Time:           2026-11-20 15:14:02.6026 +0100
+Launch Time:         2026-11-20 15:14:01.7283 +0100
+Hardware Model:      Mac17,3
+OS Version:          macOS 27.2.1 (26B131)
+Release Type:        User
+
+Crash Reporter Key:  0104F2B0-AE44-22F0-CAEB-ECE996042A3A
+Incident Identifier: 40DFBB9B-14F8-4A76-AB6D-BBEAE7E79C06
+
+Sleep/Wake UUID:       33A3135B-0BE0-4A44-A8AF-EAE795BCCE91
+
+Time Awake Since Boot: 120000 seconds
+Time Since Wake:       4709 seconds
+
+System Integrity Protection: enabled
+
+Triggered by Thread: 0, Dispatch Queue: com.apple.main-thread
+
+Exception Type:    EXC_BREAKPOINT (SIGTRAP)
+Exception Codes:   0x0000000000000001, 0x00000001c47c6c48
+
+Termination Reason:  Namespace SIGNAL, Code 5, Trace/BPT trap: 5
+Terminating Process: exc handler [40544]
+
+
+Kernel Triage:
+VM - (arg = 0x3) mach_vm_allocate_kernel failed within call to vm_map_enter
+
+
+Thread 0 Crashed::  Dispatch queue: com.apple.main-thread
+0   UIKitCore                     	       0x1c47c6c48 ___UIApplicationEvaluateRuntimeIssueForNoSceneLifecycleAdoption_block_invoke + 712
+1   libdispatch.dylib             	       0x1e673ffb8 _dispatch_client_callout + 12
+2   libdispatch.dylib             	       0x1e6727fa0 _dispatch_once_callout + 28
+3   UIKitCore                     	       0x1c47e896c -[UIApplication workspace:didCreateScene:withTransitionContext:completion:] + 320
+4   UIKitCore                     	       0x1c4210b68 -[UIApplicationSceneClientAgent scene:didInitializeWithEvent:completion:] + 260
+5   FrontBoardServices            	       0x1e2a4221c __95-[FBSScene _callOutQueue_didCreateWithTransitionContext:alternativeCreationCallout:completion:]_block_invoke + 304
+6   FrontBoardServices            	       0x1e2a4271c -[FBSScene _callOutQueue_maybeCoalesceClientSettingsUpdates:] + 116
+7   FrontBoardServices            	       0x1e2a4208c -[FBSScene _callOutQueue_didCreateWithTransitionContext:alternativeCreationCallout:completion:] + 392
+8   FrontBoardServices            	       0x1e2aa699c __93-[FBSWorkspaceScenesClient _callOutQueue_sendDidCreateForScene:transitionContext:completion:]_block_invoke.282 + 216
+9   FrontBoardServices            	       0x1e2a4f344 -[FBSWorkspace _calloutQueue_executeCalloutFromSource:withBlock:] + 160
+10  FrontBoardServices            	       0x1e2a695f0 -[FBSWorkspaceScenesClient _callOutQueue_sendDidCreateForScene:transitionContext:completion:] + 392
+11  FrontBoardServices            	       0x1e2a6ac38 __92-[FBSWorkspaceScenesClient createSceneWithIdentity:parameters:transitionContext:completion:]_block_invoke_2 + 204
+12  FrontBoardServices            	       0x1e2a4f344 -[FBSWorkspace _calloutQueue_executeCalloutFromSource:withBlock:] + 160
+13  libdispatch.dylib             	       0x1e673ffb8 _dispatch_client_callout + 12
+14  libdispatch.dylib             	       0x1e672a60c _dispatch_block_invoke_direct + 376
+15  BoardServices                 	       0x1d1840ad0 __BSSERVICEMAINRUNLOOPQUEUE_IS_CALLING_OUT_TO_A_BLOCK__ + 44
+16  BoardServices                 	       0x1d183fb74 BSServiceMainRunLoopSourceHandler + 180
+17  CoreFoundation                	       0x1c01e5c40 __CFRUNLOOP_IS_CALLING_OUT_TO_A_SOURCE0_PERFORM_FUNCTION__ + 24
+18  CoreFoundation                	       0x1c01e5b88 __CFRunLoopDoSource0 + 168
+19  CoreFoundation                	       0x1c01e5318 __CFRunLoopDoSources0 + 220
+20  CoreFoundation                	       0x1c01e4520 __CFRunLoopRun + 760
+21  CoreFoundation                	       0x1c01df4d4 _CFRunLoopRunSpecificWithOptions + 496
+22  GraphicsServices              	       0x21d3c19ac GSEventRunModal + 116
+23  UIKitCore                     	       0x1c543f4d4 UIApplicationMain + 124
+24  UIKitCore                     	       0x1c52e8320 0x1c3af7000 + 25105184
+25  GenerationZukunft_iOS.debug.dylib	       0x104afded0 static UIApplicationDelegate.main() + 128
+26  GenerationZukunft_iOS.debug.dylib	       0x104afde40 static AppDelegate.$main() + 44
+27  GenerationZukunft_iOS.debug.dylib	       0x104afdfac __debug_main_executable_dylib_entry_point + 28
+28  dyld_sim                      	       0x104cf83d4 start_sim + 20
+29  dyld                          	       0x104badd7c start + 6652
+
+Thread 1:
+
+Thread 2:
+
+Thread 3:
+
+Thread 4:
+
+Thread 5:
+
+Thread 6:
+
+
+Thread 0 crashed with ARM Thread State (64-bit):
+    x0: 0x0000000106097e11   x1: 0x0000000008000100   x2: 0x0000000000000001   x3: 0x0000000000000000
+    x4: 0x0000000000000093   x5: 0x0000000000000092   x6: 0x000000000000078c   x7: 0x0000000000000000
+    x8: 0x000000022eeb0000   x9: 0x345be89cb10f00b1  x10: 0x0000000000000008  x11: 0x000000000000007f
+   x12: 0x0000000000000033  x13: 0x00000001061cd320  x14: 0x010000022e178f51  x15: 0x000000022e178f50
+   x16: 0x00000001d17c24d8  x17: 0x00000001c01b2be0  x18: 0x0000000000000000  x19: 0x0000000106097e00
+   x20: 0x00000001062f4930  x21: 0x000000016b344328  x22: 0x0000000106108600  x23: 0x0000000105454410
+   x24: 0x000000010618c8c0  x25: 0x000000022e3df000  x26: 0x00000001061ec780  x27: 0x0000000000000001
+   x28: 0x0000000106214a00   fp: 0x000000016b344210   lr: 0x00000001c47c6c48
+    sp: 0x000000016b3441d0   pc: 0x00000001c47c6c48 cpsr: 0x60000000
+   far: 0x0000000000000000  esr: 0xf2000000 (Breakpoint) brk 0
+
+Binary Images:
+       0x104ab8000 -        0x104abbfff com.appligamer.rentenreformGameJAG.ios (1.0.0) <ca4f023f-c752-34cc-a3d5-631335950305> /Users/USER/Library/Developer/CoreSimulator/Devices/B3CF1D93-C3C3-4BAF-9FDB-79F3C957F6CC/data/Containers/Bundle/Application/14B76499-1984-4380-B4DE-AB51470EF018/GenerationZukunft_iOS.app/GenerationZukunft_iOS
+       0x104ce8000 -        0x104d43fff dyld_sim (*) <d753cba8-f4ed-3813-b91c-c6f04918fcf4> /Volumes/VOLUME/*/dyld_sim
+       0x104afc000 -        0x104b0ffff GenerationZukunft_iOS.debug.dylib (*) <6a331bd1-6376-3709-8468-44e2655684b6> /Users/USER/Library/Developer/CoreSimulator/Devices/B3CF1D93-C3C3-4BAF-9FDB-79F3C957F6CC/data/Containers/Bundle/Application/14B76499-1984-4380-B4DE-AB51470EF018/GenerationZukunft_iOS.app/GenerationZukunft_iOS.debug.dylib
+       0x104ad4000 -        0x104ad7fff libswiftUIKit.dylib (*) <434237ad-1cc9-319d-bd0b-661bffdfe297> /Volumes/VOLUME/*/libswiftUIKit.dylib
+       0x104b30000 -        0x104b3bfff libsystem_platform.dylib (*) <38c97926-a4a7-3c0e-9086-20774f32b98b> /usr/lib/system/libsystem_platform.dylib
+       0x104f7c000 -        0x104fbbfff libsystem_kernel.dylib (*) <ee6c35a4-06c3-3bb2-b1d6-00f39b96ab4d> /usr/lib/system/libsystem_kernel.dylib
+       0x104e60000 -        0x104e6ffff libsystem_pthread.dylib (*) <8728d77b-94c9-38e9-a54b-1d4a92967cd8> /usr/lib/system/libsystem_pthread.dylib
+       0x104ea4000 -        0x104eaffff libobjc-trampolines.dylib (*) <bf507851-e630-36f9-a1c5-20afd2135a25> /Volumes/VOLUME/*/libobjc-trampolines.dylib
+       0x104b7c000 -        0x104c3bfff dyld (*) <d8104ed6-185e-3a2f-ad71-b91eddbe2598> /usr/lib/dyld
+       0x1c3af7000 -        0x1c5e8714b UIKitCore (*) <dcd2fe69-e811-31f4-a724-f7f1a047154c> /Volumes/VOLUME/*/UIKitCore.framework/UIKitCore
+       0x1e6724000 -        0x1e6768c77 libdispatch.dylib (*) <d159819f-c0e6-3f2d-831b-596a68ac54c0> /Volumes/VOLUME/*/libdispatch.dylib
+       0x1e2a30000 -        0x1e2ae18b7 FrontBoardServices (*) <62a4fa66-c3e3-337f-8788-dcc2c3f1cfb0> /Volumes/VOLUME/*/FrontBoardServices.framework/FrontBoardServices
+       0x1d1817000 -        0x1d18b246f BoardServices (*) <857fd6b7-ffac-38c7-af26-b23564da6bf1> /Volumes/VOLUME/*/BoardServices.framework/BoardServices
+       0x1c014b000 -        0x1c04b936f CoreFoundation (*) <50d73769-a0a5-3256-8477-18b4323b5d09> /Volumes/VOLUME/*/CoreFoundation.framework/CoreFoundation
+       0x21d3bf000 -        0x21d3c6cfb GraphicsServices (*) <c24d8ed4-89bc-338b-8adf-798899dd47f0> /Volumes/VOLUME/*/GraphicsServices.framework/GraphicsServices
+               0x0 - 0xffffffffffffffff ??? (*) <00000000-0000-0000-0000-000000000000> ???
+       0x1d174d000 -        0x1d1816ecb BaseBoard (*) <184af5d2-a99a-32fa-ad43-793215d92717> /Volumes/VOLUME/*/BaseBoard.framework/BaseBoard
+
+External Modification Summary:
+  Calls made by other processes targeting this process:
+    task_for_pid: 0
+    thread_create: 0
+    thread_set_state: 0
+  Calls made by this process:
+    task_for_pid: 0
+    thread_create: 0
+    thread_set_state: 0
+  Calls made by all processes on this machine:
+    task_for_pid: 13
+    thread_create: 0
+    thread_set_state: 326
+
+VM Region Summary:
+ReadOnly portion of Libraries: Total=1.7G resident=0K(0%) swapped_out_or_unallocated=1.7G(100%)
+Writable regions: Total=26.6M written=1522K(6%) resident=1522K(6%) swapped_out=0K(0%) unallocated=25.1M(94%)
+
+                                VIRTUAL   REGION 
+REGION TYPE                        SIZE    COUNT (non-coalesced) 
+===========                     =======  ======= 
+Activity Tracing                   256K        1 
+Dyld Private Memory               53.5G       10 
+Foundation                          16K        1 
+Guard                            385.0G        1 
+Malloc                            13.4M        9 
+Malloc Guard Page                 3360K        4 
+OS Alloc Once                       32K        1 
+Stack                             11.2M        7 
+Stack Guard                       56.1M        7 
+Untagged                            32K        1 
+__AUTH_CONST                        32K        1 
+__DATA                            33.1M      561 
+__DATA_CONST                      84.5M      569 
+__DATA_DIRTY                       139K       14 
+__FONT_DATA                        2352        1 
+__LINKEDIT                         1.0G       10 
+__TEXT                           751.0M      599 
+__TPRO_CONST                       184K        5 
+mapped file                       34.5M        2 
+page table in kernel              1522K        1 
+shared memory                       16K        1 
+===========                     =======  ======= 
+TOTAL                            440.5G     1806 
+
+
+-----------
+Full Report
+-----------
+
+{"app_name":"GenerationZukunft_iOS","timestamp":"2026-11-20 15:14:15.00 +0100","app_version":"1.0.0","slice_uuid":"ca4f023f-c752-34cc-a3d5-631335950305","build_version":"1","platform":7,"bundleID":"com.appligamer.rentenreformGameJAG.ios","share_with_app_devs":0,"is_first_party":0,"bug_type":"309","os_version":"macOS 27.2.1 (26B131)","roots_installed":0,"name":"GenerationZukunft_iOS","incident_id":"40DFBB9B-14F8-4A76-AB6D-BBEAE7E79C06"}
+{
+  "uptime" : 120000,
+  "procRole" : "Foreground",
+  "version" : 2,
+  "userID" : 501,
+  "deployVersion" : 210,
+  "modelCode" : "Mac17,3",
+  "coalitionID" : 10269,
+  "osVersion" : {
+    "train" : "macOS 27.2.1",
+    "build" : "26B131",
+    "releaseType" : "User"
+  },
+  "captureTime" : "2026-11-20 15:14:02.6026 +0100",
+  "codeSigningMonitor" : 2,
+  "incident" : "40DFBB9B-14F8-4A76-AB6D-BBEAE7E79C06",
+  "pid" : 40544,
+  "translated" : false,
+  "cpuType" : "ARM-64",
+  "procLaunch" : "2026-11-20 15:14:01.7283 +0100",
+  "procStartAbsTime" : 3015184303247,
+  "procExitAbsTime" : 3015202957027,
+  "procName" : "GenerationZukunft_iOS",
+  "procPath" : "\/Users\/USER\/Library\/Developer\/CoreSimulator\/Devices\/B3CF1D93-C3C3-4BAF-9FDB-79F3C957F6CC\/data\/Containers\/Bundle\/Application\/14B76499-1984-4380-B4DE-AB51470EF018\/GenerationZukunft_iOS.app\/GenerationZukunft_iOS",
+  "bundleInfo" : {"CFBundleShortVersionString":"1.0.0","CFBundleVersion":"1","CFBundleIdentifier":"com.appligamer.rentenreformGameJAG.ios"},
+  "storeInfo" : {"deviceIdentifierForVendor":"C5F27DE3-B561-5C3D-B74B-B1CB1A272FAF","thirdParty":true},
+  "parentProc" : "launchd_sim",
+  "parentPid" : 40173,
+  "coalitionName" : "com.apple.CoreSimulator.SimDevice.B3CF1D93-C3C3-4BAF-9FDB-79F3C957F6CC",
+  "crashReporterKey" : "0104F2B0-AE44-22F0-CAEB-ECE996042A3A",
+  "developerMode" : 1,
+  "responsiblePid" : 38843,
+  "responsibleProc" : "SimulatorTrampoline",
+  "codeSigningID" : "com.appligamer.rentenreformGameJAG.ios",
+  "codeSigningTeamID" : "",
+  "codeSigningFlags" : 570425857,
+  "codeSigningValidationCategory" : 10,
+  "codeSigningTrustLevel" : 4294967295,
+  "codeSigningAuxiliaryInfo" : 0,
+  "instructionByteStream" : {"beforePC":"Yyg\/keQDAJECAoBSxQSAUjZBS5T8Q0uU4AMTqiRES5SoaEOUFkFLlA==","atPC":"AAAg1CAAINTI4DSwCFFB+R8FALGBAABUyOA0sABNQfkcREsU\/Xu\/qQ=="},
+  "bootSessionUUID" : "E99C85F6-F61C-4965-9825-6DC32730F18C",
+  "wakeTime" : 4709,
+  "sleepWakeUUID" : "33A3135B-0BE0-4A44-A8AF-EAE795BCCE91",
+  "sip" : "enabled",
+  "exception" : {"codes":"0x0000000000000001, 0x00000001c47c6c48","rawCodes":[1,7591455816],"type":"EXC_BREAKPOINT","signal":"SIGTRAP"},
+  "termination" : {"flags":0,"code":5,"namespace":"SIGNAL","indicator":"Trace\/BPT trap: 5","byProc":"exc handler","byPid":40544},
+  "os_fault" : {"process":"GenerationZukunft_iOS"},
+  "ktriageinfo" : "VM - (arg = 0x3) mach_vm_allocate_kernel failed within call to vm_map_enter\n",
+  "extMods" : {"caller":{"thread_create":0,"thread_set_state":0,"task_for_pid":0},"system":{"thread_create":0,"thread_set_state":326,"task_for_pid":13},"targeted":{"thread_create":0,"thread_set_state":0,"task_for_pid":0},"warnings":0},
+  "faultingThread" : 0,
+  "threads" : [{"triggered":true,"id":2194115,"threadState":{"x":[{"value":4396252689},{"value":134217984},{"value":1},{"value":0},{"value":147},{"value":146},{"value":1932},{"value":0},{"value":9377087488,"symbolLocation":8,"symbol":"_OBJC_PROTOCOL_$_NSMutableCopying"},{"value":3772864872536015025},{"value":8},{"value":127},{"value":51},{"value":4397519648},{"value":72057603401158481,"symbolLocation":72057594037927937,"symbol":"OBJC_CLASS_$___NSCFString"},{"value":9363230544,"symbolLocation":0,"symbol":"OBJC_CLASS_$___NSCFString"},{"value":7809541336,"symbolLocation":0,"symbol":"_bs_set_crash_log_message"},{"value":7517973472,"symbolLocation":0,"symbol":"-[__NSCFString UTF8String]"},{"value":0},{"value":4396252672},{"value":4398729520},{"value":6093554472},{"value":4396713472},{"value":4383392784},{"value":4397254848},{"value":9365745664,"symbolLocation":152,"symbol":"_MergedGlobals"},{"value":4397647744},{"value":1},{"value":4397812224}],"flavor":"ARM_THREAD_STATE64","lr":{"value":7591455816},"cpsr":{"value":1610612736},"fp":{"value":6093554192},"sp":{"value":6093554128},"esr":{"value":4060086272,"description":"(Breakpoint) brk 0"},"pc":{"value":7591455816,"matchesCrashFrame":1},"far":{"value":0}},"queue":"com.apple.main-thread","frames":[{"imageOffset":13433928,"symbol":"___UIApplicationEvaluateRuntimeIssueForNoSceneLifecycleAdoption_block_invoke","symbolLocation":712,"imageIndex":9},{"imageOffset":114616,"symbol":"_dispatch_client_callout","symbolLocation":12,"imageIndex":10},{"imageOffset":16288,"symbol":"_dispatch_once_callout","symbolLocation":28,"imageIndex":10},{"imageOffset":13572460,"symbol":"-[UIApplication workspace:didCreateScene:withTransitionContext:completion:]","symbolLocation":320,"imageIndex":9},{"imageOffset":7445352,"symbol":"-[UIApplicationSceneClientAgent scene:didInitializeWithEvent:completion:]","symbolLocation":260,"imageIndex":9},{"imageOffset":74268,"symbol":"__95-[FBSScene _callOutQueue_didCreateWithTransitionContext:alternativeCreationCallout:completion:]_block_invoke","symbolLocation":304,"imageIndex":11},{"imageOffset":75548,"symbol":"-[FBSScene _callOutQueue_maybeCoalesceClientSettingsUpdates:]","symbolLocation":116,"imageIndex":11},{"imageOffset":73868,"symbol":"-[FBSScene _callOutQueue_didCreateWithTransitionContext:alternativeCreationCallout:completion:]","symbolLocation":392,"imageIndex":11},{"imageOffset":485788,"symbol":"__93-[FBSWorkspaceScenesClient _callOutQueue_sendDidCreateForScene:transitionContext:completion:]_block_invoke.282","symbolLocation":216,"imageIndex":11},{"imageOffset":127812,"symbol":"-[FBSWorkspace _calloutQueue_executeCalloutFromSource:withBlock:]","symbolLocation":160,"imageIndex":11},{"imageOffset":234992,"symbol":"-[FBSWorkspaceScenesClient _callOutQueue_sendDidCreateForScene:transitionContext:completion:]","symbolLocation":392,"imageIndex":11},{"imageOffset":240696,"symbol":"__92-[FBSWorkspaceScenesClient createSceneWithIdentity:parameters:transitionContext:completion:]_block_invoke_2","symbolLocation":204,"imageIndex":11},{"imageOffset":127812,"symbol":"-[FBSWorkspace _calloutQueue_executeCalloutFromSource:withBlock:]","symbolLocation":160,"imageIndex":11},{"imageOffset":114616,"symbol":"_dispatch_client_callout","symbolLocation":12,"imageIndex":10},{"imageOffset":26124,"symbol":"_dispatch_block_invoke_direct","symbolLocation":376,"imageIndex":10},{"imageOffset":170704,"symbol":"__BSSERVICEMAINRUNLOOPQUEUE_IS_CALLING_OUT_TO_A_BLOCK__","symbolLocation":44,"imageIndex":12},{"imageOffset":166772,"symbol":"BSServiceMainRunLoopSourceHandler","symbolLocation":180,"imageIndex":12},{"imageOffset":633920,"symbol":"__CFRUNLOOP_IS_CALLING_OUT_TO_A_SOURCE0_PERFORM_FUNCTION__","symbolLocation":24,"imageIndex":13},{"imageOffset":633736,"symbol":"__CFRunLoopDoSource0","symbolLocation":168,"imageIndex":13},{"imageOffset":631576,"symbol":"__CFRunLoopDoSources0","symbolLocation":220,"imageIndex":13},{"imageOffset":628000,"symbol":"__CFRunLoopRun","symbolLocation":760,"imageIndex":13},{"imageOffset":607444,"symbol":"_CFRunLoopRunSpecificWithOptions","symbolLocation":496,"imageIndex":13},{"imageOffset":10668,"symbol":"GSEventRunModal","symbolLocation":116,"imageIndex":14},{"imageOffset":26510548,"symbol":"UIApplicationMain","symbolLocation":124,"imageIndex":9},{"imageOffset":25105184,"imageIndex":9},{"imageOffset":7888,"sourceFile":"\/<compiler-generated>","symbol":"static UIApplicationDelegate.main()","symbolLocation":128,"imageIndex":2},{"imageOffset":7744,"sourceFile":"\/<compiler-generated>","symbol":"static AppDelegate.$main()","symbolLocation":44,"imageIndex":2},{"imageOffset":8108,"sourceFile":"\/<compiler-generated>","symbol":"__debug_main_executable_dylib_entry_point","symbolLocation":28,"imageIndex":2},{"imageOffset":66516,"symbol":"start_sim","symbolLocation":20,"imageIndex":1},{"imageOffset":204156,"symbol":"start","symbolLocation":6652,"imageIndex":8}]},{"id":2194137,"frames":[],"threadState":{"x":[{"value":6094123008},{"value":4611},{"value":6093586432},{"value":0},{"value":409604},{"value":18446744073709551615},{"value":0},{"value":0},{"value":0},{"value":0},{"value":0},{"value":0},{"value":0},{"value":0},{"value":0},{"value":0},{"value":0},{"value":0},{"value":0},{"value":0},{"value":0},{"value":0},{"value":0},{"value":0},{"value":0},{"value":0},{"value":0},{"value":0},{"value":0}],"flavor":"ARM_THREAD_STATE64","lr":{"value":0},"cpsr":{"value":0},"fp":{"value":0},"sp":{"value":6094123008},"esr":{"value":1442840704,"description":"(Syscall)"},"pc":{"value":4377156184},"far":{"value":0}}},{"id":2194138,"frames":[],"threadState":{"x":[{"value":6094696448},{"value":4867},{"value":6094159872},{"value":0},{"value":409604},{"value":18446744073709551615},{"value":0},{"value":0},{"value":0},{"value":0},{"value":0},{"value":0},{"value":0},{"value":0},{"value":0},{"value":0},{"value":0},{"value":0},{"value":0},{"value":0},{"value":0},{"value":0},{"value":0},{"value":0},{"value":0},{"value":0},{"value":0},{"value":0},{"value":0}],"flavor":"ARM_THREAD_STATE64","lr":{"value":0},"cpsr":{"value":0},"fp":{"value":0},"sp":{"value":6094696448},"esr":{"value":1442840704,"description":"(Syscall)"},"pc":{"value":4377156184},"far":{"value":0}}},{"id":2194139,"frames":[],"threadState":{"x":[{"value":6095269888},{"value":6147},{"value":6094733312},{"value":0},{"value":409604},{"value":18446744073709551615},{"value":0},{"value":0},{"value":0},{"value":0},{"value":0},{"value":0},{"value":0},{"value":0},{"value":0},{"value":0},{"value":0},{"value":0},{"value":0},{"value":0},{"value":0},{"value":0},{"value":0},{"value":0},{"value":0},{"value":0},{"value":0},{"value":0},{"value":0}],"flavor":"ARM_THREAD_STATE64","lr":{"value":0},"cpsr":{"value":0},"fp":{"value":0},"sp":{"value":6095269888},"esr":{"value":1442840704,"description":"(Syscall)"},"pc":{"value":4377156184},"far":{"value":0}}},{"id":2194141,"frames":[],"threadState":{"x":[{"value":6095843328},{"value":8451},{"value":6095306752},{"value":0},{"value":409604},{"value":18446744073709551615},{"value":0},{"value":0},{"value":0},{"value":0},{"value":0},{"value":0},{"value":0},{"value":0},{"value":0},{"value":0},{"value":0},{"value":0},{"value":0},{"value":0},{"value":0},{"value":0},{"value":0},{"value":0},{"value":0},{"value":0},{"value":0},{"value":0},{"value":0}],"flavor":"ARM_THREAD_STATE64","lr":{"value":0},"cpsr":{"value":0},"fp":{"value":0},"sp":{"value":6095843328},"esr":{"value":1442840704,"description":"(Syscall)"},"pc":{"value":4377156184},"far":{"value":0}}},{"id":2194142,"frames":[],"threadState":{"x":[{"value":6096416768},{"value":15107},{"value":6095880192},{"value":0},{"value":409604},{"value":18446744073709551615},{"value":0},{"value":0},{"value":0},{"value":0},{"value":0},{"value":0},{"value":0},{"value":0},{"value":0},{"value":0},{"value":0},{"value":0},{"value":0},{"value":0},{"value":0},{"value":0},{"value":0},{"value":0},{"value":0},{"value":0},{"value":0},{"value":0},{"value":0}],"flavor":"ARM_THREAD_STATE64","lr":{"value":0},"cpsr":{"value":0},"fp":{"value":0},"sp":{"value":6096416768},"esr":{"value":1442840704,"description":"(Syscall)"},"pc":{"value":4377156184},"far":{"value":0}}},{"id":2194143,"frames":[],"threadState":{"x":[{"value":6096990208},{"value":17667},{"value":6096453632},{"value":0},{"value":409604},{"value":18446744073709551615},{"value":0},{"value":0},{"value":0},{"value":0},{"value":0},{"value":0},{"value":0},{"value":0},{"value":0},{"value":0},{"value":0},{"value":0},{"value":0},{"value":0},{"value":0},{"value":0},{"value":0},{"value":0},{"value":0},{"value":0},{"value":0},{"value":0},{"value":0}],"flavor":"ARM_THREAD_STATE64","lr":{"value":0},"cpsr":{"value":0},"fp":{"value":0},"sp":{"value":6096990208},"esr":{"value":1442840704,"description":"(Syscall)"},"pc":{"value":4377156184},"far":{"value":0}}}],
+  "usedImages" : [
+  {
+    "source" : "P",
+    "arch" : "arm64",
+    "base" : 4373315584,
+    "CFBundleShortVersionString" : "1.0.0",
+    "CFBundleIdentifier" : "com.appligamer.rentenreformGameJAG.ios",
+    "size" : 16384,
+    "uuid" : "ca4f023f-c752-34cc-a3d5-631335950305",
+    "path" : "\/Users\/USER\/Library\/Developer\/CoreSimulator\/Devices\/B3CF1D93-C3C3-4BAF-9FDB-79F3C957F6CC\/data\/Containers\/Bundle\/Application\/14B76499-1984-4380-B4DE-AB51470EF018\/GenerationZukunft_iOS.app\/GenerationZukunft_iOS",
+    "name" : "GenerationZukunft_iOS",
+    "CFBundleVersion" : "1"
+  },
+  {
+    "source" : "P",
+    "arch" : "arm64",
+    "base" : 4375609344,
+    "size" : 376832,
+    "uuid" : "d753cba8-f4ed-3813-b91c-c6f04918fcf4",
+    "path" : "\/Volumes\/VOLUME\/*\/dyld_sim",
+    "name" : "dyld_sim"
+  },
+  {
+    "source" : "P",
+    "arch" : "arm64",
+    "base" : 4373594112,
+    "size" : 81920,
+    "uuid" : "6a331bd1-6376-3709-8468-44e2655684b6",
+    "path" : "\/Users\/USER\/Library\/Developer\/CoreSimulator\/Devices\/B3CF1D93-C3C3-4BAF-9FDB-79F3C957F6CC\/data\/Containers\/Bundle\/Application\/14B76499-1984-4380-B4DE-AB51470EF018\/GenerationZukunft_iOS.app\/GenerationZukunft_iOS.debug.dylib",
+    "name" : "GenerationZukunft_iOS.debug.dylib"
+  },
+  {
+    "source" : "P",
+    "arch" : "arm64",
+    "base" : 4373430272,
+    "size" : 16384,
+    "uuid" : "434237ad-1cc9-319d-bd0b-661bffdfe297",
+    "path" : "\/Volumes\/VOLUME\/*\/libswiftUIKit.dylib",
+    "name" : "libswiftUIKit.dylib"
+  },
+  {
+    "source" : "P",
+    "arch" : "arm64",
+    "base" : 4373807104,
+    "size" : 49152,
+    "uuid" : "38c97926-a4a7-3c0e-9086-20774f32b98b",
+    "path" : "\/usr\/lib\/system\/libsystem_platform.dylib",
+    "name" : "libsystem_platform.dylib"
+  },
+  {
+    "source" : "P",
+    "arch" : "arm64",
+    "base" : 4378312704,
+    "size" : 262144,
+    "uuid" : "ee6c35a4-06c3-3bb2-b1d6-00f39b96ab4d",
+    "path" : "\/usr\/lib\/system\/libsystem_kernel.dylib",
+    "name" : "libsystem_kernel.dylib"
+  },
+  {
+    "source" : "P",
+    "arch" : "arm64",
+    "base" : 4377149440,
+    "size" : 65536,
+    "uuid" : "8728d77b-94c9-38e9-a54b-1d4a92967cd8",
+    "path" : "\/usr\/lib\/system\/libsystem_pthread.dylib",
+    "name" : "libsystem_pthread.dylib"
+  },
+  {
+    "source" : "P",
+    "arch" : "arm64",
+    "base" : 4377427968,
+    "size" : 49152,
+    "uuid" : "bf507851-e630-36f9-a1c5-20afd2135a25",
+    "path" : "\/Volumes\/VOLUME\/*\/libobjc-trampolines.dylib",
+    "name" : "libobjc-trampolines.dylib"
+  },
+  {
+    "source" : "P",
+    "arch" : "arm64e",
+    "base" : 4374118400,
+    "size" : 786432,
+    "uuid" : "d8104ed6-185e-3a2f-ad71-b91eddbe2598",
+    "path" : "\/usr\/lib\/dyld",
+    "name" : "dyld"
+  },
+  {
+    "source" : "P",
+    "arch" : "arm64",
+    "base" : 7578021888,
+    "size" : 37290316,
+    "uuid" : "dcd2fe69-e811-31f4-a724-f7f1a047154c",
+    "path" : "\/Volumes\/VOLUME\/*\/UIKitCore.framework\/UIKitCore",
+    "name" : "UIKitCore"
+  },
+  {
+    "source" : "P",
+    "arch" : "arm64",
+    "base" : 8161214464,
+    "size" : 281720,
+    "uuid" : "d159819f-c0e6-3f2d-831b-596a68ac54c0",
+    "path" : "\/Volumes\/VOLUME\/*\/libdispatch.dylib",
+    "name" : "libdispatch.dylib"
+  },
+  {
+    "source" : "P",
+    "arch" : "arm64",
+    "base" : 8097300480,
+    "size" : 727224,
+    "uuid" : "62a4fa66-c3e3-337f-8788-dcc2c3f1cfb0",
+    "path" : "\/Volumes\/VOLUME\/*\/FrontBoardServices.framework\/FrontBoardServices",
+    "name" : "FrontBoardServices"
+  },
+  {
+    "source" : "P",
+    "arch" : "arm64",
+    "base" : 7809888256,
+    "size" : 636016,
+    "uuid" : "857fd6b7-ffac-38c7-af26-b23564da6bf1",
+    "path" : "\/Volumes\/VOLUME\/*\/BoardServices.framework\/BoardServices",
+    "name" : "BoardServices"
+  },
+  {
+    "source" : "P",
+    "arch" : "arm64",
+    "base" : 7517548544,
+    "size" : 3597168,
+    "uuid" : "50d73769-a0a5-3256-8477-18b4323b5d09",
+    "path" : "\/Volumes\/VOLUME\/*\/CoreFoundation.framework\/CoreFoundation",
+    "name" : "CoreFoundation"
+  },
+  {
+    "source" : "P",
+    "arch" : "arm64",
+    "base" : 9080401920,
+    "size" : 31996,
+    "uuid" : "c24d8ed4-89bc-338b-8adf-798899dd47f0",
+    "path" : "\/Volumes\/VOLUME\/*\/GraphicsServices.framework\/GraphicsServices",
+    "name" : "GraphicsServices"
+  },
+  {
+    "size" : 0,
+    "source" : "A",
+    "base" : 0,
+    "uuid" : "00000000-0000-0000-0000-000000000000"
+  },
+  {
+    "source" : "P",
+    "arch" : "arm64",
+    "base" : 7809060864,
+    "size" : 827084,
+    "uuid" : "184af5d2-a99a-32fa-ad43-793215d92717",
+    "path" : "\/Volumes\/VOLUME\/*\/BaseBoard.framework\/BaseBoard",
+    "name" : "BaseBoard"
+  }
+],
+  "sharedCache" : {
+  "base" : 7516192768,
+  "size" : 3890626560,
+  "uuid" : "c54ad6fa-9ff2-3edb-9c8a-53a82682d342"
+},
+  "vmSummary" : "ReadOnly portion of Libraries: Total=1.7G resident=0K(0%) swapped_out_or_unallocated=1.7G(100%)\nWritable regions: Total=26.6M written=1522K(6%) resident=1522K(6%) swapped_out=0K(0%) unallocated=25.1M(94%)\n\n                                VIRTUAL   REGION \nREGION TYPE                        SIZE    COUNT (non-coalesced) \n===========                     =======  ======= \nActivity Tracing                   256K        1 \nDyld Private Memory               53.5G       10 \nFoundation                          16K        1 \nGuard                            385.0G        1 \nMalloc                            13.4M        9 \nMalloc Guard Page                 3360K        4 \nOS Alloc Once                       32K        1 \nStack                             11.2M        7 \nStack Guard                       56.1M        7 \nUntagged                            32K        1 \n__AUTH_CONST                        32K        1 \n__DATA                            33.1M      561 \n__DATA_CONST                      84.5M      569 \n__DATA_DIRTY                       139K       14 \n__FONT_DATA                        2352        1 \n__LINKEDIT                         1.0G       10 \n__TEXT                           751.0M      599 \n__TPRO_CONST                       184K        5 \nmapped file                       34.5M        2 \npage table in kernel              1522K        1 \nshared memory                       16K        1 \n===========                     =======  ======= \nTOTAL                            440.5G     1806 \n",
+  "legacyInfo" : {
+  "threadTriggered" : {
+    "queue" : "com.apple.main-thread"
+  }
+},
+  "logWritingSignature" : "f0ef0bdff8708a33c1b812f2913cc8b9cd94c412",
+  "bug_type" : "309",
+  "roots_installed" : 0,
+  "trmStatus" : 1,
+  "voucherInfos" : [{"proximateName":"SpringBoard","thread_id":2194115}],
+  "trialInfo" : {
+  "rollouts" : [
+    {
+      "rolloutId" : "67181b10c68c361a728c7cfa",
+      "factorPackIds" : [
+
+      ],
+      "deploymentId" : 240000005
+    },
+    {
+      "rolloutId" : "63508950b3714d3622fc77f7",
+      "factorPackIds" : [
+        "6526e111d0c9ce2f459b54a8"
+      ],
+      "deploymentId" : 240000015
+    }
+  ],
+  "experiments" : [
+
+  ]
+}
+}
+
+Model: Mac17,3, BootROM 20457.41.3, proc 10:4:0:6 processors, 16 GB, SMC 
+Graphics: Apple M5, Apple M5, Built-In
+Display: Color LCD, 2560 x 1664 Retina, Main, MirrorOff, Online
+Memory Module: LPDDR5, Micron
+AirPort: chip id: 0x11 api 1.2 firmware [Rev 92.4.10 PrxB1 dF=0] phy [30.1.151.0], core80211 [344.5.4 N1_b ], Oct  3 2026 15:12:23 version XBS_BUILD_TAG GIT_DESCRIBE FWID chip id: 0x11 api 1.2 firmware [Rev 92.4.10 PrxB1 dF=0] phy [30.1.151.0], core80211 [344.5.4 N1_b ]
+IO80211_driverkit-1587.10 "IO80211_driverkit-1587.10" Oct  3 2026 14:53:06
+AirPort: 
+Bluetooth: Version (null), 0 services, 0 devices, 0 incoming serial ports
+Network Service: Wi-Fi, AirPort, en0
+Network Service: Tailscale, VPN (io.tailscale.ipn.macsys), utun13
+Thunderbolt Bus: MacBook Air, Apple Inc.
+Thunderbolt Bus: MacBook Air, Apple Inc.

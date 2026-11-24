@@ -1,5 +1,6 @@
 import React from 'react';
 import { AlertTriangle, RotateCcw } from 'lucide-react';
+import { consoleLogger } from '../utils/consoleLogger';
 
 interface ErrorBoundaryState {
   hasError: boolean;
@@ -20,6 +21,14 @@ export class ErrorBoundary extends React.Component<
       hasError: true,
       errorMessage: error.message || 'Unbekannter Laufzeitfehler',
     };
+  }
+
+  componentDidCatch(error: Error, info: React.ErrorInfo): void {
+    consoleLogger.pushEntry(
+      'error',
+      'ErrorBoundary',
+      `${error.name}: ${error.message}\n${info.componentStack || error.stack || ''}`
+    );
   }
 
   handleReset = () => {

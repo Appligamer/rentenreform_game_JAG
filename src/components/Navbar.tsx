@@ -2,13 +2,16 @@ import React, { useState, useEffect } from 'react';
 import { Volume2, VolumeX, Shield, Lock, Terminal } from 'lucide-react';
 import { soundEngine } from '../utils/soundEffects';
 
+export type AppTab = 'game' | 'citizen' | 'rules' | 'briefing' | 'export' | 'console';
+
 interface NavbarProps {
-  currentTab: 'game' | 'citizen' | 'rules' | 'briefing' | 'export';
-  onSelectTab: (tab: 'game' | 'citizen' | 'rules' | 'briefing' | 'export') => void;
+  currentTab: AppTab;
+  onSelectTab: (tab: AppTab) => void;
   currentYear: number;
   devMode: boolean;
   onToggleDevMode: () => void;
   score: number;
+  errorCount?: number;
 }
 
 export const Navbar: React.FC<NavbarProps> = ({
@@ -18,6 +21,7 @@ export const Navbar: React.FC<NavbarProps> = ({
   devMode,
   onToggleDevMode,
   score,
+  errorCount = 0,
 }) => {
   const [logoClicks, setLogoClicks] = useState(0);
   const [muted, setMuted] = useState(soundEngine.isMuted());
@@ -148,6 +152,21 @@ export const Navbar: React.FC<NavbarProps> = ({
                   }`}
                 >
                   Multiplattform
+                </button>
+                <button
+                  onClick={() => onSelectTab('console')}
+                  className={`hover:text-amber-400 transition-colors whitespace-nowrap shrink-0 pb-1 cursor-pointer inline-flex items-center gap-1.5 ${
+                    currentTab === 'console'
+                      ? 'text-amber-400 border-b border-amber-400 font-semibold'
+                      : 'text-amber-400/80'
+                  }`}
+                >
+                  <span>Console Log Overlay</span>
+                  {errorCount > 0 && (
+                    <span className="px-1.5 py-0.2 rounded bg-red-500/20 text-red-400 border border-red-500/30 font-mono text-[10px] tabular-nums">
+                      {errorCount}
+                    </span>
+                  )}
                 </button>
               </>
             )}

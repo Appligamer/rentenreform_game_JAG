@@ -1,17 +1,40 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { usePensionGame } from './hooks/usePensionGame';
 import { getDifficultyConfig } from './simulation/difficultyConfig';
-import { Navbar } from './components/Navbar';
+import { Navbar, AppTab } from './components/Navbar';
 import { ToastBanner } from './components/ToastBanner';
 import { GameChallengeScreen } from './components/GameChallengeScreen';
 import { CitizenSimulation } from './components/CitizenSimulation';
 import { RulesMissionView } from './components/RulesMissionView';
 import { DesignerAssetExplorer } from './components/DesignerAssetExplorer';
 import { PlatformExportHub } from './components/PlatformExportHub';
+import { ConsoleLogOverlayTab } from './components/ConsoleLogOverlayTab';
+import { consoleLogger } from './utils/consoleLogger';
 
 export default function App() {
-  const [currentTab, setCurrentTab] = useState<'game' | 'citizen' | 'rules' | 'briefing' | 'export'>('game');
+  const [currentTab, setCurrentTab] = useState<AppTab>('game');
   const [devMode, setDevMode] = useState<boolean>(false);
+  const [errorCount, setErrorCount] = useState<number>(0);
+
+  useEffect(() => {
+    return consoleLogger.subscribe((entries) => {
+      let count = 0;
+      for (const e of entries) {
+        if (e.level === 'error') count++;
+      }
+      setErrorCount(count);
+    });
+  }, []);
+
+  const handleToggleDevMode = () => {
+    setDevMode((prev) => {
+      const next = !prev;
+      if (!next && (currentTab === 'briefing' || currentTab === 'export' || currentTab === 'console')) {
+        setCurrentTab('game');
+      }
+      return next;
+    });
+  };
 
   const game = usePensionGame();
   const diffConfig = getDifficultyConfig(game.difficulty);
@@ -23,8 +46,9 @@ export default function App() {
         onSelectTab={setCurrentTab}
         currentYear={game.macro.year}
         devMode={devMode}
-        onToggleDevMode={() => setDevMode((prev) => !prev)}
+        onToggleDevMode={handleToggleDevMode}
         score={game.metrics.score}
+        errorCount={errorCount}
       />
 
       <main className="flex-1 max-w-6xl w-full mx-auto px-4 sm:px-6 py-6">
@@ -61,6 +85,8 @@ export default function App() {
         {devMode && currentTab === 'briefing' && <DesignerAssetExplorer />}
 
         {devMode && currentTab === 'export' && <PlatformExportHub />}
+
+        {devMode && currentTab === 'console' && <ConsoleLogOverlayTab />}
       </main>
 
       <ToastBanner toasts={game.toasts} onDismiss={game.dismissToast} />
