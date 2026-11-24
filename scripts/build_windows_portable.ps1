@@ -1,7 +1,14 @@
 <#
 .SYNOPSIS
-Erzeugt ein versandfertiges Windows-Paket (Portable ZIP + Inno Setup .iss / Setup.exe) fuer Generation Zukunft.
+Erzeugt ein versandfertiges, signiertes Windows-Paket (Einzel-EXE + Portable ZIP + Inno Setup) fuer Generation Zukunft.
 #>
+param(
+    [string]$PfxPath = "",
+    [string]$PfxPassword = "",
+    [string]$CertThumbprint = "",
+    [switch]$SkipSign
+)
+
 $ErrorActionPreference = "Stop"
 
 $RootDir = Split-Path -Parent $PSScriptRoot
@@ -9,7 +16,17 @@ $FlutterDir = Join-Path $RootDir "pension_game_simulation"
 $OutDir = Join-Path $RootDir "dist_windows"
 $BundleDir = Join-Path $OutDir "GenerationZukunft_Windows"
 
-Write-Host "=== Generation Zukunft: Windows Packaging ===" -ForegroundColor Yellow
+$AppVersion = "1.0.0"
+$PkgPath = Join-Path $RootDir "package.json"
+if (Test-Path $PkgPath) {
+    try {
+        $pkg = Get-Content $PkgPath -Raw | ConvertFrom-Json
+        if ($pkg.version) { $AppVersion = [string]$pkg.version }
+    } catch {}
+}
+$AssemblyVersion = if ($AppVersion -match '^\d+\.\d+\.\d+$') { "$AppVersion.0" } else { "1.0.0.0" }
+
+Write-Host "=== Generation Zukunft v$AppVersion: Windows Packaging ===" -ForegroundColor Yellow
 if (Test-Path $OutDir) { Remove-Item -Recurse -Force $OutDir }
 New-Item -ItemType Directory -Path $BundleDir | Out-Null
 
@@ -92,15 +109,9 @@ if (-not $BuiltNative) {
         }
     }
     Copy-Item -Path (Join-Path $RootDir "start_game_windows.bat") -Destination $BundleDir -Force
-    Copy-Item -Path (Join-Path $RootDir "START_GAME_WINDOWS.exe") -Destination $BundleDir -Force
 }
 
-# 3. ZIP-Archiv zum direkten Versenden erzeugen
-Write-Host "[2/4] Erstelle portables ZIP-Archiv..." -ForegroundColor Cyan
-$ZipPath = Join-Path $OutDir "GenerationZukunft_Windows_Portable.zip"
-Compress-Archive -Path (Join-Path $BundleDir "*") -DestinationPath $ZipPath -Force
-
-# 4. EINE EINZIGE eigenstaendige .exe mit Windows-Bordmitteln (.NET csc.exe) erzeugen
+# 3. EINE EINZIGE eigenstaendige .exe mit Windows-Bordmitteln (.NET csc.exe) erzeugen
 $SingleExePath = Join-Path $OutDir "GenerationZukunft.exe"
 $IconPath = Join-Path $RootDir "windows\runner\resources\app_icon.ico"
 $CscCandidates = @(
@@ -118,21 +129,62 @@ if (-not (Test-Path (Join-Path $WebSourceForSingle "index.html"))) {
 }
 
 if ($CscExe -and (Test-Path (Join-Path $WebSourceForSingle "index.html"))) {
-    Write-Host "[3/4] Erstelle eigenstaendige Einzel-EXE mit Windows-.NET-Compiler..." -ForegroundColor Cyan
+    Write-Host "[2/4] Erstelle eigenstaendige Einzel-EXE mit Icon, Manifest & Version v$AppVersion..." -ForegroundColor Cyan
+
+    # Stellt sicher, dass favicon.ico auch im WebBundle liegt (fuer Edge App-Fenster & Windows-Taskleiste)
+    if (Test-Path $IconPath) {
+        Copy-Item -Path $IconPath -Destination (Join-Path $WebSourceForSingle "favicon.ico") -Force
+    }
+
     $EmbeddedZip = Join-Path $OutDir "WebBundle.zip"
     if (Test-Path $EmbeddedZip) { Remove-Item -Force $EmbeddedZip }
     Compress-Archive -Path (Join-Path $WebSourceForSingle "*") -DestinationPath $EmbeddedZip -Force
 
+    $ManifestPath = Join-Path $OutDir "app.manifest"
+    $ManifestXml = @"
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<assembly xmlns="urn:schemas-microsoft-com:asm.v1" manifestVersion="1.0">
+  <assemblyIdentity version="$AssemblyVersion" name="GenerationZukunft.App" type="win32" />
+  <description>Generation Zukunft - Renten-Simulation (econo=me)</description>
+  <trustInfo xmlns="urn:schemas-microsoft-com:asm.v3">
+    <security>
+      <requestedPrivileges>
+        <requestedExecutionLevel level="asInvoker" uiAccess="false" />
+      </requestedPrivileges>
+    </security>
+  </trustInfo>
+  <compatibility xmlns="urn:schemas-microsoft-com:compatibility.v1">
+    <application>
+      <supportedOS Id="{8e0f7a12-bfb3-4fe8-b9a5-48fd50a15a9a}" />
+      <supportedOS Id="{1f676c76-80e1-4239-95bb-83d0f6d0da78}" />
+    </application>
+  </compatibility>
+</assembly>
+"@
+    Set-Content -Path $ManifestPath -Value $ManifestXml -Encoding UTF8
+
     $CsPath = Join-Path $OutDir "GenerationZukunftLauncher.cs"
-    $CsCode = @'
+    $AssemblyHeader = @"
 using System;
 using System.Diagnostics;
 using System.IO;
 using System.IO.Compression;
 using System.Net;
 using System.Reflection;
+using System.Runtime.InteropServices;
 using System.Threading;
 using System.Windows.Forms;
+
+[assembly: AssemblyTitle("Generation Zukunft - Renten-Simulation")]
+[assembly: AssemblyDescription("Interaktive Simulation zur deutschen Rentenversicherung (econo=me)")]
+[assembly: AssemblyProduct("Generation Zukunft")]
+[assembly: AssemblyCompany("Jacob Glathe & Team (econo=me)")]
+[assembly: AssemblyCopyright("Copyright (c) Jacob Glathe & Team")]
+[assembly: ComVisible(false)]
+[assembly: AssemblyVersion("$AssemblyVersion")]
+[assembly: AssemblyFileVersion("$AssemblyVersion")]
+"@
+    $CsCode = $AssemblyHeader + @'
 
 namespace GenerationZukunftApp
 {
@@ -380,6 +432,7 @@ namespace GenerationZukunftApp
         "/r:System.Windows.Forms.dll",
         "/r:$(Join-Path $NetDir 'System.IO.Compression.dll')",
         "/r:$(Join-Path $NetDir 'System.IO.Compression.FileSystem.dll')",
+        "/win32manifest:$ManifestPath",
         "/resource:$EmbeddedZip,WebBundle.zip"
     )
     if (Test-Path $IconPath) {
@@ -388,17 +441,87 @@ namespace GenerationZukunftApp
     $CompArgs += $CsPath
 
     & $CscExe @CompArgs
-    Remove-Item -Force $CsPath, $EmbeddedZip -ErrorAction SilentlyContinue
+    Remove-Item -Force $CsPath, $EmbeddedZip, $ManifestPath -ErrorAction SilentlyContinue
 }
 
-# 5. Optional: Inno Setup (.iss) Skript erzeugen und falls ISCC.exe installiert ist Setup.exe bauen
-Write-Host "[4/4] Erzeuge Inno Setup Skript fuer Installer..." -ForegroundColor Cyan
-$MainExe = if ($BuiltNative) { "GenerationZukunft.exe" } else { "START_GAME_WINDOWS.exe" }
+# 4. Automatische Code-Signatur (PFX / Zertifikatsspeicher / lokales Dev-Zertifikat)
+$SignMode = "NICHT_SIGNIERT"
+function Invoke-SignExecutable {
+    param([string]$TargetExe)
+    if ($SkipSign -or -not (Test-Path $TargetExe)) { return }
+
+    $cert = $null
+    $isSelfSigned = $false
+
+    # A) Explizites oder im Projekt liegendes .pfx-Zertifikat
+    if (-not $PfxPath) {
+        foreach ($cand in @((Join-Path $RootDir "code-signing.pfx"), (Join-Path $PSScriptRoot "code-signing.pfx"))) {
+            if (Test-Path $cand) { $PfxPath = $cand; break }
+        }
+    }
+    if ($PfxPath -and (Test-Path $PfxPath)) {
+        $secPwd = if ($PfxPassword) { ConvertTo-SecureString $PfxPassword -AsPlainText -Force } else { Read-Host "PFX-Passwort eingeben" -AsSecureString }
+        $cert = New-Object System.Security.Cryptography.X509Certificates.X509Certificate2($PfxPath, $secPwd, [System.Security.Cryptography.X509Certificates.X509KeyStorageFlags]::Exportable)
+    }
+
+    # B) Zertifikat per Thumbprint oder vorhandenes CA-CodeSigning-Zertifikat im Store
+    if (-not $cert -and $CertThumbprint) {
+        $cert = Get-ChildItem Cert:\CurrentUser\My -CodeSigningCert | Where-Object { $_.Thumbprint -eq $CertThumbprint } | Select-Object -First 1
+    }
+    if (-not $cert) {
+        $cert = Get-ChildItem Cert:\CurrentUser\My -CodeSigningCert | Where-Object { $_.Issuer -ne $_.Subject } | Select-Object -First 1
+    }
+
+    # C) Fallback: Lokales Selbst-Signatur-Zertifikat fuer diesen PC
+    if (-not $cert) {
+        $isSelfSigned = $true
+        $subject = "CN=Jacob Glathe (Generation Zukunft Local)"
+        $cert = Get-ChildItem Cert:\CurrentUser\My -CodeSigningCert | Where-Object { $_.Subject -eq $subject } | Select-Object -First 1
+        if (-not $cert) {
+            Write-Host "      Erstelle lokales Code-Signing-Zertifikat ($subject)..." -ForegroundColor DarkCyan
+            $cert = New-SelfSignedCertificate -Type CodeSigningCert -Subject $subject -CertStoreLocation "Cert:\CurrentUser\My" -NotAfter (Get-Date).AddYears(5)
+            $storeRoot = New-Object System.Security.Cryptography.X509Certificates.X509Store("Root", "CurrentUser")
+            $storeRoot.Open("ReadWrite"); $storeRoot.Add($cert); $storeRoot.Close()
+            $storePub = New-Object System.Security.Cryptography.X509Certificates.X509Store("TrustedPublisher", "CurrentUser")
+            $storePub.Open("ReadWrite"); $storePub.Add($cert); $storePub.Close()
+        }
+    }
+
+    if ($cert) {
+        if ($isSelfSigned) {
+            Set-AuthenticodeSignature -FilePath $TargetExe -Certificate $cert -HashAlgorithm SHA256 | Out-Null
+            $script:SignMode = "LOKAL_SELBSTSIGNIERT"
+        } else {
+            Set-AuthenticodeSignature -FilePath $TargetExe -Certificate $cert -HashAlgorithm SHA256 -TimestampServer "http://timestamp.digicert.com" | Out-Null
+            $script:SignMode = "CA_OFFIZIELL"
+        }
+    }
+}
+
+if (Test-Path $SingleExePath) {
+    Write-Host "[3/5] Signiere GenerationZukunft.exe (SHA-256)..." -ForegroundColor Cyan
+    Invoke-SignExecutable -TargetExe $SingleExePath
+    if (-not $BuiltNative) {
+        Copy-Item -Path $SingleExePath -Destination (Join-Path $BundleDir "GenerationZukunft.exe") -Force
+    }
+}
+if ($BuiltNative -and (Test-Path (Join-Path $BundleDir "GenerationZukunft.exe"))) {
+    Invoke-SignExecutable -TargetExe (Join-Path $BundleDir "GenerationZukunft.exe")
+}
+
+# 5. ZIP-Archiv zum direkten Versenden erzeugen (enthaelt nun die signierte GenerationZukunft.exe)
+Write-Host "[4/5] Erstelle portables ZIP-Archiv..." -ForegroundColor Cyan
+$ZipPath = Join-Path $OutDir "GenerationZukunft_Windows_Portable.zip"
+Compress-Archive -Path (Join-Path $BundleDir "*") -DestinationPath $ZipPath -Force
+
+# 6. Optional: Inno Setup (.iss) Skript erzeugen und falls ISCC.exe installiert ist Setup.exe bauen
+Write-Host "[5/5] Erzeuge Inno Setup Skript fuer Installer..." -ForegroundColor Cyan
+$MainExe = "GenerationZukunft.exe"
 $IssPath = Join-Path $OutDir "GenerationZukunft_Setup.iss"
 $IssContent = @"
 [Setup]
 AppName=Generation Zukunft - Renten-Simulation
-AppVersion=1.0.0
+AppVersion=$AppVersion
 AppPublisher=Jacob Glathe & Team (econo=me)
 DefaultDirName={autopf}\GenerationZukunft
 DefaultGroupName=Generation Zukunft
@@ -432,6 +555,7 @@ $SetupExePath = Join-Path $OutDir "GenerationZukunft_Windows_Setup.exe"
 if ($Iscc) {
     Write-Host "      Inno Setup gefunden -> kompiliere $SetupExePath ..." -ForegroundColor Cyan
     & $Iscc $IssPath
+    Invoke-SignExecutable -TargetExe $SetupExePath
 }
 
 Write-Host ""
@@ -444,4 +568,12 @@ Write-Host "Ordner zum Testen:                $BundleDir"
 if (Test-Path $SetupExePath) {
     Write-Host "Inno Setup EXE:                   $SetupExePath" -ForegroundColor Green
 }
+if ($SignMode -eq "CA_OFFIZIELL") {
+    Write-Host "Signatur-Status:                  OFFIZIELLES CA-ZERTIFIKAT (Smart App Control OK)" -ForegroundColor Green
+} elseif ($SignMode -eq "LOKAL_SELBSTSIGNIERT") {
+    Write-Host "Signatur-Status:                  LOKAL SELBST-SIGNIERT (auf diesem PC vertrauenswuerdig)" -ForegroundColor Yellow
+    Write-Host "Hinweis Smart App Control:        Fuer fremde Win11-PCs mit aktivem Smart App Control ist ein" -ForegroundColor Gray
+    Write-Host "                                  offizielles CA-Code-Signing-Zertifikat (.pfx / Store) noetig." -ForegroundColor Gray
+}
+
 

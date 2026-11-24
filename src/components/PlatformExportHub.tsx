@@ -11,7 +11,7 @@ export const PlatformExportHub: React.FC = () => {
   };
 
   const macCommand = `./START_GAME_MAC.command`;
-  const winCommand = `START_GAME_WINDOWS.exe`;
+  const winCommand = `powershell -ExecutionPolicy Bypass -File scripts\\build_windows_portable.ps1`;
   const fullGitSyncCmd = `cd ~ && rm -rf rentenreform_game_JAG && git clone https://github.com/Appligamer/rentenreform_game_JAG.git rentenreform_game_JAG && cd rentenreform_game_JAG && (open macos/Runner.xcodeproj 2>/dev/null || open .)`;
 
   return (
@@ -90,20 +90,22 @@ export const PlatformExportHub: React.FC = () => {
                   <Monitor className="w-6 h-6 text-sky-400" />
                 </div>
                 <div>
-                  <h3 className="text-base font-bold text-white">Windows Starter</h3>
+                  <h3 className="text-base font-bold text-white">Windows Starter & .exe</h3>
                   <span className="text-xs text-sky-400 font-mono">
-                    START_GAME_WINDOWS.exe & .bat
+                    GenerationZukunft.exe & .bat
                   </span>
                 </div>
               </div>
               <span className="text-[10px] font-mono bg-sky-400/10 text-sky-400 px-2 py-0.5 rounded font-bold">
-                Nativ Windows .exe
+                Windows .exe
               </span>
             </div>
 
             <p className="text-xs text-[#86868b] leading-relaxed mb-4">
-              Liegt als eigenständige Binärdatei <code className="text-white font-mono text-[11px]">START_GAME_WINDOWS.exe</code> direkt
-              im Hauptverzeichnis. Ein Doppelklick bootet das Spiel auf Windows 10/11 sofort.
+              Erzeugt mit Windows-Bordmitteln die eigenständige{' '}
+              <code className="text-white font-mono text-[11px]">dist_windows\GenerationZukunft.exe</code>{' '}
+              oder startet das Spiel direkt per{' '}
+              <code className="text-white font-mono text-[11px]">start_game_windows.bat</code>.
             </p>
 
             <div className="p-3.5 rounded-xl bg-black border border-white/10 font-mono text-xs text-sky-400 mb-4 flex items-center justify-between">
@@ -122,8 +124,8 @@ export const PlatformExportHub: React.FC = () => {
           </div>
 
           <div className="text-[11px] text-[#6e6e73] space-y-1">
-            <div>· Doppelklick auf <strong className="text-white">START_GAME_WINDOWS.exe</strong> in Windows.</div>
-            <div>· Alternativ: <strong className="text-white">start_game_windows.bat</strong> ausführen.</div>
+            <div>· Direkt spielen: <strong className="text-white">start_game_windows.bat</strong> doppelklicken.</div>
+            <div>· Einzelne Versand-.exe bauen: Obigen PowerShell-Befehl ausführen.</div>
           </div>
         </div>
       </div>
@@ -178,8 +180,8 @@ export const PlatformExportHub: React.FC = () => {
 {`rentenreform_game_JAG/
 ├── START_GAME_MAC.command             # 🍎 Apple macOS 1-Klick-Starter (Doppelklickbar)
 ├── GenerationZukunft.app              # 🍎 Nativer macOS App-Bundle Ordner
-├── START_GAME_WINDOWS.exe             # 🪟 Windows PE 1-Klick-Starter (Nativ .exe)
-├── start_game_windows.bat             # 🪟 Windows Batch Starter
+├── start_game_windows.bat             # 🪟 Windows 1-Klick-Starter
+├── scripts/build_windows_portable.ps1 # 🪟 Erzeugt Einzel-EXE & Versand-ZIP
 ├── artworks/                          # Eindeutiger Zielordner für optionale Artworks
 ├── macos/                             # Apple Xcode Projekt (macOS & iOS)
 │   └── Runner.xcodeproj
