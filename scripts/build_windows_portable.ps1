@@ -1,6 +1,6 @@
 <#
 .SYNOPSIS
-Erzeugt ein versandfertiges Windows-Paket (einzelne EXE + ZIP) für Generation Zukunft.
+Erzeugt ein versandfertiges Windows-Paket (Portable ZIP + Inno Setup .iss / Setup.exe) fuer Generation Zukunft.
 #>
 $ErrorActionPreference = "Stop"
 
@@ -9,7 +9,7 @@ $FlutterDir = Join-Path $RootDir "pension_game_simulation"
 $OutDir = Join-Path $RootDir "dist_windows"
 $BundleDir = Join-Path $OutDir "GenerationZukunft_Windows"
 
-Write-Host "=== Generation Zukunft: Windows Packaging ===" -ForegroundColor Amber
+Write-Host "=== Generation Zukunft: Windows Packaging ===" -ForegroundColor Yellow
 if (Test-Path $OutDir) { Remove-Item -Recurse -Force $OutDir }
 New-Item -ItemType Directory -Path $BundleDir | Out-Null
 
@@ -53,10 +53,12 @@ if (-not $BuiltNative) {
         throw "Kein WebBundle gefunden. Bitte zuerst 'npm run build' ausfuehren."
     }
     $TargetWeb = Join-Path $BundleDir "WebBundle"
-    New-Item -ItemType Directory -Path $TargetWeb | Out-Null
+    $TargetAssets = Join-Path $TargetWeb "assets"
+    New-Item -ItemType Directory -Path $TargetAssets -Force | Out-Null
     Copy-Item -Path (Join-Path $WebSource "index.html") -Destination $TargetWeb -Force
-    if (Test-Path (Join-Path $WebSource "assets")) {
-        Copy-Item -Path (Join-Path $WebSource "assets") -Destination $TargetWeb -Recurse -Force
+    $SourceAssets = Join-Path $WebSource "assets"
+    if (Test-Path $SourceAssets) {
+        Get-ChildItem -Path $SourceAssets -File | Copy-Item -Destination $TargetAssets -Force
     }
     Copy-Item -Path (Join-Path $RootDir "start_game_windows.bat") -Destination $BundleDir -Force
     Copy-Item -Path (Join-Path $RootDir "START_GAME_WINDOWS.exe") -Destination $BundleDir -Force
@@ -67,31 +69,57 @@ Write-Host "[2/3] Erstelle portables ZIP-Archiv..." -ForegroundColor Cyan
 $ZipPath = Join-Path $OutDir "GenerationZukunft_Windows_Portable.zip"
 Compress-Archive -Path (Join-Path $BundleDir "*") -DestinationPath $ZipPath -Force
 
-# 4. Optionale Einzel-EXE ueber eingebautes Windows IExpress (nur bei WebBundle oder flachem Ordner)
-$SedPath = Join-Path $OutDir "package.sed"
-$TargetSingleExe = Join-Path $OutDir "GenerationZukunft_Setup_SingleFile.exe"
-$LaunchCmd = if ($BuiltNative) { "GenerationZukunft.exe" } else { "cmd.exe /c start_game_windows.bat" }
+# 4. Inno Setup (.iss) Skript erzeugen und falls ISCC.exe installiert ist direkt zu einer Setup.exe kompilieren
+Write-Host "[3/3] Erzeuge Inno Setup Skript fuer Einzel-Installer (.exe)..." -ForegroundColor Cyan
+$MainExe = if ($BuiltNative) { "GenerationZukunft.exe" } else { "START_GAME_WINDOWS.exe" }
+$IssPath = Join-Path $OutDir "GenerationZukunft_Setup.iss"
+$IconPath = Join-Path $RootDir "windows\runner\resources\app_icon.ico"
+$IssContent = @"
+[Setup]
+AppName=Generation Zukunft - Renten-Simulation
+AppVersion=1.0.0
+AppPublisher=Jacob Glathe & Team (econo=me)
+DefaultDirName={autopf}\GenerationZukunft
+DefaultGroupName=Generation Zukunft
+OutputDir=$OutDir
+OutputBaseFilename=GenerationZukunft_Windows_Setup
+SetupIconFile=$IconPath
+Compression=lzma2
+SolidCompression=yes
+WizardStyle=modern
+PrivilegesRequired=lowest
 
-if (Get-Command iexpress.exe -ErrorAction SilentlyContinue) {
-    Write-Host "[3/3] Erzeuge einzelne selbstentpackende EXE via IExpress..." -ForegroundColor Cyan
-    $AllFiles = Get-ChildItem -Path $BundleDir -File -Recurse
-    $SourceFiles = ""
-    $FileRefs = ""
-    $Idx = 0
-    foreach ($f in $AllFiles) {
-        # IExpress entpackt flach in einen Temp-Ordner; bei nativem Build nur flache Dateien, fuer Unterordner ZIP nutzen
-        if ($f.DirectoryName -eq $BundleDir) {
-            $SourceFiles += "FILE$Idx=`"$($f.Name)`"`r`n"
-            $FileRefs += "%FILE$Idx%=`r`n"
-            $Idx++
-        }
-    }
-    if ($Idx -gt 0 -and -not $BuiltNative) {
-        Write-Host "Hinweis: Fuer Ordner mit Unterverzeichnissen (data/ oder WebBundle/assets/) ist die ZIP-Datei das zuverlaessigste Einzelpaket." -ForegroundColor Gray
-    }
+[Files]
+Source: "$BundleDir\*"; DestDir: "{app}"; Flags: ignoreversion recursesubdirs createallsubdirs
+
+[Icons]
+Name: "{group}\Generation Zukunft"; Filename: "{app}\$MainExe"
+Name: "{autodesktop}\Generation Zukunft"; Filename: "{app}\$MainExe"
+
+[Run]
+Filename: "{app}\$MainExe"; Description: "Generation Zukunft jetzt starten"; Flags: nowait postinstall skipifsilent
+"@
+Set-Content -Path $IssPath -Value $IssContent -Encoding UTF8
+
+$IsccCandidates = @(
+    "ISCC.exe",
+    "${env:ProgramFiles(x86)}\Inno Setup 6\ISCC.exe",
+    "$env:ProgramFiles\Inno Setup 6\ISCC.exe"
+)
+$Iscc = $IsccCandidates | Where-Object { Get-Command $_ -ErrorAction SilentlyContinue } | Select-Object -First 1
+$SetupExePath = Join-Path $OutDir "GenerationZukunft_Windows_Setup.exe"
+if ($Iscc) {
+    Write-Host "      Inno Setup gefunden -> kompiliere $SetupExePath ..." -ForegroundColor Cyan
+    & $Iscc $IssPath
 }
 
 Write-Host ""
 Write-Host "FERTIG!" -ForegroundColor Green
 Write-Host "Ordner zum Testen:      $BundleDir"
 Write-Host "ZIP zum Versenden:      $ZipPath"
+Write-Host "Inno Setup Skript:      $IssPath"
+if (Test-Path $SetupExePath) {
+    Write-Host "Einzelne Setup-EXE:     $SetupExePath" -ForegroundColor Green
+} else {
+    Write-Host "Tipp fuer 1-Datei-EXE:  Oeffne $IssPath in Inno Setup und druecke Ctrl+F9." -ForegroundColor Gray
+}
