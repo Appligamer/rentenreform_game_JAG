@@ -26,7 +26,7 @@ if (Test-Path $PkgPath) {
 }
 $AssemblyVersion = if ($AppVersion -match '^\d+\.\d+\.\d+$') { "$AppVersion.0" } else { "1.0.0.0" }
 
-Write-Host "=== Generation Zukunft v$AppVersion: Windows Packaging ===" -ForegroundColor Yellow
+Write-Host "=== Generation Zukunft v${AppVersion}: Windows Packaging ===" -ForegroundColor Yellow
 if (Test-Path $OutDir) { Remove-Item -Recurse -Force $OutDir }
 New-Item -ItemType Directory -Path $BundleDir | Out-Null
 
@@ -472,29 +472,36 @@ function Invoke-SignExecutable {
         $cert = Get-ChildItem Cert:\CurrentUser\My -CodeSigningCert | Where-Object { $_.Issuer -ne $_.Subject } | Select-Object -First 1
     }
 
-    # C) Fallback: Lokales Selbst-Signatur-Zertifikat fuer diesen PC
-    if (-not $cert) {
-        $isSelfSigned = $true
-        $subject = "CN=Jacob Glathe (Generation Zukunft Local)"
-        $cert = Get-ChildItem Cert:\CurrentUser\My -CodeSigningCert | Where-Object { $_.Subject -eq $subject } | Select-Object -First 1
+    try {
         if (-not $cert) {
-            Write-Host "      Erstelle lokales Code-Signing-Zertifikat ($subject)..." -ForegroundColor DarkCyan
-            $cert = New-SelfSignedCertificate -Type CodeSigningCert -Subject $subject -CertStoreLocation "Cert:\CurrentUser\My" -NotAfter (Get-Date).AddYears(5)
-            $storeRoot = New-Object System.Security.Cryptography.X509Certificates.X509Store("Root", "CurrentUser")
-            $storeRoot.Open("ReadWrite"); $storeRoot.Add($cert); $storeRoot.Close()
-            $storePub = New-Object System.Security.Cryptography.X509Certificates.X509Store("TrustedPublisher", "CurrentUser")
-            $storePub.Open("ReadWrite"); $storePub.Add($cert); $storePub.Close()
+            $isSelfSigned = $true
+            $subject = "CN=Jacob Glathe (Generation Zukunft Local)"
+            $cert = Get-ChildItem Cert:\CurrentUser\My -CodeSigningCert | Where-Object { $_.Subject -eq $subject } | Select-Object -First 1
+            if (-not $cert) {
+                Write-Host "      Erstelle lokales Code-Signing-Zertifikat ($subject)..." -ForegroundColor DarkCyan
+                $cert = New-SelfSignedCertificate -Type CodeSigningCert -Subject $subject -CertStoreLocation "Cert:\CurrentUser\My" -NotAfter (Get-Date).AddYears(5)
+                try {
+                    $storeRoot = New-Object System.Security.Cryptography.X509Certificates.X509Store("Root", "CurrentUser")
+                    $storeRoot.Open("ReadWrite"); $storeRoot.Add($cert); $storeRoot.Close()
+                    $storePub = New-Object System.Security.Cryptography.X509Certificates.X509Store("TrustedPublisher", "CurrentUser")
+                    $storePub.Open("ReadWrite"); $storePub.Add($cert); $storePub.Close()
+                } catch {}
+            }
         }
-    }
 
-    if ($cert) {
-        if ($isSelfSigned) {
-            Set-AuthenticodeSignature -FilePath $TargetExe -Certificate $cert -HashAlgorithm SHA256 | Out-Null
-            $script:SignMode = "LOKAL_SELBSTSIGNIERT"
-        } else {
-            Set-AuthenticodeSignature -FilePath $TargetExe -Certificate $cert -HashAlgorithm SHA256 -TimestampServer "http://timestamp.digicert.com" | Out-Null
-            $script:SignMode = "CA_OFFIZIELL"
+        if ($cert) {
+            if ($isSelfSigned) {
+                $sig = Set-AuthenticodeSignature -FilePath $TargetExe -Certificate $cert -HashAlgorithm SHA256
+                if ($sig.Status -eq "Valid" -or $sig.Status -eq "UnknownError") {
+                    $script:SignMode = "LOKAL_SELBSTSIGNIERT"
+                }
+            } else {
+                Set-AuthenticodeSignature -FilePath $TargetExe -Certificate $cert -HashAlgorithm SHA256 -TimestampServer "http://timestamp.digicert.com" | Out-Null
+                $script:SignMode = "CA_OFFIZIELL"
+            }
         }
+    } catch {
+        Write-Host "      Hinweis: Signierung uebersprungen ($($_.Exception.Message))" -ForegroundColor DarkYellow
     }
 }
 
