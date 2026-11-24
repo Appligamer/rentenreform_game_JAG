@@ -4,10 +4,6 @@ Plattformübergreifendes Simulations- und Strategiespiel zur deutschen Rentenver
 
 ---
 
-## Wichtiger Hinweis zur Synchronisation (AI Studio ↔ GitHub)
-Wenn du neue Änderungen aus AI Studio herunterlädst, übertrage sie zunächst in dein GitHub-Repository (`git add . && git commit -m "Update" && git push`), damit `git clone` auf anderen Rechnern exakt diesen Stand lädt.
-
----
 
 ## 🍎 macOS & 📱 iOS / iPadOS (Xcode)
 
