@@ -86,5 +86,5 @@ npm run dev
 This project is licensed under the **PolyForm Noncommercial License 1.0.0** – see the [LICENSE.md](LICENSE.md) file for details.
 
 * **Personal & Educational Use:** Free to use, modify, and share for non-commercial purposes.
-* **Commercial Use:** Strictly prohibited without prior written permission. For commercial licensing inquiries, please contact [deine E-Mail-Adresse].
+* **Commercial Use:** Strictly prohibited without prior written permission. For commercial licensing inquiries, please contact jcob.glathe@gmail.com
 
