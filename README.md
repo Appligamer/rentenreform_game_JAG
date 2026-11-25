@@ -4,7 +4,7 @@ Plattformübergreifendes Simulations- und Strategiespiel zur deutschen Rentenver
 
 ---
 
-## 🍎 macOS & 📱 iOS / iPadOS (Xcode)
+## macOS &  iOS / iPadOS (Xcode)
 
 Das Projekt enthält ein vorkompiliertes Offline-`WebBundle` und einen eigenen `BundleSchemeHandler` (`app://local/index.html`) — es wird **kein laufender Localhost-Server** benötigt.
 
@@ -16,7 +16,7 @@ Das Projekt enthält ein vorkompiliertes Offline-`WebBundle` und einen eigenen `
 
 ---
 
-## 🪟 Windows: Eine versandfertige, signierte `.exe` erstellen (Schritt-für-Schritt)
+##  Windows: Eine versandfertige, signierte `.exe` erstellen (Schritt-für-Schritt)
 
 ### Methode 1 (Empfohlen — autarkes Build-Skript nur mit Windows-Bordmitteln)
 
@@ -73,10 +73,18 @@ Falls du eine native C++/Flutter-`.exe` statt des eingebetteten WebBundles bauen
 
 ---
 
-## 🌐 Web-Entwicklung (Browser)
+##  Web-Entwicklung (Browser)
 
 ```bash
 npm install
 npm run dev
 ```
 Öffnet die Live-Simulation unter `http://localhost:3000`.
+
+## License
+
+This project is licensed under the **PolyForm Noncommercial License 1.0.0** – see the [LICENSE.md](LICENSE.md) file for details.
+
+* **Personal & Educational Use:** Free to use, modify, and share for non-commercial purposes.
+* **Commercial Use:** Strictly prohibited without prior written permission. For commercial licensing inquiries, please contact [deine E-Mail-Adresse].
+
