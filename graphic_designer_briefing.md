@@ -1,186 +1,123 @@
-# Grafik- & Asset-Briefing für den Illustrator / Grafikdesigner
-## Projekt: "Generation Zukunft" — Renten-Simulation (econo=me Wettbewerb)
+# Grafik- & Asset-Briefing für Grafik & Illustration
+## Projekt: „Generation Zukunft“ — Renten-Simulation (`econo=me` Wettbewerb)
 
-> **Liebe/r Illustrator/in & Grafikdesigner/in,**  
-> dieses Dokument enthält die **vollständigen, pixelgenauen Spezifikationen für jede einzelne UI-Komponente**, für die optionale handgezeichnete Grafiken vorgesehen sind.  
-> **Ablageort:** Alle fertigen Dateien gehören in den einen zentralen Ordner **`artworks/`** im Projekt-Hauptverzeichnis (mit exaktem Unterordner und Dateinamen).  
-> **Wichtig:** Alle Dateien sind **optional** — fehlt ein Artwork noch, zeigt das Spiel automatisch saubere, eingebaute Vektor-Illustrationen.
+> **Aktueller Stand der App (Web, macOS, iOS/iPadOS & Windows `.exe`):**  
+> - **Ablageort:** Alle fertigen Dateien gehören in **genau einen zentralen Ordner: `artworks/`** im Projekt-Hauptverzeichnis (mit dem exakten Unterordner und Dateinamen).  
+> - **Vollautomatische Erkennung:** Sobald eine Datei mit dem passenden Namen in `artworks/` liegt, erkennt das Build-System (`vite.config.ts`, `WebBundle`, `scripts\build_windows_portable.ps1`) sie beim nächsten Build automatisch — ohne Code-Änderung.  
+> - **100 % optional:** Fehlt eine Datei noch, zeigt die App automatisch ihre eingebauten dunklen Editorial-Vektor-Illustrationen (keine Fehlermeldungen oder kaputten Bildsymbole).
 
 ---
 
-## 1. Übergeordnete Art Direction & Stilbibel
+## 1. Projekt-Kontext & Spielaufbau (Aktuelle Screens)
 
-### 1.1 Ästhetischer Leitfaden ("Hand-Drawn Meets Apple Minimal")
-- **Stilistik:** Hochwertiger, handgezeichneter Comic- & Editorial-Stil (vergleichbar mit den Illustrationen in *The New Yorker*, *Kurzgesagt* oder Story-Games wie *Gris* / *Reigns* / *Frostpunk*).
-- **Linienführung:** Klare, organische Tusche-/Tinten-Outlines (strikte Vektoren oder saubere Raster-Outlines), nicht verwaschen, mit variabler Strichstärke (Line-Weight 2–5 px bei 100% Zoom).
-- **Schattierung:** Subtiles Cel-Shading oder Schraffuren (keine weichgezeichneten Photoshop-Airbrush-Verläufe).
-- **Integration in den Dark Mode:**  
-  - Das Interface verwendet ein tiefes Schwarz (`#000000`) und dunkles Anthrazit (`#161617`) als Basis.
-  - Hintergründe und Illustrationen müssen auf dunklem Grund leuchten, ohne grell zu wirken.
-  - Freigestellte Assets (Charaktere, Badges, Icons) **MÜSSEN mit transparentem Alpha-Kanal (PNG-32 / WebP)** geliefert werden.
+Das Spiel führt Nutzer von einem **Begrüßungsscreen** (mit „Direkt starten“, 4-Schritte-Tutorial und bisherigen Bestwerten) durch folgende Bereiche:
+1. **Kampagne (2026–2045):** 20 Jahresrunden mit 4 Status-Ringen (Jugend, Rentner, Generationenkapital, Bundeskasse), jährlichen Politik-Dilemmata, **6 aktiven Reformkarten**, Verlaufsdiagramm und Ergebnis-Zeugnis im Zieljahr **2045**.
+2. **Bürger-Lebenslauf (3-Säulen-Modell):** Mikro-Rechner von Berufseinstieg bis Rentenalter (gesetzliche Rente, bAV, private ETF-Vorsorge).
+3. **Regeln & Wettbewerb:** Erklärung der Mechaniken und der realen Rentenformel für den Bundeswettbewerb *econo=me*.
 
-### 1.2 Farbpalette & Semantik
-| Bereich | Farbton | Hex-Code | Semantische Bedeutung |
+---
+
+## 2. Art Direction & Farbpalette („Apple Dark Minimal Meets Editorial“)
+
+- **Stilistik:** Klarer, moderner Editorial-Illustrationsstil (Anmutung wie *The New Yorker*, *Kurzgesagt* oder reduzierte Story-Games).
+- **Linien & Flächen:** Saubere Tusche-/Vektor-Konturen, dezentes Cel-Shading (keine weichen Airbrush-Nebel).
+- **Dark-Mode-Basis:** Die App nutzt `#000000` (Hintergrund), `#161617` (Cards/Bento) und feine 1px-Rahmen (`rgba(255,255,255,0.1)`). Illustrationen sollen auf dunklem Untergrund kontrastreich, aber edel und nicht grell wirken.
+- **Transparenz:** Freigestellte Motive (Charaktere, Icons, Medaillen) als **PNG-32 mit transparentem Alpha-Kanal** (alternativ `.webp` / `.svg`).
+
+| Bereich | Farbton | Hex-Code | Verwendung |
 |---|---|---|---|
-| **Generationenkapital / Zukunft** | Sanftes Gold / Bernstein | `#F59E0B` bis `#D97706` | Globale Aktienfonds, Erträge, Hoffnung |
-| **Stabilität & Haltelinie (48%)** | Apple-Blau / Azur | `#38BDF8` bis `#0284C7` | Gesetzliche Sicherheit, Vertrauen |
-| **Demografische Balance / Erfolg** | Frisches Smaragdgrün | `#34D399` bis `#059669` | Gesunde Rentenkasse, Nachhaltigkeit |
-| **Krise / Überlastung (>22% Beitrag)** | Gedämpftes Korallenrot | `#F87171` bis `#DC2626` | Belastung der jungen Generation, Defizit |
-| **Gedämpfte Konturen & Schatten** | Tiefes Schiefergrau | `#1E293B` / `#0F172A` | Formgebung, Linienkontrast |
+| **Generationenkapital / Akzent** | Bernstein / Gold | `#F59E0B` bis `#D97706` | Aktienfonds, Erträge, Primär-Buttons |
+| **Stabilität / Gesetzliche Rente** | Azur / Apple-Blau | `#38BDF8` bis `#0284C7` | Haltelinie 48 %, Sicherheit |
+| **Balance / Erfolg** | Smaragdgrün | `#34D399` bis `#059669` | Stabile Kasse, positive Effekte |
+| **Krise / Belastung** | Korallenrot | `#F87171` bis `#DC2626` | > 22 % Beitrag, Defizit-Warnung |
+| **Dunkle Flächen & Outlines** | Schiefer / Anthrazit | `#1E293B` / `#101012` | Konturen, Schatten, App-Icon-Basis |
 
 ---
 
-## 2. Detaillierte Komponenten-Spezifikationen
+## 3. Prioritäten: Was ist JETZT sofort im Spiel sichtbar?
 
-Nachfolgend findest du für **jede einzelne Komponente**, die ein Artwork benötigt, die exakten Maße, Stimmungen, Bildinhalte und Dateinamen.
+### Priorität 1 — Direkt in der aktuellen Oberfläche eingebunden (8 Assets)
+Diese 8 Dateien werden sofort im aktiven Spiel angezeigt, sobald du sie in `artworks/` ablegst:
 
----
+#### A) Die 6 aktiven Reformkarten (`artworks/cards/`)
+> **Wichtiger UI-Hinweis:** In der aktuellen Oberfläche sitzt das Kartenbild im **oberen Karten-Banner (`h-32`, `object-cover`)**. Kartentitel, Kosten und Beschreibungstext rendert die App darunter im UI-Block.  
+> **Bitte daher keinen Text direkt ins Bild schreiben** und das **Hauptmotiv kompakt im mittleren Bilddrittel** platzieren!  
+> Unterstützte Formate: `.png` (Standard `600 × 900 px`, alternativ `1200 × 600 px` Querformat — im `object-cover`-Banner bleibt das Motiv mittig zentriert), `.webp` oder `.svg`.
 
-### KOMPONENTE A: Szenario- & Spielfeld-Hintergründe (Background Scenes)
+1. **`artworks/cards/card_generationenkapital_boost.png`** (*Generationenkapital-Turbo*)  
+   *Motiv:* Goldener Setzling / Bonsai-Baum, der aus einem Tresor mit Bundesadler wächst und Münzen/Kurslinien trägt.
+2. **`artworks/cards/card_haltelinie_48.png`** (*Haltelinie 48 % absichern*)  
+   *Motiv:* Standhafter Leuchtturm mit eingemeißelter „48%“ gegen stürmische Meereswellen (Azur/Blau).
+3. **`artworks/cards/card_retirement_age_68.png`** (*Lebensarbeitszeit koppeln*)  
+   *Motiv:* Nach vorne geblättertes Kalenderblatt neben Wanderkarte / ansteigendem Wegweiser.
+4. **`artworks/cards/card_bav_matching.png`** (*Betriebsrenten-Pflichtzuschuss*)  
+   *Motiv:* Vertrauensvoller Handschlag zwischen Arbeitnehmer und Betrieb vor Werkssilhouette und Sparschwein.
+5. **`artworks/cards/card_market_bull.png`** (*Globale Wachstums-Offensive*)  
+   *Motiv:* Dynamischer Bulle aus goldenen Licht- und Chartlinien im Aufwärtstrend.
+6. **`artworks/cards/card_boomer_wave.png`** (*Fachkräfte- & Erwerbspakt*)  
+   *Motiv:* Mächtige Welle aus den Jahrgängen 1960–1965, die von einer tragfähigen Brücke aufgefangen wird.
 
-Diese Hintergründe bilden den oberen bzw. zentralen Blickfang im Spiel und spiegeln den Wandel der Gesellschaft von 2026 bis 2060 wider.
+#### B) Charakter im Lebenslauf-Modus (`artworks/characters/`)
+7. **`artworks/characters/char_worker_young_neutral.png`** (`512 × 512 px`, PNG-32 transparent)  
+   *Motiv:* Brustbild eines jungen Berufseinsteigers (ca. 22 J., Gen Z/Alpha, 2026) mit Laptop/Rucksack, optimistisch, klare Tusche-Outlines.
 
-#### A1. Hintergrund "Berlin Regierungsviertel & Zukunfts-Skyline"
-- **Dateiname:** `artworks/backgrounds/bg_berlin_future_skyline.png`
-- **Abmessungen:** `2560 × 1440 px` (Standard 16:9, skalierbar auf `1920 × 1080 px`)
-- **Format:** PNG-24 (optimiert) oder WebP, max. 1.5 MB
-- **Motiv:** Reichstagskuppel und Spree im Vordergrund, im Hintergrund moderne Solartürme und Finanzzentren. Stimmung wandelt sich je nach Rundenstatus (Tag, Dämmerung, Abend).
-- **Fokuszone:** Die unteren 30% des Bildes sollten ruhig verlaufen (abgedunkelt in `#000000` via Alpha-Gradient), da dort UI-Overlays und Diagramme sitzen.
-
-#### A2. Hintergrund "Krise: Demografie-Winter"
-- **Dateiname:** `artworks/backgrounds/bg_demographic_winter.png`
-- **Abmessungen:** `2560 × 1440 px` (16:9)
-- **Motiv:** Wolkig-melancholische Stimmung, verlassene Baustellen oder stilisierte Sanduhren, die die schwindende Zeit für Reformen symbolisieren.
-
----
-
-### KOMPONENTE B: Charakter-Porträts (Bürger, Generationen & Politik)
-
-Die Charaktere kommentieren Entscheidungen, treten als Ratgeber auf und altern im Lebenslauf-Modus mit.
-
-- **Einheitliche Abmessungen:** `512 × 512 px` (1:1 Quadrat)
-- **Format:** PNG-32 mit transparentem Hintergrund (Alpha-Kanal)
-- **Ausschnitt:** Brustbild / Porträt, leicht 3/4-gewandt nach rechts oder frontal.
-
-#### B1. "Felix / Mia – Die Berufseinsteiger (Generation Z/Alpha)"
-Repräsentieren die junge Generation, die heute in die Rentenkasse einzahlt und 2065 in Rente gehen wird.
-- `artworks/characters/char_worker_young_neutral.png`: Neugierig, mit Laptop/Rucksack, bereit für den Berufsstart 2026.
-- `artworks/characters/char_worker_young_worried.png`: Frustriert/erschöpft mit Blick auf den Gehaltszettel (wenn der Beitragssatz auf 22,5% steigt).
-- `artworks/characters/char_worker_young_prosperous.png`: Entspannt lächelnd mit Smartphone (Aktien-Sparplan und Generationenkapital greifen).
-
-#### B2. "Monika & Klaus – Die Babyboomer (Jahrgang 1960–1964)"
-Gehen zwischen 2025 und 2031 in Rente und hoffen auf Verlässlichkeit der 48%-Haltelinie.
-- `artworks/characters/char_boomer_satisfied.png`: Zufrieden im Garten/am Wandern, genießt den wohlverdienten Ruhestand mit stabiler Rente.
-- `artworks/characters/char_boomer_protesting.png`: Besorgt mit Rentenbescheid in der Hand, symbolisiert Angst vor Altersarmut oder Rentenkürzungen.
-
-#### B3. "Der Reform-Architekt / Bundesfinanzminister"
-Der Spieler in seiner Rolle als politischer Entscheider.
-- `artworks/characters/char_minister_visionary.png`: Entschlossen am Konferenztisch mit Aktenmappe "Rentenpaket II".
-- `artworks/characters/char_minister_under_pressure.png`: Zerzaustes Haar, Krawatte gelockert, rote Zahlen im Bundeshaushalt.
+#### C) Sieges-Trophäe im Ergebnis-Modal 2045 (`artworks/awards/`)
+8. **`artworks/awards/trophy_generation_justice.png`** (`512 × 512 px`, PNG-32 transparent)  
+   *Motiv:* Handgravierte Goldmedaille mit zwei ineinandergreifenden Händen und Lorbeerzweigen.
 
 ---
 
-### KOMPONENTE C: Reform- und Entscheidungskarten (Decision Cards)
+### Priorität 2 — Flutter-Desktop-Header & vorbereitete Erweiterungs-Slots
+Diese Slots sind im Ordner `artworks/` vorbereitet und für den nativen Flutter-Build bzw. geplante Ausbaustufen vorgesehen:
 
-Kernelement des Gameplays: Der Spieler zieht und spielt politische Karten aus, die die Rentenparameter verändern.
+#### Szenario-Hintergründe (`artworks/backgrounds/`, `2560 × 1440 px`, 16:9)
+- **`artworks/backgrounds/bg_berlin_future_skyline.png`** *(im nativen Flutter-Spielfeld bereits verknüpft)*: Reichstagskuppel & Spree mit modernen Solar-/Finanztürmen; untere 30 % ruhig nach `#000000` auslaufend.
+- **`artworks/backgrounds/bg_demographic_winter.png`**: Gedimmte Krisenstimmung mit Sanduhren / Nebel über der Skyline.
 
-- **Abmessungen:** `600 × 900 px` (Seitenverhältnis 2:3)
-- **Format:** PNG-32 mit transparenter Vignette oder Kartenecken (Radius 24 px)
-- **Layout-Aufbau jeder Karte:**
-  - Obere 55% (`600 × 500 px`): Handgezeichnete Hauptillustration
-  - Untere 45%: Bleibt frei für programmatischen Text (Titel, Kosten, Effekte) oder wird mit einem handgezeichneten Rahmenband versehen.
+#### Weitere Charakter-Stimmungen (`artworks/characters/`, `512 × 512 px`, PNG-32 transparent)
+- `char_worker_young_worried.png` (Sorge beim Blick auf hohe Beitragsabzüge)
+- `char_worker_young_prosperous.png` (entspannt dank ETF-Sparplan & Generationenkapital)
+- `char_boomer_satisfied.png` (zufriedener Ruhestand, Outdoor-Weste/Lesebrille)
+- `char_boomer_protesting.png` (besorgt mit Rentenbescheid)
+- `char_minister_visionary.png` (am Konferenztisch mit Akte „Rentenpaket II“)
+- `char_minister_under_pressure.png` (Krawatte gelockert, Haushaltsdruck)
 
-#### C1. "Generationenkapital Hebeln (Kreditfinanzierter Staatsfonds)"
-- **Dateiname:** `artworks/cards/card_generationenkapital_boost.png`
-- **Motiv:** Ein riesiger Setzling oder Bonsai-Baum, der aus einem Tresor mit Bundesadler wächst und goldene Münzen/Aktiencharts trägt.
-- **Symbolik:** Zukunftsinvestition, Kapitalmarkterträge für die Rente.
+#### Reserve-Karten (`artworks/cards/`)
+- `card_contribution_slider.png` (Druckregler / Ventil von 18,6 % grün bis 23 % rot)
+- `card_market_bear.png` (Bär im Sturm vor fallenden Kursen)
 
-#### C2. "Gesetzliche Haltelinie 48% Garantieren"
-- **Dateiname:** `artworks/cards/card_haltelinie_48.png`
-- **Motiv:** Ein stabiler Leuchtturm oder eine antike Waage, die auf der 48%-Marke verankert ist und stürmischen Wellen trotzt.
-- **Symbolik:** Soziale Sicherheit und Schutz vor Rentenverfall.
+#### Metrik-Icons (`artworks/icons/`, `256 × 256 px`, PNG-32 transparent)
+- `icon_demography_ratio.png` (zwei junge Erwerbstätige stützen einen Senior)
+- `icon_generation_capital.png` (goldene Globus-Münze mit Aufwärtspfeil)
+- `icon_pension_level.png` (Schutzschild mit „48%“)
+- `icon_contribution_rate.png` (Zahnrad mit `%`-Symbol)
+- `icon_federal_subsidy.png` (Bundesfinanz-Siegel / Steuergroschen)
+- `icon_pension_gap.png` (Kluft zwischen letztem Gehalt und gesetzlicher Rente)
 
-#### C3. "Anhebung des Renteneintrittsalters auf 68"
-- **Dateiname:** `artworks/cards/card_retirement_age_68.png`
-- **Motiv:** Ein Kalenderblatt mit Jahreszahlen, das nach vorne geblättert wird, daneben eine Wanderkarte mit etwas steilerem Anstieg.
-
-#### C4. "Beitragssatz deckeln vs. erhöhen"
-- **Dateiname:** `artworks/cards/card_contribution_slider.png`
-- **Motiv:** Ein industrieller Druckregler mit Prozentanzeigen (18,6% grün bis 23% rot), aus dem Dampf entweicht.
-
-#### C5. "Börsen-Rallye (Kapitalmarkt-Boom)"
-- **Dateiname:** `artworks/cards/card_market_bull.png`
-- **Motiv:** Ein kraftvoller, eleganter Bulle aus Licht- und Datenlinien, der die Rendite des Generationenkapitals in die Höhe treibt.
-
-#### C6. "Globaler Börsencrash & Zinsanstieg"
-- **Dateiname:** `artworks/cards/card_market_bear.png`
-- **Motiv:** Ein Bär im Sturm vor Kursverläufen, der den Stresstest für kreditfinanzierte Aktienrenten visualisiert.
-
-#### C7. "Demografischer Kipppunkt (Die Babyboomer-Welle)"
-- **Dateiname:** `artworks/cards/card_boomer_wave.png`
-- **Motiv:** Eine gewaltige Welle, bestehend aus Geburtstags-Jahrgängen 1960–1965, die auf eine schmale Brücke der Beitragszahler zurollt.
-
-#### C8. "Betriebliche Altersvorsorge (bAV) & Arbeitgeber-Zuschuss"
-- **Dateiname:** `artworks/cards/card_bav_matching.png`
-- **Motiv:** Ein Handschlag zwischen Arbeitnehmer und Betrieb vor einer Fabriksilhouette mit geteiltem Sparschwein.
+#### Lebenslauf-Vignetten (`artworks/life/`, `800 × 500 px`, 16:10) & weitere Awards (`artworks/awards/`)
+- `illu_first_salary.png` (Erste Gehaltsabrechnung 2026)
+- `illu_compound_interest.png` (Schneeball-Zinseszinseffekt)
+- `illu_golden_years.png` (entspannter Ruhestand)
+- `trophy_fiscal_stability.png` (`512 × 512 px`, Silbermedaille Staatsfinanzen)
+- `certificate_border_frame.png` (`1600 × 1200 px`, Urkundenrahmen für 2045)
 
 ---
 
-### KOMPONENTE D: Status-Badges, Währungen & Metrik-Icons
+## 4. App-Icon (macOS, iOS & Windows EXE/Taskleiste)
 
-Kompakte Icons, die in der oberen Statusleiste und neben den Diagrammen angezeigt werden.
-
-- **Abmessungen:** `256 × 256 px` (Exportfähig auch als `128 × 128 px` und `64 × 64 px`)
-- **Format:** PNG-32 mit Freistellung (transparenter Hintergrund)
-
-1. `artworks/icons/icon_demography_ratio.png`:  
-   *Motiv:* Stilisierte Figuren – zwei junge Erwerbstätige, die einen rüstigen Rentner auf den Schultern tragen (Symbol für Umlage 2:1 bzw. 1.5:1).
-2. `artworks/icons/icon_generation_capital.png`:  
-   *Motiv:* Stilisierte goldene Globus-Münze mit Aufwärtspfeil (Generationenkapital / globale Aktienanlage).
-3. `artworks/icons/icon_pension_level.png`:  
-   *Motiv:* Ein Schutzschild mit der eingravierten Ziffer "48%".
-4. `artworks/icons/icon_contribution_rate.png`:  
-   *Motiv:* Zahnrad mit Prozentzeichen `%`, das die Last der Abgaben symbolisiert.
-5. `artworks/icons/icon_federal_subsidy.png`:  
-   *Motiv:* Das stilisierte Bundesadler-Siegel oder Bundesfinanzministerium mit Steuergroschen.
-6. `artworks/icons/icon_pension_gap.png`:  
-   *Motiv:* Eine aufbrechende Schlucht zwischen "Aktuellem Gehalt" und "Gesetzlicher Rente" (Rentenlücke).
+Aktuell nutzt die App auf allen Plattformen ein einheitliches minimalistisches Signet: einen **Bernsteingold-Ring (`#F59E0B`) auf dunkelanthrazitfarbenem Hintergrund (`#101012`)**.  
+Falls du ein final illustriertes App-Icon lieferst:
+- **Master-PNG:** `1024 × 1024 px`, sRGB, **vollflächig quadratisch ohne selbst abgerundete Ecken** (macOS/iOS runden automatisch ab).
+- Zielorte für das Team beim Einpflegen:
+  - Apple: `macos/Runner/Assets.xcassets/AppIcon.appiconset/icon_1024.png` (bzw. `ios/Runner/Assets.xcassets/AppIcon.appiconset/`)
+  - Windows (`.exe` & Taskleiste): `windows/runner/resources/app_icon.ico` (Multi-Size-ICO mit `16, 24, 32, 48, 64, 128, 256 px` — wird automatisch in `GenerationZukunft.exe` und als `favicon.ico` eingebettet).
 
 ---
 
-### KOMPONENTE E: Lebenslauf- & Karriere-Vignetten
+## 5. Checkliste für deine Dateilieferung
 
-Für den Mikro-Modus, in dem der Spieler seinen eigenen Lebenslauf von 20 bis 67 Jahren steuert.
-
-- **Abmessungen:** `800 × 500 px` (16:10 Querformat)
-- **Format:** PNG-32
-
-1. `artworks/life/illu_first_salary.png`: Erster Arbeitsvertrag und erste Gehaltsabrechnung mit Rentenversicherungsabzug.
-2. `artworks/life/illu_compound_interest.png`: Die Zinseszins-Maschine: Ein Schneeball, der zu einer gewaltigen Kugel anrollt.
-3. `artworks/life/illu_golden_years.png`: Ein erfüllter Lebensabend ohne Geldsorgen auf einer sonnigen Terrasse.
-
----
-
-### KOMPONENTE F: Urkunden-Rahmen & Auszeichnungs-Medaillen (econo=me Award)
-
-Nach Durchspielen der Simulation (z. B. im Jahr 2045 oder 2060) erhält der Spieler ein Ergebnis-Zeugnis für den Wettbewerb.
-
-1. `artworks/awards/trophy_generation_justice.png` (`512 × 512 px`):  
-   Goldmedaille mit zwei ineinandergreifenden Händen (Generationengerechtigkeit gemeistert: Haltelinie gehalten und Beiträge unter 21,5% gehalten).
-2. `artworks/awards/trophy_fiscal_stability.png` (`512 × 512 px`):  
-   Silbermedaille mit Bankgebäude und Waage (Solide Staatsfinanzen ohne Schuldenspirale).
-3. `artworks/awards/certificate_border_frame.png` (`1600 × 1200 px`, 4:3):  
-   Eleganter, handgezeichneter Urkundenrahmen mit Lorbeerzweigen und filigranen Mustern.
-
----
-
-## 3. Technische Richtlinien für die Dateilieferung
-
-- **Farbprofil:** sRGB (Standard für Bildschirme).
-- **Auflösung:** 72 bis 144 DPI (entscheidend sind die angegebenen Pixelmaße).
-- **Dateibenennung:** Ausschließlich Kleinbuchstaben und Unterstriche (z. B. `card_generationenkapital_boost.png`). Keine Umlaute oder Leerzeichen.
-- **Ebenen:** Bitte behalte offene Arbeitsdateien (`.psd`, `.procreate` oder `.fig`) bei dir im Archiv, falls nachträglich Farbvarianten oder Ebenen-Animationen benötigt werden.
-- **Export-Ordner:** Alle finalen Assets gehören ausschließlich in den einen zentralen Ordner `artworks/` im Hauptverzeichnis (z. B. `artworks/cards/...`, `artworks/characters/...`). Alle Grafiken sind optional — fehlt eine Datei noch, nutzt das Spiel automatisch saubere eingebaute Vektor-Illustrationen.
-
----
-*Vielen Dank für deinen kreativen Einsatz! Bei Rückfragen zu einzelnen Szenen wende dich direkt an Jacob Glathe & das Entwickler-Team.*
+- **Farbraum:** sRGB
+- **Dateinamen:** exakt wie oben — nur Kleinbuchstaben, Ziffern und Unterstriche (`_`), keine Leerzeichen oder Umlaute
+- **Format:** `.png` (empfohlen), `.webp`, `.jpg` oder `.svg`
+- **Ablage:** einfach in `artworks/<unterordner>/<dateiname>` speichern — im Dev-Katalog (*DevMode über `Ctrl+Shift+D` → Tab „Grafik-Briefing“*) kannst du alle Slots jederzeit live vorab prüfen
+- **Quelldateien:** offene Dateien (`.psd`, `.procreate`, `.fig`, `.ai`) bitte separat sichern
