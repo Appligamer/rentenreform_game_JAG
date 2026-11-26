@@ -108,7 +108,7 @@ if (-not $BuiltNative) {
             Copy-Item -Path $_.FullName -Destination $dest -Force
         }
     }
-    Copy-Item -Path (Join-Path $RootDir "start_game_windows.bat") -Destination $BundleDir -Force
+    Copy-Item -Path (Join-Path $RootDir "START_GAME_WINDOWS.bat") -Destination $BundleDir -Force
 }
 
 # 3. EINE EINZIGE eigenstaendige .exe mit Windows-Bordmitteln (.NET csc.exe) erzeugen

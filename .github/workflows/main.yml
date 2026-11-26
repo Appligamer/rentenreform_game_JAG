@@ -29,6 +29,7 @@ jobs:
       - name: Validate macOS shell scripts
         run: |
           bash -n START_GAME_MAC.command
+          bash -n START_GAME_IOS.command
           bash -n run_game_mac.sh
           bash -n GenerationZukunft.app/Contents/MacOS/GenerationZukunft
 

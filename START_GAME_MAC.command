@@ -36,6 +36,7 @@ echo ""
 echo "[1/3] Prüfe natives macOS-Projekt..."
 NATIVE_APP=""
 for candidate in \
+    "build/macos-derived/Build/Products/Release/Runner.app" \
     "build/macos/Build/Products/Release/Runner.app" \
     "build/Build/Products/Release/Runner.app" \
     "macos/build/Release/Runner.app"

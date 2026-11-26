@@ -20,6 +20,11 @@ class AppDelegate: NSObject, NSApplicationDelegate {
     super.init()
   }
 
+  func applicationDidFinishLaunching(_ notification: Notification) {
+    NSApp.activate(ignoringOtherApps: true)
+    NSApp.windows.forEach { $0.makeKeyAndOrderFront(nil) }
+  }
+
   func applicationShouldTerminateAfterLastWindowClosed(_ sender: NSApplication) -> Bool {
     return true
   }

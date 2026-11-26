@@ -22,6 +22,11 @@ class MainFlutterWindow: NSWindow {
 class MainFlutterWindow: NSWindow, WKNavigationDelegate {
   private var webView: WKWebView!
   private let schemeHandler = BundleSchemeHandler()
+  private var localServer: LocalBundleHTTPServer?
+
+  deinit {
+    localServer?.stop()
+  }
 
   override func awakeFromNib() {
     let config = BundleSchemeHandler.makeConfiguration(schemeHandler: schemeHandler)
@@ -29,37 +34,87 @@ class MainFlutterWindow: NSWindow, WKNavigationDelegate {
     config.preferences.setValue(true, forKey: "developerExtrasEnabled")
     #endif
 
+    if self.frame.width < 400 || self.frame.height < 300 {
+      self.setContentSize(NSSize(width: 1280, height: 820))
+      self.center()
+    }
+
     self.title = "Generation Zukunft — Renten-Simulation (econo=me)"
-    self.styleMask.insert([.titled, .closable, .miniaturizable, .resizable, .fullSizeContentView])
+    self.styleMask.insert([.titled, .closable, .miniaturizable, .resizable])
     self.titlebarAppearsTransparent = true
-    self.titleVisibility = .hidden
+    self.appearance = NSAppearance(named: .darkAqua)
     self.backgroundColor = NSColor(red: 0.0, green: 0.0, blue: 0.0, alpha: 1.0)
     self.isOpaque = true
 
-    let container = self.contentView ?? NSView(frame: NSRect(x: 0, y: 0, width: 1280, height: 800))
+    let container = self.contentView ?? NSView(frame: self.contentRect(forFrameRect: self.frame))
     self.contentView = container
 
     webView = WKWebView(frame: container.bounds, configuration: config)
-    webView.autoresizingMask = [.width, .height]
+    webView.translatesAutoresizingMaskIntoConstraints = false
     webView.navigationDelegate = self
     if #available(macOS 12.0, *) {
       webView.underPageBackgroundColor = NSColor.black
     }
 
     container.addSubview(webView)
+    NSLayoutConstraint.activate([
+      webView.topAnchor.constraint(equalTo: container.topAnchor),
+      webView.bottomAnchor.constraint(equalTo: container.bottomAnchor),
+      webView.leadingAnchor.constraint(equalTo: container.leadingAnchor),
+      webView.trailingAnchor.constraint(equalTo: container.trailingAnchor),
+    ])
+
     loadApp()
 
     super.awakeFromNib()
   }
 
   private func loadApp() {
-    if schemeHandler.hasBundledApp {
-      webView.load(URLRequest(url: BundleSchemeHandler.entryURL))
-    } else {
+    guard let webRoot = schemeHandler.webRootURL, schemeHandler.hasBundledApp else {
       webView.loadHTMLString(
-        BundleSchemeHandler.fallbackHTML(reason: "Das lokale Spielpaket (WebBundle) wurde im App-Bundle nicht gefunden."),
+        BundleSchemeHandler.fallbackHTML(reason: "Das lokale Spielpaket (WebBundle) wurde im macOS App-Bundle nicht gefunden."),
         baseURL: nil
       )
+      return
+    }
+
+    if let server = LocalBundleHTTPServer(rootURL: webRoot) {
+      self.localServer = server
+      server.start { [weak self] url in
+        guard let self else { return }
+        if let url {
+          self.webView.load(URLRequest(url: url))
+        } else {
+          self.webView.load(URLRequest(url: BundleSchemeHandler.entryURL))
+        }
+      }
+    } else {
+      webView.load(URLRequest(url: BundleSchemeHandler.entryURL))
+    }
+  }
+
+  func webView(_ webView: WKWebView, didFinish navigation: WKNavigation!) {
+    DispatchQueue.main.asyncAfter(deadline: .now() + 1.5) { [weak self] in
+      guard let self else { return }
+      let probeJS = """
+      (function() {
+        var r = document.getElementById('root');
+        var count = r ? r.childElementCount : -1;
+        var logs = (window.__EARLY_LOGS__ || []).map(function(l) { return l.level + ': ' + l.message; }).join(' | ');
+        return count + '::' + logs;
+      })()
+      """
+      self.webView.evaluateJavaScript(probeJS) { result, _ in
+        guard let text = result as? String else { return }
+        let parts = text.split(separator: ":", maxSplits: 2, omittingEmptySubsequences: false)
+        if let first = parts.first, let count = Int(first), count == 0 {
+          let details = parts.count >= 3 ? String(parts[2]) : ""
+          let msg = details.isEmpty
+            ? "Die Simulation konnte nicht initialisiert werden (leerer Root-Container)."
+            : "Startfehler: \(details)"
+          self.webView.loadHTMLString(BundleSchemeHandler.fallbackHTML(reason: msg), baseURL: nil)
+        }
+      }
     }
   }
 
