@@ -1,0 +1,7 @@
+# Einheitliche Zeilenenden & Schutz ausführbarer macOS-/Shell-Skripte
+* text=auto
+*.command text eol=lf
+*.sh text eol=lf
+GenerationZukunft.app/Contents/MacOS/* text eol=lf
+*.bat text eol=crlf
+*.ps1 text eol=crlf
