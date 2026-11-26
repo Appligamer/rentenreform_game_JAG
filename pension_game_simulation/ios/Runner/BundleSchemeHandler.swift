@@ -201,6 +201,7 @@ final class BundleSchemeHandler: NSObject, WKURLSchemeHandler {
     case "webp": return "image/webp"
     case "woff2": return "font/woff2"
     case "woff": return "font/woff"
+    case "ico": return "image/x-icon"
     default: return "application/octet-stream"
     }
   }

@@ -1,18 +1,29 @@
 #!/bin/bash
 # Native macOS App Launcher für Generation Zukunft
+set -u
+
+export PATH="/opt/homebrew/bin:/opt/homebrew/sbin:/usr/local/bin:/usr/bin:/bin:/usr/sbin:/sbin:$PATH"
 APP_DIR="$(cd "$(dirname "$0")/../../.." && pwd)"
 cd "$APP_DIR" || exit 1
 
+for candidate in \
+    "build/Build/Products/Release/Runner.app" \
+    "macos/build/Release/Runner.app" \
+    "pension_game_simulation/build/macos/Build/Products/Release/Runner.app"
+do
+    if [ -d "$candidate" ]; then
+        open "$candidate"
+        exit 0
+    fi
+done
+
+if [ -f "$APP_DIR/START_GAME_MAC.command" ]; then
+    chmod +x "$APP_DIR/START_GAME_MAC.command" 2>/dev/null || true
+    open -a Terminal "$APP_DIR/START_GAME_MAC.command"
+    exit 0
+fi
+
 if [ -d "macos/Runner.xcodeproj" ]; then
-    open macos/Runner.xcodeproj
+    open "macos/Runner.xcodeproj"
     exit 0
 fi
-
-if command -v flutter &> /dev/null; then
-    flutter run -d macos
-    exit 0
-fi
-
-npm run dev &
-sleep 2
-open "http://localhost:3000"
