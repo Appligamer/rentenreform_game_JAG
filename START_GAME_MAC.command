@@ -1,11 +1,12 @@
 #!/bin/bash
 # ==============================================================================
 # GENERATION ZUKUNFT — APPLE macOS UNIVERSAL LAUNCHER (.command)
-# Doppelklickbar im macOS Finder | Funktioniert Online (Vite) & Offline (WebBundle)
+# Hält den Server-Prozess aktiv im Vordergrund (kein vorzeitiges Beenden).
 # ==============================================================================
 
 set -u
-cd "$(dirname "$0")" || exit 1
+SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
+cd "$SCRIPT_DIR" || exit 1
 
 # Homebrew (Apple Silicon & Intel), NVM, Volta, fnm & Flutter in PATH aufnehmen
 export PATH="/opt/homebrew/bin:/opt/homebrew/sbin:/usr/local/bin:/usr/bin:/bin:/usr/sbin:/sbin:$PATH"
@@ -16,6 +17,14 @@ if [ -d "$HOME/.nvm/versions/node" ]; then
     LATEST_NVM_NODE="$(ls -d "$HOME/.nvm/versions/node/"*/bin 2>/dev/null | sort -V | tail -n 1 || true)"
     [ -n "${LATEST_NVM_NODE:-}" ] && export PATH="$LATEST_NVM_NODE:$PATH"
 fi
+
+WATCHER_PID=""
+cleanup() {
+    if [ -n "${WATCHER_PID:-}" ] && kill -0 "$WATCHER_PID" 2>/dev/null; then
+        kill "$WATCHER_PID" 2>/dev/null || true
+    fi
+}
+trap cleanup EXIT INT TERM
 
 echo "====================================================================="
 echo "   GENERATION ZUKUNFT — DIE RENTEN-SIMULATION (ECONO=ME)"
@@ -63,26 +72,23 @@ else
     echo "  -> Xcode nicht gefunden (übersprungen, starte Game Engine direkt)."
 fi
 
-# 3. Game Engine starten (bevorzugt Vite Dev-Server mit Auto-Install, sonst Offline-WebBundle)
+# 3. Game Engine direkt im Vordergrund starten (bleibt aktiv bis Ctrl+C / Schließen)
 echo "[2/3] Prüfe Game Engine & Abhängigkeiten..."
 
-SERVER_PID=""
-cleanup() {
-    if [ -n "${SERVER_PID:-}" ] && kill -0 "$SERVER_PID" 2>/dev/null; then
-        kill "$SERVER_PID" 2>/dev/null || true
-    fi
-}
-trap cleanup EXIT INT TERM
-
-# Falls bereits ein Server auf Port 3000 läuft, direkt öffnen
+# Falls bereits ein Server auf Port 3000 läuft, Browser öffnen und Fenster offen halten
 if command -v curl >/dev/null 2>&1 && curl -fsS --max-time 1 "http://127.0.0.1:3000" >/dev/null 2>&1; then
     echo "  -> Game Engine läuft bereits auf http://localhost:3000"
     echo "[3/3] Öffne Generation Zukunft im Browser..."
     open "http://localhost:3000"
+    echo ""
+    echo "[OK] Server ist aktiv. Dieses Fenster überwacht Port 3000 (Ctrl+C zum Schließen)..."
+    while curl -fsS --max-time 1 "http://127.0.0.1:3000" >/dev/null 2>&1; do
+        sleep 2
+    done
+    read -r -p "Server wurde beendet. Drücke Enter zum Schließen..."
     exit 0
 fi
 
-STARTED_DEV=0
 if command -v npm >/dev/null 2>&1 && [ -f "package.json" ]; then
     if [ ! -x "node_modules/.bin/vite" ]; then
         echo "  -> Erststart: Installiere lokale Pakete (npm install)..."
@@ -92,61 +98,55 @@ if command -v npm >/dev/null 2>&1 && [ -f "package.json" ]; then
     fi
 
     if [ -x "node_modules/.bin/vite" ]; then
-        echo "  -> Starte Vite Game Engine auf http://localhost:3000 ..."
-        LOG_FILE="/tmp/gz_vite_$$.log"
-        npm run dev > "$LOG_FILE" 2>&1 &
-        SERVER_PID=$!
+        echo "[3/3] Starte Vite Game Engine im Vordergrund (http://localhost:3000)..."
+        echo "  Hinweis: Dieses Terminal-Fenster geöffnet lassen, solange du spielst (Ctrl+C zum Beenden)."
+        echo ""
 
-        READY=0
-        for _ in $(seq 1 40); do
-            if ! kill -0 "$SERVER_PID" 2>/dev/null; then
-                break
-            fi
-            if command -v curl >/dev/null 2>&1 && curl -fsS --max-time 1 "http://127.0.0.1:3000" >/dev/null 2>&1; then
-                READY=1
-                break
-            fi
-            sleep 0.5
-        done
+        MAIN_PID=$$
+        (
+            for _ in $(seq 1 60); do
+                if ! kill -0 "$MAIN_PID" 2>/dev/null; then
+                    exit 0
+                fi
+                if command -v curl >/dev/null 2>&1 && curl -fsS --max-time 1 "http://127.0.0.1:3000" >/dev/null 2>&1; then
+                    open "http://localhost:3000"
+                    exit 0
+                fi
+                sleep 0.5
+            done
+        ) &
+        WATCHER_PID=$!
 
-        if [ "$READY" -eq 1 ]; then
-            STARTED_DEV=1
-            echo "[3/3] Öffne Generation Zukunft im Browser (http://localhost:3000)..."
-            open "http://localhost:3000"
-            echo ""
-            echo "====================================================================="
-            echo "  [OK] Generation Zukunft läuft! (Ctrl+C zum Beenden)"
-            echo "  Dieses Terminal-Fenster während des Spielens geöffnet lassen."
-            echo "====================================================================="
-            wait "$SERVER_PID"
-            exit 0
-        else
-            echo "  [WARNUNG] Vite-Server konnte nicht rechtzeitig gestartet werden:"
-            tail -n 10 "$LOG_FILE" 2>/dev/null || true
-            kill "$SERVER_PID" 2>/dev/null || true
-            SERVER_PID=""
+        # Im Vordergrund ausführen -> Prozess bleibt dauerhaft am Leben!
+        npm run dev
+        DEV_EXIT=$?
+        cleanup
+        echo ""
+        echo "[INFO] Vite-Server beendet (Exit-Code: $DEV_EXIT)."
+        if [ "$DEV_EXIT" -eq 0 ] || [ "$DEV_EXIT" -eq 130 ]; then
+            read -r -p "Drücke Enter zum Schließen..."
+            exit "$DEV_EXIT"
         fi
-        rm -f "$LOG_FILE" 2>/dev/null || true
+        echo "  -> Wechsle automatisch auf Offline-WebBundle..."
     fi
 fi
 
-# Fallback: Eingebautes Offline-WebBundle über lokalen HTTP-Server (benötigt kein npm/vite)
-if [ "$STARTED_DEV" -eq 0 ]; then
-    WEB_DIR=""
-    for candidate in \
-        "dist" \
-        "macos/Runner/WebBundle" \
-        "ios/Runner/WebBundle" \
-        "pension_game_simulation/macos/Runner/WebBundle"
-    do
-        if [ -f "$candidate/index.html" ]; then
-            WEB_DIR="$candidate"
-            break
-        fi
-    done
+# Fallback: Eingebautes Offline-WebBundle über lokalen HTTP-Server im Vordergrund
+WEB_DIR=""
+for candidate in \
+    "dist" \
+    "macos/Runner/WebBundle" \
+    "ios/Runner/WebBundle" \
+    "pension_game_simulation/macos/Runner/WebBundle"
+do
+    if [ -f "$candidate/index.html" ]; then
+        WEB_DIR="$candidate"
+        break
+    fi
+done
 
-    if [ -n "$WEB_DIR" ] && command -v python3 >/dev/null 2>&1; then
-        PORT="$(python3 -c '
+if [ -n "$WEB_DIR" ] && command -v python3 >/dev/null 2>&1; then
+    PORT="$(python3 -c '
 import socket
 for p in range(41735, 41760):
     with socket.socket() as s:
@@ -154,30 +154,34 @@ for p in range(41735, 41760):
             print(p)
             break
 ' 2>/dev/null || echo 41735)"
-        echo "  -> Starte Offline-WebBundle ($WEB_DIR) auf http://127.0.0.1:$PORT ..."
-        python3 -m http.server "$PORT" --bind 127.0.0.1 --directory "$WEB_DIR" >/dev/null 2>&1 &
-        SERVER_PID=$!
 
-        for _ in $(seq 1 20); do
-            if ! kill -0 "$SERVER_PID" 2>/dev/null; then
-                break
+    echo "[3/3] Starte Offline-WebBundle ($WEB_DIR) im Vordergrund auf http://127.0.0.1:$PORT ..."
+    echo "  Hinweis: Dieses Terminal-Fenster geöffnet lassen, solange du spielst (Ctrl+C zum Beenden)."
+    echo ""
+
+    MAIN_PID=$$
+    (
+        for _ in $(seq 1 40); do
+            if ! kill -0 "$MAIN_PID" 2>/dev/null; then
+                exit 0
             fi
             if command -v curl >/dev/null 2>&1 && curl -fsS --max-time 1 "http://127.0.0.1:$PORT/index.html" >/dev/null 2>&1; then
-                break
+                open "http://127.0.0.1:$PORT/index.html"
+                exit 0
             fi
             sleep 0.25
         done
+        open "http://127.0.0.1:$PORT/index.html" 2>/dev/null || true
+    ) &
+    WATCHER_PID=$!
 
-        echo "[3/3] Öffne Generation Zukunft (Offline-Modus) im Browser..."
-        open "http://127.0.0.1:$PORT/index.html"
-        echo ""
-        echo "====================================================================="
-        echo "  [OK] Generation Zukunft läuft im Offline-Modus! (Ctrl+C zum Beenden)"
-        echo "  Dieses Terminal-Fenster während des Spielens geöffnet lassen."
-        echo "====================================================================="
-        wait "$SERVER_PID"
-        exit 0
-    fi
+    # Im Vordergrund ausführen -> Prozess bleibt dauerhaft am Leben!
+    python3 -m http.server "$PORT" --bind 127.0.0.1 --directory "$WEB_DIR"
+    PY_EXIT=$?
+    cleanup
+    echo ""
+    read -r -p "Offline-Server beendet (Exit-Code: $PY_EXIT). Drücke Enter zum Schließen..."
+    exit "$PY_EXIT"
 fi
 
 if [ "$REPAIRED" -eq 1 ]; then
