@@ -1,0 +1,97 @@
+name: Build Web & macOS
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+  workflow_dispatch:
+
+jobs:
+  web:
+    name: Web Lint & Build
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Install dependencies
+        run: npm install --no-audit --no-fund
+
+      - name: Validate macOS shell scripts
+        run: |
+          bash -n START_GAME_MAC.command
+          bash -n run_game_mac.sh
+          bash -n GenerationZukunft.app/Contents/MacOS/GenerationZukunft
+
+      - name: TypeScript lint check
+        run: npm run lint
+
+      - name: Build web bundle
+        run: npm run build
+
+      - name: Upload web artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: generation-zukunft-web-dist
+          path: dist/
+          retention-days: 14
+
+  macos:
+    name: macOS Native Xcode Build
+    runs-on: macos-latest
+    needs: web
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Download built web bundle
+        uses: actions/download-artifact@v4
+        with:
+          name: generation-zukunft-web-dist
+          path: dist
+
+      - name: Sync WebBundle into macOS Runner
+        run: |
+          rm -rf macos/Runner/WebBundle
+          mkdir -p macos/Runner/WebBundle
+          cp -R dist/. macos/Runner/WebBundle/
+
+      - name: Build macOS app with Xcode
+        run: |
+          xcodebuild \
+            -project macos/Runner.xcodeproj \
+            -scheme Runner \
+            -configuration Release \
+            -derivedDataPath build/macos-derived \
+            CODE_SIGN_IDENTITY="-" \
+            CODE_SIGNING_REQUIRED=NO \
+            CODE_SIGNING_ALLOWED=NO \
+            clean build
+
+      - name: Package macOS .app artifact
+        run: |
+          APP_PATH="$(find build/macos-derived/Build/Products/Release -maxdepth 1 -name '*.app' | head -n 1)"
+          if [ -z "$APP_PATH" ] || [ ! -d "$APP_PATH" ]; then
+            echo "Error: Built .app bundle not found in Release products."
+            exit 1
+          fi
+          echo "Packaging: $APP_PATH"
+          mkdir -p artifacts
+          ditto -c -k --sequesterRsrc --keepParent "$APP_PATH" artifacts/GenerationZukunft_macOS.app.zip
+
+      - name: Upload macOS artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: generation-zukunft-macos-app
+          path: artifacts/GenerationZukunft_macOS.app.zip
+          retention-days: 14
