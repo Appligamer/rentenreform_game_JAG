@@ -8,4 +8,5 @@ coverage/
 !.env.example
 .aistudio/
 **/xcuserdata/
+**/project.xcworkspace/
 
