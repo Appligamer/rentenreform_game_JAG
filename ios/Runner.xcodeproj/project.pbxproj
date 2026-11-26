@@ -253,7 +253,7 @@
 
 /* Begin XCConfigurationList section */
 		550000502FF8000100123456 /* Build configuration list for PBXNativeTarget "Runner" */ = {
-			isa = XCBuildConfiguration;
+			isa = XCConfigurationList;
 			buildConfigurations = (
 				550000702FF8000100123456 /* Debug */,
 				550000712FF8000100123456 /* Release */,
@@ -262,7 +262,7 @@
 			defaultConfigurationName = Debug;
 		};
 		550000512FF8000100123456 /* Build configuration list for PBXProject "Runner" */ = {
-			isa = XCBuildConfiguration;
+			isa = XCConfigurationList;
 			buildConfigurations = (
 				550000722FF8000100123456 /* Debug */,
 				550000732FF8000100123456 /* Release */,

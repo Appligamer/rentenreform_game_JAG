@@ -12,7 +12,7 @@ param(
 $ErrorActionPreference = "Stop"
 
 $RootDir = Split-Path -Parent $PSScriptRoot
-$FlutterDir = Join-Path $RootDir "pension_game_simulation"
+$FlutterDir = $RootDir
 $OutDir = Join-Path $RootDir "dist_windows"
 $BundleDir = Join-Path $OutDir "GenerationZukunft_Windows"
 

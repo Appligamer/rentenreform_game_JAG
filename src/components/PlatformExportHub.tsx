@@ -182,13 +182,13 @@ export const PlatformExportHub: React.FC = () => {
 ├── GenerationZukunft.app              # 🍎 Nativer macOS App-Bundle Ordner
 ├── start_game_windows.bat             # 🪟 Windows 1-Klick-Starter
 ├── scripts/build_windows_portable.ps1 # 🪟 Erzeugt Einzel-EXE & Versand-ZIP
-├── artworks/                          # Eindeutiger Zielordner für optionale Artworks
-├── macos/                             # Apple Xcode Projekt (macOS & iOS)
-│   └── Runner.xcodeproj
-├── windows/                           # C++ Windows Desktop Runner
-│   └── runner/
-├── graphic_designer_briefing.md       # Vollständiges Grafik-Briefing
-└── pension_game_simulation/           # Flutter Multiplattform Quellcode`}
+├── src/                               # TypeScript / React Web- & Desktop-Engine
+├── lib/                               # Flutter Multiplattform Quellcode & Simulation
+├── artworks/ & assets/images/         # Zielordner für optionale Artworks
+├── macos/Runner.xcodeproj             # Apple macOS Xcode Projekt
+├── ios/Runner.xcodeproj               # Apple iOS Xcode Projekt
+├── windows/runner/                    # C++ Windows Desktop Runner
+└── graphic_designer_briefing.md       # Vollständiges Grafik-Briefing`}
         </pre>
       </div>
     </div>

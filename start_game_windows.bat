@@ -12,8 +12,8 @@ if exist "pension_game_simulation.exe" (
     start "" "pension_game_simulation.exe"
     exit /b 0
 )
-if exist "pension_game_simulation\build\windows\x64\runner\Release\pension_game_simulation.exe" (
-    start "" "pension_game_simulation\build\windows\x64\runner\Release\pension_game_simulation.exe"
+if exist "build\windows\x64\runner\Release\pension_game_simulation.exe" (
+    start "" "build\windows\x64\runner\Release\pension_game_simulation.exe"
     exit /b 0
 )
 if exist "Release\pension_game_simulation.exe" (
@@ -101,8 +101,7 @@ exit /b 0
 :try_dev
 :: 3. Entwickler-Modus (Flutter oder Node.js)
 where flutter >nul 2>nul
-if %errorlevel% equ 0 if exist "pension_game_simulation\pubspec.yaml" (
-    cd /d "pension_game_simulation"
+if %errorlevel% equ 0 if exist "pubspec.yaml" (
     flutter run -d windows
     exit /b 0
 )

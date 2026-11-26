@@ -32,24 +32,13 @@ echo "   Apple macOS Universal Launcher"
 echo "====================================================================="
 echo ""
 
-# 1. Selbstheilung: Fehlende Xcode-Runner-Dateien nur bei Bedarf ergänzen
-REPAIRED=0
-if [ ! -f "macos/Runner/AppDelegate.swift" ] || [ ! -f "macos/Runner/Info.plist" ]; then
-    if [ -f "pension_game_simulation/macos/Runner/AppDelegate.swift" ]; then
-        echo "[INFO] Fehlende macOS Runner Dateien werden synchronisiert..."
-        mkdir -p macos
-        cp -r pension_game_simulation/macos/* macos/ 2>/dev/null || true
-        REPAIRED=1
-    fi
-fi
-
-# 2. Natives macOS App-Bundle oder Xcode-Projekt (einmalig) öffnen
+# 1. Natives macOS App-Bundle oder Xcode-Projekt (einmalig) öffnen
 echo "[1/3] Prüfe natives macOS-Projekt..."
 NATIVE_APP=""
 for candidate in \
+    "build/macos/Build/Products/Release/Runner.app" \
     "build/Build/Products/Release/Runner.app" \
-    "macos/build/Release/Runner.app" \
-    "pension_game_simulation/build/macos/Build/Products/Release/Runner.app"
+    "macos/build/Release/Runner.app"
 do
     if [ -d "$candidate" ]; then
         NATIVE_APP="$candidate"
@@ -60,19 +49,14 @@ done
 if [ -n "$NATIVE_APP" ]; then
     echo "  -> Starte kompilierte macOS App: $NATIVE_APP"
     open "$NATIVE_APP"
-elif [ -d "/Applications/Xcode.app" ]; then
-    if [ -d "macos/Runner.xcodeproj" ]; then
-        echo "  -> Öffne macos/Runner.xcodeproj in Xcode (Cmd+R für natives macOS-Fenster)..."
-        open "macos/Runner.xcodeproj"
-    elif [ -d "pension_game_simulation/macos/Runner.xcodeproj" ]; then
-        echo "  -> Öffne pension_game_simulation/macos/Runner.xcodeproj in Xcode..."
-        open "pension_game_simulation/macos/Runner.xcodeproj"
-    fi
+elif [ -d "/Applications/Xcode.app" ] && [ -d "macos/Runner.xcodeproj" ]; then
+    echo "  -> Öffne macos/Runner.xcodeproj in Xcode (Cmd+R für natives macOS-Fenster)..."
+    open "macos/Runner.xcodeproj"
 else
     echo "  -> Xcode nicht gefunden (übersprungen, starte Game Engine direkt)."
 fi
 
-# 3. Game Engine direkt im Vordergrund starten (bleibt aktiv bis Ctrl+C / Schließen)
+# 2. Game Engine direkt im Vordergrund starten (bleibt aktiv bis Ctrl+C / Schließen)
 echo "[2/3] Prüfe Game Engine & Abhängigkeiten..."
 
 # Falls bereits ein Server auf Port 3000 läuft, Browser öffnen und Fenster offen halten
@@ -136,8 +120,7 @@ WEB_DIR=""
 for candidate in \
     "dist" \
     "macos/Runner/WebBundle" \
-    "ios/Runner/WebBundle" \
-    "pension_game_simulation/macos/Runner/WebBundle"
+    "ios/Runner/WebBundle"
 do
     if [ -f "$candidate/index.html" ]; then
         WEB_DIR="$candidate"
@@ -182,12 +165,6 @@ for p in range(41735, 41760):
     echo ""
     read -r -p "Offline-Server beendet (Exit-Code: $PY_EXIT). Drücke Enter zum Schließen..."
     exit "$PY_EXIT"
-fi
-
-if [ "$REPAIRED" -eq 1 ]; then
-    echo ""
-    echo "[TIPP] Um reparierte Xcode-Dateien in GitHub zu sichern:"
-    echo "git add . && git commit -m 'Fix Xcode Runner files' && git push"
 fi
 
 echo ""

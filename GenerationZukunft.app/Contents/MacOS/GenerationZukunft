@@ -7,9 +7,9 @@ APP_DIR="$(cd "$(dirname "$0")/../../.." && pwd)"
 cd "$APP_DIR" || exit 1
 
 for candidate in \
+    "build/macos/Build/Products/Release/Runner.app" \
     "build/Build/Products/Release/Runner.app" \
-    "macos/build/Release/Runner.app" \
-    "pension_game_simulation/build/macos/Build/Products/Release/Runner.app"
+    "macos/build/Release/Runner.app"
 do
     if [ -d "$candidate" ]; then
         open "$candidate"
