@@ -41,9 +41,13 @@
     - `platforms/ios/Runner/SceneDelegate.swift`: `@objc(SceneDelegate)` für zuverlässige Runtime-Auflösung des `UIApplicationSceneManifest` auf iOS-Geräten ergänzt.
     - `platforms/shared/BundleSchemeHandler.swift`: `LocalBundleHTTPServer` gehärtet (`SIGPIPE` ignoriert, `SO_NOSIGPIPE`, `TCP_NODELAY`, `SO_RCVTIMEO`/`SO_SNDTIMEO`, `EINTR`/`EAGAIN`-Schleifen in `recv`/`sendAll`, `shutdown(SHUT_WR)` vor `close`, stabiler Portbereich `41735–41750` für persistentes `localStorage`, Health-Check & Auto-Restart); `buildInlinedAppHTML(webRoot:)` für autarke Offline-Wiederherstellung ohne Loopback-Socket sowie HTML-Escaping im `errorGuardJS` ergänzt.
     - `platforms/ios/Runner/GameViewController.swift` & `platforms/macos/Runner/MainFlutterWindow.swift`: Unabhängiger `DispatchWorkItem`-Readiness-Watchdog, automatischer Inline-Fallback (`loadInlinedFallback`), `UIApplication.willEnterForegroundNotification`-Server-Wiederherstellung und `webViewWebContentProcessDidTerminate`-Auto-Reload integriert.
+    - **Watchdog-/SIGKILL-Entkopplung (`GameViewController.swift`, `Info.plist`, `GenerationZukunft_iOS.xcodeproj`):** `WKWebView`-Initialisierung und Start von `LocalBundleHTTPServer` aus `viewDidLoad()`/`scene(_:willConnectTo:)` herausgenommen (`viewDidAppear` + Hintergrund-GCD-Queue), um Launch-Watchdog-Abbrüche (`0x8badf00d` / `SIGKILL`) auszuschließen; natives Lade-Overlay mit Retry-Button (`setupNativeOverlayUI`) gegen leere schwarze Bildschirme ergänzt; `didEnterBackgroundNotification`-Server-Stopp und Terminations-Zähler (`webContentTerminationCount`) gegen Endlos-Reloads eingebaut; `Info.plist` auf `$(MARKETING_VERSION)`/`$(CURRENT_PROJECT_VERSION)` umgestellt und `WebKit.framework` explizit gelinkt.
+  - **Root-Wiederherstellung für GitHub-Reiter (`LICENSE.md`, `README.md`, `Protocoll.md`):**
+    - `LICENSE.md` (PolyForm Noncommercial License 1.0.0), `README.md` und `Protocoll.md` aus `docs/` zurück ins Hauptverzeichnis (`/`) verschoben, damit GitHub den **PolyForm Noncommercial 1.0.0**-Lizenz-Reiter und `README.md` wieder direkt erkennt und `Protocoll.md` im Wurzelverzeichnis sichtbar ist.
+    - `README.md` um die aktuellen Xcode-Pfade (`GenerationZukunft_macOS.xcodeproj` / `GenerationZukunft_iOS.xcodeproj`) sowie einen prominenten Abschnitt/Direktlink auf `Protocoll.md` erweitert.
 - **Verifikation & Dokumentation:**
   - `npm run lint` (`tsc --noEmit`), Vite-Production-Build (`web/dist/` mit `safari15`-Target), bitgleicher Abgleich (`diff -qr`) in `platforms/macos/Runner/WebBundle` & `platforms/ios/Runner/WebBundle`, `bash -n`, XML-/Plist-/XIB-Validität, Swift-Klammerprüfung und alle Dateireferenzen beider `.xcodeproj`-Projekte erfolgreich geprüft.
-  - `docs/Protocoll.md` im bestehenden Tagesabschnitt `2026-11-27` fortgeführt.
+  - `Protocoll.md` im Hauptverzeichnis unter dem bestehenden Tagesabschnitt `2026-11-27` fortgeführt.
 
 ---
 

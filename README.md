@@ -4,15 +4,21 @@ Plattformübergreifendes Simulations- und Strategiespiel zur deutschen Rentenver
 
 ---
 
-## macOS &  iOS / iPadOS (Xcode)
+## macOS & iOS / iPadOS (Xcode)
 
-Das Projekt enthält ein vorkompiliertes Offline-`WebBundle` und einen eigenen `BundleSchemeHandler` (`app://local/index.html`) — es wird **kein laufender Localhost-Server** benötigt.
+Das Projekt enthält ein vorkompiliertes Offline-`WebBundle` und einen lokalen Loopback-Server + `BundleSchemeHandler`-Fallback (`app://local/index.html`).
 
-1. Öffne **`macos/Runner.xcodeproj`** (enthält beide Targets) oder **`ios/Runner.xcodeproj`** in Xcode.
-2. Wähle oben in Xcode das gewünschte Schema:
-   - **`Runner`** → **My Mac** (native macOS Desktop-App)
-   - **`Runner-iOS`** → **iPhone / iPad Simulator** oder angeschlossenes iPhone/iPad (ab iOS 15.0)
-3. Klicke auf **Play (`Cmd + R`)**.
+1. Öffne je nach Plattform das passende Xcode-Projekt direkt im Hauptordner:
+   - **macOS:** **`GenerationZukunft_macOS.xcodeproj`** → Schema **`Runner`** → **My Mac** (strikt macOS-only)
+   - **iOS & iPadOS:** **`GenerationZukunft_iOS.xcodeproj`** → Schema **`GenerationZukunft_iOS`** → **iPhone / iPad Simulator** oder angeschlossenes iPhone/iPad (ab iOS 15.0)
+2. Klicke auf **Play (`Cmd + R`)**.
+
+---
+
+## Entwicklungsprotokoll (`Protocoll.md`)
+
+Alle Architektur-, Build-, Bugfix- und Commit-Änderungen werden fortlaufend tagesaktuell dokumentiert in:
+👉 **[Aktuelles Entwicklungsprotokoll öffnen (`Protocoll.md`)](Protocoll.md)**
 
 ---
 
