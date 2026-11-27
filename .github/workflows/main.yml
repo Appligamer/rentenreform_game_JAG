@@ -61,11 +61,12 @@ jobs:
           name: generation-zukunft-web-dist
           path: dist
 
-      - name: Sync WebBundle into macOS Runner
+      - name: Sync WebBundle into macOS and iOS Runner
         run: |
-          rm -rf macos/Runner/WebBundle
-          mkdir -p macos/Runner/WebBundle
+          rm -rf macos/Runner/WebBundle ios/Runner/WebBundle
+          mkdir -p macos/Runner/WebBundle ios/Runner/WebBundle
           cp -R dist/. macos/Runner/WebBundle/
+          cp -R dist/. ios/Runner/WebBundle/
 
       - name: Build macOS app with Xcode
         run: |

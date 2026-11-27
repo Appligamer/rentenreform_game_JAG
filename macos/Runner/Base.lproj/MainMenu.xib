@@ -16,18 +16,18 @@
         <customObject id="Voe-Tx-rLC" customClass="AppDelegate" customModule="Runner" customModuleProvider="target"/>
         <menu title="Main Menu" systemMenu="main" id="AYu-sK-qS6">
             <items>
-                <menuItem title="pension_game_simulation" id="1Xt-HY-uBw">
+                <menuItem title="Generation Zukunft" id="1Xt-HY-uBw">
                     <modifierMask key="keyEquivalentModifierMask"/>
-                    <menu key="submenu" title="pension_game_simulation" systemMenu="apple" id="uQy-DD-JDr">
+                    <menu key="submenu" title="Generation Zukunft" systemMenu="apple" id="uQy-DD-JDr">
                         <items>
-                            <menuItem title="About pension_game_simulation" id="5kV-Vb-QxS">
+                            <menuItem title="About Generation Zukunft" id="5kV-Vb-QxS">
                                 <modifierMask key="keyEquivalentModifierMask"/>
                                 <connections>
                                     <action selector="orderFrontStandardAboutPanel:" target="-1" id="Exp-CZ-Vem"/>
                                 </connections>
                             </menuItem>
                             <menuItem isSeparatorItem="YES" id="VOq-y0-SEH"/>
-                            <menuItem title="Quit pension_game_simulation" keyEquivalent="q" id="4sb-4s-VLi">
+                            <menuItem title="Quit Generation Zukunft" keyEquivalent="q" id="4sb-4s-VLi">
                                 <connections>
                                     <action selector="terminate:" target="-1" id="Te7-pn-YzF"/>
                                 </connections>

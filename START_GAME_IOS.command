@@ -43,11 +43,15 @@ open "$XCODE_PROJ"
 
 # 2. Verfügbaren iPhone/iPad Simulator suchen und automatisch bauen & starten
 if command -v xcrun >/dev/null 2>&1 && command -v xcodebuild >/dev/null 2>&1; then
-    SIM_UDID="$(xcrun simctl list devices available 'iPhone' 2>/dev/null | grep -E 'iPhone [0-9]+' | head -n 1 | sed -E 's/.*\(([0-9A-F-]+)\).*/\1/' || true)"
+    SIM_UDID="$(xcrun simctl list devices available 'iPhone' 2>/dev/null | grep '(Booted)' | head -n 1 | sed -E 's/.*\(([0-9A-F-]{36})\).*/\1/' || true)"
+    if [ -z "$SIM_UDID" ]; then
+        SIM_UDID="$(xcrun simctl list devices available 'iPhone' 2>/dev/null | grep -E '\([0-9A-F-]{36}\)' | head -n 1 | sed -E 's/.*\(([0-9A-F-]{36})\).*/\1/' || true)"
+    fi
     if [ -n "$SIM_UDID" ]; then
         echo "[2/3] Starte iOS Simulator ($SIM_UDID) und kompiliere App..."
         open -a Simulator >/dev/null 2>&1 || true
         xcrun simctl boot "$SIM_UDID" >/dev/null 2>&1 || true
+        xcrun simctl bootstatus "$SIM_UDID" -b >/dev/null 2>&1 || true
 
         if xcodebuild \
             -project "$XCODE_PROJ" \

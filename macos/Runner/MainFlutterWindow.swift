@@ -19,7 +19,7 @@ class MainFlutterWindow: NSWindow {
   }
 }
 #else
-final class MacGameViewController: NSViewController, WKNavigationDelegate {
+final class MacGameViewController: NSViewController, WKNavigationDelegate, WKUIDelegate {
   private var webView: WKWebView!
   private let schemeHandler = BundleSchemeHandler()
   private var localServer: LocalBundleHTTPServer?
@@ -35,7 +35,9 @@ final class MacGameViewController: NSViewController, WKNavigationDelegate {
     #endif
 
     let wv = WKWebView(frame: NSRect(x: 0, y: 0, width: 1280, height: 820), configuration: config)
+    wv.autoresizingMask = [.width, .height]
     wv.navigationDelegate = self
+    wv.uiDelegate = self
     if #available(macOS 12.0, *) {
       wv.underPageBackgroundColor = NSColor.black
     }
@@ -57,23 +59,35 @@ final class MacGameViewController: NSViewController, WKNavigationDelegate {
       return
     }
 
-    if let server = LocalBundleHTTPServer(rootURL: webRoot) {
+    if let server = LocalBundleHTTPServer(rootURL: webRoot),
+       let url = server.start() {
       self.localServer = server
-      server.start { [weak self] url in
-        guard let self else { return }
-        if let url {
-          self.webView.load(URLRequest(url: url))
-        } else {
-          self.webView.load(URLRequest(url: BundleSchemeHandler.entryURL))
-        }
-      }
+      webView.load(URLRequest(url: url))
     } else {
       webView.load(URLRequest(url: BundleSchemeHandler.entryURL))
     }
   }
 
+  func webView(
+    _ webView: WKWebView,
+    createWebViewWith configuration: WKWebViewConfiguration,
+    for navigationAction: WKNavigationAction,
+    windowFeatures: WKWindowFeatures
+  ) -> WKWebView? {
+    if navigationAction.targetFrame == nil, let url = navigationAction.request.url {
+      if url.scheme == "http" || url.scheme == "https",
+         url.host != "127.0.0.1",
+         url.host != "localhost" {
+        NSWorkspace.shared.open(url)
+      } else {
+        webView.load(URLRequest(url: url))
+      }
+    }
+    return nil
+  }
+
   func webView(_ webView: WKWebView, didFinish navigation: WKNavigation!) {
-    DispatchQueue.main.asyncAfter(deadline: .now() + 1.5) { [weak self] in
+    DispatchQueue.main.asyncAfter(deadline: .now() + 2.5) { [weak self] in
       guard let self else { return }
       let probeJS = """
       (function() {
@@ -85,9 +99,9 @@ final class MacGameViewController: NSViewController, WKNavigationDelegate {
       """
       self.webView.evaluateJavaScript(probeJS) { result, _ in
         guard let text = result as? String else { return }
-        let parts = text.split(separator: ":", maxSplits: 2, omittingEmptySubsequences: false)
+        let parts = text.components(separatedBy: "::")
         if let first = parts.first, let count = Int(first), count == 0 {
-          let details = parts.count >= 3 ? String(parts[2]) : ""
+          let details = parts.count >= 2 ? parts.dropFirst().joined(separator: "::") : ""
           let msg = details.isEmpty
             ? "Die Simulation konnte nicht initialisiert werden (leerer Root-Container)."
             : "Startfehler: \(details)"
@@ -125,6 +139,7 @@ class MainFlutterWindow: NSWindow {
     self.appearance = NSAppearance(named: .darkAqua)
     self.backgroundColor = NSColor.black
     self.isOpaque = true
+    self.minSize = NSSize(width: 960, height: 640)
 
     let gameViewController = MacGameViewController()
     self.contentViewController = gameViewController

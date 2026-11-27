@@ -1,15 +1,22 @@
+import Darwin
 import Foundation
-import Network
 import WebKit
 
-/// Lokaler Loopback-HTTP-Server (`http://127.0.0.1:<port>/`), damit WKWebView
-/// ES-Module (`<script type="module" crossorigin>`), `localStorage` und CSS
-/// ohne Custom-Scheme-CORS-Beschränkungen auf macOS und iOS vollständig lädt.
+/// Synchron bindender Loopback-HTTP-Server (`http://127.0.0.1:<port>/`) auf Basis von
+/// POSIX BSD-Sockets (`127.0.0.1` only — keine Firewall-Abfrage, kein Async-Timeout).
+/// Ermöglicht in WKWebView unter macOS und iOS natives Laden von ES-Modulen
+/// (`<script type="module" crossorigin>`), CSS und persistentem `localStorage`.
 final class LocalBundleHTTPServer {
   private let rootURL: URL
-  private let queue = DispatchQueue(label: "com.appligamer.localbundle.http", qos: .userInitiated)
-  private var listener: NWListener?
-  private var didNotify = false
+  private let lock = NSLock()
+  private var listenFD: Int32 = -1
+  private var isRunning = false
+  private(set) var port: UInt16 = 0
+
+  var entryURL: URL? {
+    guard port > 0 else { return nil }
+    return URL(string: "http://127.0.0.1:\(port)/index.html")
+  }
 
   init?(rootURL: URL) {
     let indexURL = rootURL.appendingPathComponent("index.html")
@@ -19,98 +26,147 @@ final class LocalBundleHTTPServer {
     self.rootURL = rootURL.standardizedFileURL
   }
 
-  func start(completion: @escaping (URL?) -> Void) {
-    do {
-      let params = NWParameters.tcp
-      params.allowLocalEndpointReuse = true
-      params.requiredLocalEndpoint = NWEndpoint.hostPort(host: .ipv4(.loopback), port: .any)
+  deinit {
+    stop()
+  }
 
-      let listener = try NWListener(using: params)
-      self.listener = listener
+  func start() -> URL? {
+    lock.lock()
+    defer { lock.unlock() }
 
-      listener.stateUpdateHandler = { [weak self] state in
-        guard let self else { return }
-        switch state {
-        case .ready:
-          if !self.didNotify, let port = listener.port?.rawValue {
-            self.didNotify = true
-            let url = URL(string: "http://127.0.0.1:\(port)/index.html")
-            DispatchQueue.main.async {
-              completion(url)
-            }
-          }
-        case .failed, .cancelled:
-          if !self.didNotify {
-            self.didNotify = true
-            DispatchQueue.main.async {
-              completion(nil)
-            }
-          }
-        default:
-          break
-        }
-      }
+    if isRunning, let existing = entryURL {
+      return existing
+    }
 
-      listener.newConnectionHandler = { [weak self] connection in
-        self?.handleConnection(connection)
-      }
+    let fd = Darwin.socket(AF_INET, SOCK_STREAM, 0)
+    guard fd >= 0 else { return nil }
 
-      listener.start(queue: queue)
+    var yes: Int32 = 1
+    _ = Darwin.setsockopt(fd, SOL_SOCKET, SO_REUSEADDR, &yes, socklen_t(MemoryLayout<Int32>.size))
+    _ = Darwin.setsockopt(fd, SOL_SOCKET, SO_NOSIGPIPE, &yes, socklen_t(MemoryLayout<Int32>.size))
 
-      queue.asyncAfter(deadline: .now() + 2.0) { [weak self] in
-        guard let self, !self.didNotify else { return }
-        self.didNotify = true
-        DispatchQueue.main.async {
-          completion(nil)
-        }
-      }
-    } catch {
-      DispatchQueue.main.async {
-        completion(nil)
+    var addr = sockaddr_in()
+    addr.sin_len = UInt8(MemoryLayout<sockaddr_in>.size)
+    addr.sin_family = sa_family_t(AF_INET)
+    addr.sin_port = 0
+    addr.sin_addr = in_addr(s_addr: Darwin.inet_addr("127.0.0.1"))
+
+    let bindStatus = withUnsafePointer(to: &addr) { ptr in
+      ptr.withMemoryRebound(to: sockaddr.self, capacity: 1) { sockPtr in
+        Darwin.bind(fd, sockPtr, socklen_t(MemoryLayout<sockaddr_in>.size))
       }
     }
+    guard bindStatus == 0, Darwin.listen(fd, 64) == 0 else {
+      Darwin.close(fd)
+      return nil
+    }
+
+    var boundAddr = sockaddr_in()
+    var addrLen = socklen_t(MemoryLayout<sockaddr_in>.size)
+    let nameStatus = withUnsafeMutablePointer(to: &boundAddr) { ptr in
+      ptr.withMemoryRebound(to: sockaddr.self, capacity: 1) { sockPtr in
+        Darwin.getsockname(fd, sockPtr, &addrLen)
+      }
+    }
+    guard nameStatus == 0 else {
+      Darwin.close(fd)
+      return nil
+    }
+
+    let assignedPort = UInt16(bigEndian: boundAddr.sin_port)
+    guard assignedPort > 0 else {
+      Darwin.close(fd)
+      return nil
+    }
+
+    self.listenFD = fd
+    self.port = assignedPort
+    self.isRunning = true
+
+    DispatchQueue.global(qos: .userInitiated).async { [weak self] in
+      self?.acceptLoop(listenFD: fd)
+    }
+
+    return URL(string: "http://127.0.0.1:\(assignedPort)/index.html")
   }
 
   func stop() {
-    queue.async { [weak self] in
-      self?.listener?.cancel()
-      self?.listener = nil
+    lock.lock()
+    let fd = listenFD
+    listenFD = -1
+    isRunning = false
+    port = 0
+    lock.unlock()
+
+    if fd >= 0 {
+      Darwin.shutdown(fd, SHUT_RDWR)
+      Darwin.close(fd)
     }
   }
 
-  private func handleConnection(_ connection: NWConnection) {
-    connection.start(queue: queue)
-    receiveRequest(on: connection, buffer: Data())
-  }
+  private func acceptLoop(listenFD: Int32) {
+    while true {
+      lock.lock()
+      let active = isRunning && self.listenFD == listenFD
+      lock.unlock()
+      if !active { break }
 
-  private func receiveRequest(on connection: NWConnection, buffer: Data) {
-    let headerEnd = Data([0x0D, 0x0A, 0x0D, 0x0A])
-    connection.receive(minimumIncompleteLength: 1, maximumLength: 65536) { [weak self] chunk, _, isComplete, error in
-      guard let self else {
-        connection.cancel()
-        return
-      }
-      var nextBuffer = buffer
-      if let chunk {
-        nextBuffer.append(chunk)
+      let clientFD = Darwin.accept(listenFD, nil, nil)
+      if clientFD < 0 {
+        if errno == EINTR { continue }
+        break
       }
 
-      if nextBuffer.range(of: headerEnd) != nil || isComplete || error != nil {
-        self.processHTTPRequest(nextBuffer, on: connection)
-      } else {
-        self.receiveRequest(on: connection, buffer: nextBuffer)
+      DispatchQueue.global(qos: .userInitiated).async { [weak self] in
+        self?.handleClient(clientFD)
       }
     }
   }
 
-  private func processHTTPRequest(_ data: Data, on connection: NWConnection) {
-    let raw = String(data: data, encoding: .utf8) ?? ""
-    let firstLine = raw.components(separatedBy: "\r\n").first ?? ""
+  private func handleClient(_ clientFD: Int32) {
+    defer { Darwin.close(clientFD) }
+
+    var yes: Int32 = 1
+    _ = Darwin.setsockopt(clientFD, SOL_SOCKET, SO_NOSIGPIPE, &yes, socklen_t(MemoryLayout<Int32>.size))
+
+    var requestData = Data()
+    var chunk = [UInt8](repeating: 0, count: 8192)
+    let crlfEnd = Data([0x0D, 0x0A, 0x0D, 0x0A])
+    let lfEnd = Data([0x0A, 0x0A])
+
+    while requestData.count < 65536 {
+      let bytesRead = chunk.withUnsafeMutableBytes { rawBuf in
+        Darwin.recv(clientFD, rawBuf.baseAddress, rawBuf.count, 0)
+      }
+      if bytesRead <= 0 { break }
+      requestData.append(chunk, count: bytesRead)
+      if requestData.range(of: crlfEnd) != nil || requestData.range(of: lfEnd) != nil {
+        break
+      }
+    }
+
+    guard !requestData.isEmpty else { return }
+
+    let raw = String(data: requestData, encoding: .utf8) ?? ""
+    let firstLine = raw.split(whereSeparator: { $0.isNewline }).first.map(String.init) ?? ""
     let parts = firstLine.split(separator: " ")
 
     let method = parts.count >= 1 ? parts[0].uppercased() : "GET"
-    let rawTarget = parts.count >= 2 ? String(parts[1]) : "/"
+    if method == "OPTIONS" {
+      let optPayload = Data([
+        "HTTP/1.1 204 No Content",
+        "Access-Control-Allow-Origin: *",
+        "Access-Control-Allow-Methods: GET, HEAD, OPTIONS",
+        "Access-Control-Allow-Headers: *",
+        "Connection: close",
+        "",
+        ""
+      ].joined(separator: "\r\n").utf8)
+      sendAll(optPayload, to: clientFD)
+      return
+    }
 
+    let rawTarget = parts.count >= 2 ? String(parts[1]) : "/"
     let noQuery = rawTarget.split(separator: "?", maxSplits: 1, omittingEmptySubsequences: false).first.map(String.init) ?? "/"
     let noHash = noQuery.split(separator: "#", maxSplits: 1, omittingEmptySubsequences: false).first.map(String.init) ?? "/"
     var relativePath = noHash.removingPercentEncoding ?? noHash
@@ -125,33 +181,33 @@ final class LocalBundleHTTPServer {
     let rootPath = rootURL.path
 
     var isDir: ObjCBool = false
-    if fileURL.path.hasPrefix(rootPath),
+    if (fileURL.path == rootPath || fileURL.path.hasPrefix(rootPath + "/")),
        FileManager.default.fileExists(atPath: fileURL.path, isDirectory: &isDir),
        !isDir.boolValue,
        let body = try? Data(contentsOf: fileURL) {
       let mime = BundleSchemeHandler.mimeType(for: fileURL.pathExtension.lowercased())
-      sendHTTPResponse(statusCode: 200, statusText: "OK", mimeType: mime, body: body, headOnly: method == "HEAD", on: connection)
+      sendResponse(statusCode: 200, statusText: "OK", mimeType: mime, body: body, headOnly: method == "HEAD", to: clientFD)
       return
     }
 
     if !relativePath.hasPrefix("artworks/"),
        (relativePath as NSString).pathExtension.isEmpty,
        let indexData = try? Data(contentsOf: rootURL.appendingPathComponent("index.html")) {
-      sendHTTPResponse(statusCode: 200, statusText: "OK", mimeType: "text/html; charset=utf-8", body: indexData, headOnly: method == "HEAD", on: connection)
+      sendResponse(statusCode: 200, statusText: "OK", mimeType: "text/html; charset=utf-8", body: indexData, headOnly: method == "HEAD", to: clientFD)
       return
     }
 
     let notFound = Data("Not Found".utf8)
-    sendHTTPResponse(statusCode: 404, statusText: "Not Found", mimeType: "text/plain; charset=utf-8", body: notFound, headOnly: method == "HEAD", on: connection)
+    sendResponse(statusCode: 404, statusText: "Not Found", mimeType: "text/plain; charset=utf-8", body: notFound, headOnly: method == "HEAD", to: clientFD)
   }
 
-  private func sendHTTPResponse(
+  private func sendResponse(
     statusCode: Int,
     statusText: String,
     mimeType: String,
     body: Data,
     headOnly: Bool,
-    on connection: NWConnection
+    to clientFD: Int32
   ) {
     let header = [
       "HTTP/1.1 \(statusCode) \(statusText)",
@@ -170,10 +226,19 @@ final class LocalBundleHTTPServer {
     if !headOnly {
       payload.append(body)
     }
+    sendAll(payload, to: clientFD)
+  }
 
-    connection.send(content: payload, completion: .contentProcessed { _ in
-      connection.cancel()
-    })
+  private func sendAll(_ data: Data, to clientFD: Int32) {
+    data.withUnsafeBytes { rawBuf in
+      guard let base = rawBuf.baseAddress else { return }
+      var offset = 0
+      while offset < data.count {
+        let sent = Darwin.send(clientFD, base.advanced(by: offset), data.count - offset, 0)
+        if sent <= 0 { break }
+        offset += sent
+      }
+    }
   }
 }
 
@@ -248,7 +313,7 @@ final class BundleSchemeHandler: NSObject, WKURLSchemeHandler {
     let fileURL = root.appendingPathComponent(relativePath).standardizedFileURL
     let rootPath = root.standardizedFileURL.path
 
-    guard fileURL.path.hasPrefix(rootPath),
+    guard (fileURL.path == rootPath || fileURL.path.hasPrefix(rootPath + "/")),
           let data = try? Data(contentsOf: fileURL) else {
       if !relativePath.hasPrefix("artworks/"),
          (relativePath as NSString).pathExtension.isEmpty,
