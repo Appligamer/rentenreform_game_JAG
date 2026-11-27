@@ -2,22 +2,36 @@
 
 Plattformübergreifendes Simulations- und Strategiespiel zur deutschen Rentenversicherung, dem **Rentenpaket II (Haltelinie 48 %)** und dem **Generationenkapital (Aktienrente)** — entwickelt von **Jacob Glathe & Team** für **macOS**, **iOS/iPadOS**, **Windows** und **Web**.
 
+[![Entwicklungsprotokoll (Protocoll.md)](https://img.shields.io/badge/Protokoll-Protocoll.md_%C3%B6ffnen-f59e0b?style=for-the-badge&logo=readthedocs&logoColor=000000)](Protocoll.md)
+[![Lizenz: PolyForm Noncommercial 1.0.0](https://img.shields.io/badge/Lizenz-PolyForm_Noncommercial_1.0.0-2563eb?style=for-the-badge&logo=opensourceinitiative&logoColor=ffffff)](LICENSE.md)
+[![macOS Xcode](https://img.shields.io/badge/macOS-GenerationZukunft__macOS.xcodeproj-111827?style=for-the-badge&logo=apple&logoColor=ffffff)](#macos--ios--ipados-xcode)
+[![iOS & iPadOS Xcode](https://img.shields.io/badge/iOS_%2F_iPadOS-GenerationZukunft__iOS.xcodeproj-0284c7?style=for-the-badge&logo=apple&logoColor=ffffff)](GenerationZukunft_iOS.xcodeproj)
+[![Windows .exe Build](https://img.shields.io/badge/Windows-GenerationZukunft__Windows.bat-059669?style=for-the-badge&logo=windows&logoColor=ffffff)](#windows-eine-versandfertige-signierte-exe-erstellen-schritt-für-schritt)
+[![Web Quellcode](https://img.shields.io/badge/Web--App-web%2Fsrc-7c3aed?style=for-the-badge&logo=react&logoColor=ffffff)](web/src)
+[![Grafik-Briefing](https://img.shields.io/badge/Design-Grafik--Briefing-db2777?style=for-the-badge&logo=figma&logoColor=ffffff)](docs/graphic_designer_briefing.md)
+[![GitHub Actions CI/CD](https://img.shields.io/badge/CI%2FCD-Workflows-374151?style=for-the-badge&logo=githubactions&logoColor=ffffff)](.github/workflows/main.yml)
+
 ---
 
-## macOS & iOS / iPadOS (Xcode)
+## Schnellzugriff & Wichtigste Projekt-Infos
 
-Das Projekt enthält ein vorkompiliertes Offline-`WebBundle` und einen lokalen Loopback-Server + `BundleSchemeHandler`-Fallback (`app://local/index.html`).
-
-1. Öffne je nach Plattform das passende Xcode-Projekt direkt im Hauptordner:
-   - **macOS:** **`GenerationZukunft_macOS.xcodeproj`** → Schema **`Runner`** → **My Mac** (strikt macOS-only)
-   - **iOS & iPadOS:** **`GenerationZukunft_iOS.xcodeproj`** → Schema **`GenerationZukunft_iOS`** → **iPhone / iPad Simulator** oder angeschlossenes iPhone/iPad (ab iOS 15.0)
-2. Klicke auf **Play (`Cmd + R`)**.
+| Bereich | Datei / Pfad | Zweck & Hinweise |
+| :--- | :--- | :--- |
+| **Entwicklungsprotokoll** | [`Protocoll.md`](Protocoll.md) | Vollständiges Änderungs- & Commit-Protokoll (täglich aktualisiert) |
+| **Lizenz** | [`LICENSE.md`](LICENSE.md) | **PolyForm Noncommercial 1.0.0** (nur nicht-kommerzielle Nutzung; Kontakt: `jcob.glathe@gmail.com`) |
+| **macOS App (Xcode)** | [`GenerationZukunft_macOS.xcodeproj`](GenerationZukunft_macOS.xcodeproj) | Natives macOS-Projekt (Schema `Runner`, macOS 12.0+, Team `Y4K9X2HCX2`) |
+| **iOS & iPadOS (Xcode)** | [`GenerationZukunft_iOS.xcodeproj`](GenerationZukunft_iOS.xcodeproj) | Natives iPhone/iPad-Projekt (Schema `GenerationZukunft_iOS`, iOS 15.0+, `TARGETED_DEVICE_FAMILY = 1,2`) |
+| **Windows Starter** | [`GenerationZukunft_Windows.bat`](GenerationZukunft_Windows.bat) | Direkter Windows-Starter & portable `.exe`-Erstellung via [`scripts/build_windows_portable.ps1`](scripts/build_windows_portable.ps1) |
+| **Web-Simulation** | [`web/src/`](web/src) | React + TypeScript + Tailwind Simulationskern (Web-Build nach [`web/dist/`](web/dist)) |
+| **Plattform-Code** | [`platforms/`](platforms) | Native Swift-Bridge (`platforms/shared/`), iOS (`platforms/ios/`), macOS (`platforms/macos/`), Windows/Flutter |
+| **Launcher-Skripte** | [`launchers/`](launchers) | Terminal-/Simulator-Starter (`START_GAME_MAC.command`, `START_GAME_IOS.command`, `GenerationZukunft.app`) |
+| **Grafik & Artworks** | [`artworks/`](artworks) & [`docs/graphic_designer_briefing.md`](docs/graphic_designer_briefing.md) | Grafik-Slots (`HandDrawnFrame`) & Designer-Briefing |
 
 ---
 
 ## Entwicklungsprotokoll (`Protocoll.md`)
 
-> **Hinweis zu GitHub:** GitHub erlaubt in der Reiterleiste neben `README` und `PolyForm Noncommercial 1.0.0 license` technisch keine eigenen benutzerdefinierten Datei-Reiter. Daher wird der aktuelle Stand hier direkt im `README`-Reiter eingeblendet und vollständig in [`Protocoll.md`](Protocoll.md) geführt.
+> **Hinweis zu GitHub:** GitHub erlaubt in der Reiterleiste neben `README` und `PolyForm Noncommercial 1.0.0 license` technisch keine eigenen benutzerdefinierten Datei-Reiter. Über den Button oben sowie die Live-Übersicht hier siehst du das Protokoll direkt im `README`-Reiter.
 
 <details open>
 <summary><strong>Aktueller Stand (2026-11-27) — Vollständiges Protokoll öffnen: <a href="Protocoll.md">Protocoll.md</a></strong></summary>
@@ -33,13 +47,24 @@ Das Projekt enthält ein vorkompiliertes Offline-`WebBundle` und einen lokalen L
 
 ---
 
-##  Windows: Eine versandfertige, signierte `.exe` erstellen (Schritt-für-Schritt)
+## macOS & iOS / iPadOS (Xcode)
+
+Das Projekt enthält ein vorkompiliertes Offline-`WebBundle` und einen lokalen Loopback-Server + `BundleSchemeHandler`-Fallback (`app://local/index.html`).
+
+1. Öffne je nach Plattform das passende Xcode-Projekt direkt im Hauptordner:
+   - **macOS:** **`GenerationZukunft_macOS.xcodeproj`** → Schema **`Runner`** → **My Mac** (strikt macOS-only)
+   - **iOS & iPadOS:** **`GenerationZukunft_iOS.xcodeproj`** → Schema **`GenerationZukunft_iOS`** → **iPhone / iPad Simulator** oder angeschlossenes iPhone/iPad (ab iOS 15.0)
+2. Klicke auf **Play (`Cmd + R`)**.
+
+---
+
+## Windows: Eine versandfertige, signierte `.exe` erstellen (Schritt-für-Schritt)
 
 ### Methode 1 (Empfohlen — autarkes Build-Skript nur mit Windows-Bordmitteln)
 
 Das Skript **`scripts\build_windows_portable.ps1`** automatisiert jeden Release-Build für aktuelle **und zukünftige Versionen**:
 - Liest die Versionsnummer automatisch aus `package.json` (und baut bei installiertem `node_modules` automatisch neu via `npm run build`, sonst über das aktuelle `WebBundle`).
-- Bettet das komplette Spiel, das mehrstufige App-Icon (`windows\runner\resources\app_icon.ico`, `16×16` bis `256×256`, inkl. `favicon.ico` für die Windows-Taskleiste), das Windows-Manifest und die Produkt-Metadaten in **eine einzige autarke `GenerationZukunft.exe`** ein.
+- Bettet das komplette Spiel, das mehrstufige App-Icon (`platforms\windows\runner\resources\app_icon.ico`, `16×16` bis `256×256`, inkl. `favicon.ico` für die Windows-Taskleiste), das Windows-Manifest und die Produkt-Metadaten in **eine einzige autarke `GenerationZukunft.exe`** ein.
 - **Signiert automatisch (SHA-256 Authenticode):**
   1. Wenn du ein offizielles Code-Signing-Zertifikat besitzt (`code-signing.pfx` im Hauptordner/in `scripts\`, per `-PfxPath`, oder installiert im Windows-Zertifikatsspeicher), signiert das Skript automatisch damit inkl. Timestamp (`http://timestamp.digicert.com`).
   2. Falls (noch) kein offizielles Zertifikat vorhanden ist, erstellt und nutzt das Skript automatisch ein lokales Code-Signing-Zertifikat (`CN=Jacob Glathe (Generation Zukunft Local)`) für deinen PC.
