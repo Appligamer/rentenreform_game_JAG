@@ -23,8 +23,11 @@ final class MacGameViewController: NSViewController, WKNavigationDelegate, WKUID
   private var webView: WKWebView!
   private let schemeHandler = BundleSchemeHandler()
   private var localServer: LocalBundleHTTPServer?
+  private var watchdogWorkItem: DispatchWorkItem?
+  private var didUseInlinedFallback = false
 
   deinit {
+    watchdogWorkItem?.cancel()
     webView?.configuration.userContentController.removeScriptMessageHandler(forName: HapticBridge.handlerName)
     localServer?.stop()
   }
@@ -42,6 +45,11 @@ final class MacGameViewController: NSViewController, WKNavigationDelegate, WKUID
     if #available(macOS 12.0, *) {
       wv.underPageBackgroundColor = NSColor.black
     }
+    #if DEBUG
+    if #available(macOS 13.3, *) {
+      wv.isInspectable = true
+    }
+    #endif
     self.webView = wv
     self.view = wv
   }
@@ -52,6 +60,9 @@ final class MacGameViewController: NSViewController, WKNavigationDelegate, WKUID
   }
 
   private func loadApp() {
+    didUseInlinedFallback = false
+    watchdogWorkItem?.cancel()
+
     guard let webRoot = schemeHandler.webRootURL, schemeHandler.hasBundledApp else {
       webView.loadHTMLString(
         BundleSchemeHandler.fallbackHTML(reason: "Das lokale Spielpaket (WebBundle) wurde im macOS App-Bundle nicht gefunden."),
@@ -60,12 +71,91 @@ final class MacGameViewController: NSViewController, WKNavigationDelegate, WKUID
       return
     }
 
-    if let server = LocalBundleHTTPServer(rootURL: webRoot),
-       let url = server.start() {
-      self.localServer = server
+    if localServer == nil {
+      localServer = LocalBundleHTTPServer(rootURL: webRoot)
+    }
+
+    if let url = localServer?.restartIfNeeded() {
       webView.load(URLRequest(url: url))
+      scheduleReadinessWatchdog(delaySeconds: 4.5)
+    } else {
+      loadInlinedFallback()
+    }
+  }
+
+  private func loadInlinedFallback(reasonPrefix: String? = nil) {
+    watchdogWorkItem?.cancel()
+    guard !didUseInlinedFallback else {
+      let msg = reasonPrefix ?? "Die Simulation konnte nicht initialisiert werden."
+      webView.loadHTMLString(BundleSchemeHandler.fallbackHTML(reason: msg), baseURL: nil)
+      return
+    }
+    didUseInlinedFallback = true
+
+    if let webRoot = schemeHandler.webRootURL,
+       let inlinedHTML = BundleSchemeHandler.buildInlinedAppHTML(webRoot: webRoot) {
+      webView.loadHTMLString(inlinedHTML, baseURL: BundleSchemeHandler.entryURL)
+      scheduleReadinessWatchdog(delaySeconds: 3.5)
     } else {
       webView.load(URLRequest(url: BundleSchemeHandler.entryURL))
+      scheduleReadinessWatchdog(delaySeconds: 3.5)
+    }
+  }
+
+  private func scheduleReadinessWatchdog(delaySeconds: TimeInterval) {
+    watchdogWorkItem?.cancel()
+    let item = DispatchWorkItem { [weak self] in
+      self?.verifyRootMounted(allowFallbackRetry: true)
+    }
+    watchdogWorkItem = item
+    DispatchQueue.main.asyncAfter(deadline: .now() + delaySeconds, execute: item)
+  }
+
+  private func verifyRootMounted(allowFallbackRetry: Bool) {
+    let probeJS = """
+    (function() {
+      var r = document.getElementById('root');
+      var count = r ? r.childElementCount : -1;
+      var logs = (window.__EARLY_LOGS__ || []).map(function(l) { return l.level + ': ' + l.message; }).join(' | ');
+      return count + '::' + logs;
+    })()
+    """
+    webView.evaluateJavaScript(probeJS) { [weak self] result, error in
+      guard let self else { return }
+
+      if let error {
+        if allowFallbackRetry && !self.didUseInlinedFallback {
+          self.loadInlinedFallback(reasonPrefix: "WebView-Prüfung fehlgeschlagen: \(error.localizedDescription)")
+        } else {
+          self.webView.loadHTMLString(
+            BundleSchemeHandler.fallbackHTML(reason: "WebView-Initialisierung fehlgeschlagen: \(error.localizedDescription)"),
+            baseURL: nil
+          )
+        }
+        return
+      }
+
+      guard let text = result as? String else {
+        if allowFallbackRetry && !self.didUseInlinedFallback {
+          self.loadInlinedFallback()
+        }
+        return
+      }
+
+      let parts = text.components(separatedBy: "::")
+      let count = Int(parts.first ?? "-1") ?? -1
+      let details = parts.count >= 2 ? parts.dropFirst().joined(separator: "::") : ""
+
+      if count <= 0 {
+        if allowFallbackRetry && !self.didUseInlinedFallback {
+          self.loadInlinedFallback(reasonPrefix: details)
+        } else {
+          let msg = details.isEmpty
+            ? "Die Simulation konnte nicht initialisiert werden (leerer Root-Container)."
+            : "Startfehler: \(details)"
+          self.webView.loadHTMLString(BundleSchemeHandler.fallbackHTML(reason: msg), baseURL: nil)
+        }
+      }
     }
   }
 
@@ -88,43 +178,34 @@ final class MacGameViewController: NSViewController, WKNavigationDelegate, WKUID
   }
 
   func webView(_ webView: WKWebView, didFinish navigation: WKNavigation!) {
-    DispatchQueue.main.asyncAfter(deadline: .now() + 2.5) { [weak self] in
-      guard let self else { return }
-      let probeJS = """
-      (function() {
-        var r = document.getElementById('root');
-        var count = r ? r.childElementCount : -1;
-        var logs = (window.__EARLY_LOGS__ || []).map(function(l) { return l.level + ': ' + l.message; }).join(' | ');
-        return count + '::' + logs;
-      })()
-      """
-      self.webView.evaluateJavaScript(probeJS) { result, _ in
-        guard let text = result as? String else { return }
-        let parts = text.components(separatedBy: "::")
-        if let first = parts.first, let count = Int(first), count == 0 {
-          let details = parts.count >= 2 ? parts.dropFirst().joined(separator: "::") : ""
-          let msg = details.isEmpty
-            ? "Die Simulation konnte nicht initialisiert werden (leerer Root-Container)."
-            : "Startfehler: \(details)"
-          self.webView.loadHTMLString(BundleSchemeHandler.fallbackHTML(reason: msg), baseURL: nil)
-        }
-      }
-    }
+    scheduleReadinessWatchdog(delaySeconds: 2.2)
   }
 
   func webView(_ webView: WKWebView, didFail navigation: WKNavigation!, withError error: Error) {
-    renderError(error)
+    handleNavigationFailure(error)
   }
 
   func webView(_ webView: WKWebView, didFailProvisionalNavigation navigation: WKNavigation!, withError error: Error) {
-    renderError(error)
+    handleNavigationFailure(error)
   }
 
-  private func renderError(_ error: Error) {
-    webView.loadHTMLString(
-      BundleSchemeHandler.fallbackHTML(reason: "Ladefehler: \(error.localizedDescription)"),
-      baseURL: nil
-    )
+  func webViewWebContentProcessDidTerminate(_ webView: WKWebView) {
+    loadApp()
+  }
+
+  private func handleNavigationFailure(_ error: Error) {
+    let nsError = error as NSError
+    if nsError.domain == NSURLErrorDomain && nsError.code == NSURLErrorCancelled {
+      return
+    }
+    if !didUseInlinedFallback {
+      loadInlinedFallback(reasonPrefix: "Ladefehler: \(error.localizedDescription)")
+    } else {
+      webView.loadHTMLString(
+        BundleSchemeHandler.fallbackHTML(reason: "Ladefehler: \(error.localizedDescription)"),
+        baseURL: nil
+      )
+    }
   }
 }
 

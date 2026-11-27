@@ -34,9 +34,16 @@
     - `web/src/utils/haptics.ts`: Neue `HapticFeedbackEngine` mit kalibrierten Mustern für `Navigator.vibrate()` (`selection`, `light`, `medium`, `heavy`, `success`, `warning`, `error`) sowie automatischer Bridge-Weiterleitung an `window.webkit.messageHandlers.haptics`.
     - Eingebunden in `usePensionGame.ts` (Dilemma-Optionen, Reformkarten, Schwierigkeitsgrad, Neustart, Warnung, Sieg/Game-Over), `ReformCardDeck.tsx` (Filter-Tabs), `Navbar.tsx` (Navigation, Sound-Toggle, Entwickler-Modal), `WelcomeScreen.tsx` (Start, Tutorial-Schritte, Verlauf) und `CitizenSimulation.tsx` (gedrosselte Slider-Haptik).
     - `platforms/shared/BundleSchemeHandler.swift`, `platforms/ios/Runner/GameViewController.swift`, `platforms/macos/Runner/MainFlutterWindow.swift`: Native Swift-Klasse `HapticBridge: WKScriptMessageHandler` ergänzt (`UIImpactFeedbackGenerator`, `UISelectionFeedbackGenerator`, `UINotificationFeedbackGenerator` unter iOS/iPadOS bzw. `NSHapticFeedbackManager.defaultPerformer` unter macOS) inkl. sauberem `deinit`-Cleanup.
+  - **iPhone-11-Echtgerät-Fix (Behebung des schwarzen Bildschirms nach Installation auf physischem iPhone):**
+    - `index.html`: Externes Google-Fonts-Stylesheet auf nicht-blockierendes Laden (`media="print" onload="this.media='all'"`) umgestellt, damit `WKWebView` auch offline oder bei langsamer Mobilfunkverbindung sofort rendert.
+    - `vite.config.ts`: `build.target` auf `['es2020', 'safari15']` (passend zu `IPHONEOS_DEPLOYMENT_TARGET = 15.0`) gesetzt und `web/dist/` neu in beide `WebBundle`-Ordner synchronisiert.
+    - `platforms/ios/Runner/Info.plist`: `NSAppTransportSecurity` um `NSAllowsArbitraryLoadsInWebContent`, `NSAllowsLocalNetworking` sowie explizite `NSExceptionDomains` (`127.0.0.1`, `localhost`) erweitert.
+    - `platforms/ios/Runner/SceneDelegate.swift`: `@objc(SceneDelegate)` für zuverlässige Runtime-Auflösung des `UIApplicationSceneManifest` auf iOS-Geräten ergänzt.
+    - `platforms/shared/BundleSchemeHandler.swift`: `LocalBundleHTTPServer` gehärtet (`SIGPIPE` ignoriert, `SO_NOSIGPIPE`, `TCP_NODELAY`, `SO_RCVTIMEO`/`SO_SNDTIMEO`, `EINTR`/`EAGAIN`-Schleifen in `recv`/`sendAll`, `shutdown(SHUT_WR)` vor `close`, stabiler Portbereich `41735–41750` für persistentes `localStorage`, Health-Check & Auto-Restart); `buildInlinedAppHTML(webRoot:)` für autarke Offline-Wiederherstellung ohne Loopback-Socket sowie HTML-Escaping im `errorGuardJS` ergänzt.
+    - `platforms/ios/Runner/GameViewController.swift` & `platforms/macos/Runner/MainFlutterWindow.swift`: Unabhängiger `DispatchWorkItem`-Readiness-Watchdog, automatischer Inline-Fallback (`loadInlinedFallback`), `UIApplication.willEnterForegroundNotification`-Server-Wiederherstellung und `webViewWebContentProcessDidTerminate`-Auto-Reload integriert.
 - **Verifikation & Dokumentation:**
-  - `npm run lint` (`tsc --noEmit`), Vite-Production-Build (`web/dist/`), bitgleicher Abgleich in `platforms/macos/Runner/WebBundle` & `platforms/ios/Runner/WebBundle`, `bash -n`, XML-/Plist-/XIB-Validität, Swift-Klammerprüfung und alle Dateireferenzen beider `.xcodeproj`-Projekte erfolgreich geprüft.
-  - `docs/Protocoll.md` mit vollständiger GitHub-Historie (`2026-10-20` bis `2026-11-27`) und Projekt-System-Prompt aktualisiert.
+  - `npm run lint` (`tsc --noEmit`), Vite-Production-Build (`web/dist/` mit `safari15`-Target), bitgleicher Abgleich (`diff -qr`) in `platforms/macos/Runner/WebBundle` & `platforms/ios/Runner/WebBundle`, `bash -n`, XML-/Plist-/XIB-Validität, Swift-Klammerprüfung und alle Dateireferenzen beider `.xcodeproj`-Projekte erfolgreich geprüft.
+  - `docs/Protocoll.md` im bestehenden Tagesabschnitt `2026-11-27` fortgeführt.
 
 ---
 

@@ -18,9 +18,22 @@ final class LocalBundleHTTPServer {
   private var isRunning = false
   private(set) var port: UInt16 = 0
 
+  var isHealthy: Bool {
+    lock.lock()
+    defer { lock.unlock() }
+    guard isRunning && listenFD >= 0 && port > 0 else { return false }
+    var sockErr: Int32 = 0
+    var len = socklen_t(MemoryLayout<Int32>.size)
+    let status = Darwin.getsockopt(listenFD, SOL_SOCKET, SO_ERROR, &sockErr, &len)
+    return status == 0 && sockErr == 0
+  }
+
   var entryURL: URL? {
-    guard port > 0 else { return nil }
-    return URL(string: "http://127.0.0.1:\(port)/index.html")
+    lock.lock()
+    let currentPort = port
+    lock.unlock()
+    guard currentPort > 0 else { return nil }
+    return URL(string: "http://127.0.0.1:\(currentPort)/index.html")
   }
 
   init?(rootURL: URL) {
@@ -36,13 +49,29 @@ final class LocalBundleHTTPServer {
   }
 
   func start() -> URL? {
-    lock.lock()
-    defer { lock.unlock() }
+    _ = Darwin.signal(SIGPIPE, SIG_IGN)
 
-    if isRunning, let existing = entryURL {
+    lock.lock()
+    if isRunning && listenFD >= 0 && port > 0 {
+      let existing = URL(string: "http://127.0.0.1:\(port)/index.html")
+      lock.unlock()
       return existing
     }
+    lock.unlock()
 
+    // Bevorzugt stabilen Port-Bereich für persistentes localStorage, sonst Kernel-Port (0)
+    var candidatePorts: [UInt16] = Array(41735...41750)
+    candidatePorts.append(0)
+
+    for desiredPort in candidatePorts {
+      if let url = tryBindAndListen(desiredPort: desiredPort) {
+        return url
+      }
+    }
+    return nil
+  }
+
+  private func tryBindAndListen(desiredPort: UInt16) -> URL? {
     let fd = Darwin.socket(AF_INET, SOCK_STREAM, 0)
     guard fd >= 0 else { return nil }
 
@@ -53,7 +82,7 @@ final class LocalBundleHTTPServer {
     var addr = sockaddr_in()
     addr.sin_len = UInt8(MemoryLayout<sockaddr_in>.size)
     addr.sin_family = sa_family_t(AF_INET)
-    addr.sin_port = 0
+    addr.sin_port = desiredPort.bigEndian
     addr.sin_addr = in_addr(s_addr: Darwin.inet_addr("127.0.0.1"))
 
     let bindStatus = withUnsafePointer(to: &addr) { ptr in
@@ -84,15 +113,25 @@ final class LocalBundleHTTPServer {
       return nil
     }
 
+    lock.lock()
     self.listenFD = fd
     self.port = assignedPort
     self.isRunning = true
+    lock.unlock()
 
     DispatchQueue.global(qos: .userInitiated).async { [weak self] in
       self?.acceptLoop(listenFD: fd)
     }
 
     return URL(string: "http://127.0.0.1:\(assignedPort)/index.html")
+  }
+
+  func restartIfNeeded() -> URL? {
+    if isHealthy {
+      return entryURL
+    }
+    stop()
+    return start()
   }
 
   func stop() {
@@ -119,6 +158,18 @@ final class LocalBundleHTTPServer {
       let clientFD = Darwin.accept(listenFD, nil, nil)
       if clientFD < 0 {
         if errno == EINTR { continue }
+        var shouldClose = false
+        lock.lock()
+        if self.listenFD == listenFD {
+          isRunning = false
+          self.listenFD = -1
+          port = 0
+          shouldClose = true
+        }
+        lock.unlock()
+        if shouldClose {
+          Darwin.close(listenFD)
+        }
         break
       }
 
@@ -129,10 +180,18 @@ final class LocalBundleHTTPServer {
   }
 
   private func handleClient(_ clientFD: Int32) {
-    defer { Darwin.close(clientFD) }
+    defer {
+      Darwin.shutdown(clientFD, SHUT_WR)
+      Darwin.close(clientFD)
+    }
 
     var yes: Int32 = 1
     _ = Darwin.setsockopt(clientFD, SOL_SOCKET, SO_NOSIGPIPE, &yes, socklen_t(MemoryLayout<Int32>.size))
+    _ = Darwin.setsockopt(clientFD, IPPROTO_TCP, TCP_NODELAY, &yes, socklen_t(MemoryLayout<Int32>.size))
+
+    var timeout = timeval(tv_sec: 2, tv_usec: 0)
+    _ = Darwin.setsockopt(clientFD, SOL_SOCKET, SO_RCVTIMEO, &timeout, socklen_t(MemoryLayout<timeval>.size))
+    _ = Darwin.setsockopt(clientFD, SOL_SOCKET, SO_SNDTIMEO, &timeout, socklen_t(MemoryLayout<timeval>.size))
 
     var requestData = Data()
     var chunk = [UInt8](repeating: 0, count: 8192)
@@ -143,7 +202,11 @@ final class LocalBundleHTTPServer {
       let bytesRead = chunk.withUnsafeMutableBytes { rawBuf in
         Darwin.recv(clientFD, rawBuf.baseAddress, rawBuf.count, 0)
       }
-      if bytesRead <= 0 { break }
+      if bytesRead < 0 {
+        if errno == EINTR { continue }
+        break
+      }
+      if bytesRead == 0 { break }
       requestData.append(chunk, count: bytesRead)
       if requestData.range(of: crlfEnd) != nil || requestData.range(of: lfEnd) != nil {
         break
@@ -238,9 +301,25 @@ final class LocalBundleHTTPServer {
     data.withUnsafeBytes { rawBuf in
       guard let base = rawBuf.baseAddress else { return }
       var offset = 0
+      var temporaryRetries = 0
       while offset < data.count {
         let sent = Darwin.send(clientFD, base.advanced(by: offset), data.count - offset, 0)
-        if sent <= 0 { break }
+        if sent < 0 {
+          if errno == EINTR {
+            continue
+          }
+          if errno == EAGAIN || errno == EWOULDBLOCK {
+            temporaryRetries += 1
+            if temporaryRetries > 50 {
+              break
+            }
+            usleep(1000)
+            continue
+          }
+          break
+        }
+        if sent == 0 { break }
+        temporaryRetries = 0
         offset += sent
       }
     }
@@ -263,6 +342,9 @@ final class BundleSchemeHandler: NSObject, WKURLSchemeHandler {
        FileManager.default.fileExists(atPath: webBundle.appendingPathComponent("index.html").path) {
       return webBundle
     }
+    if let bundledIndex = Bundle.main.url(forResource: "index", withExtension: "html", subdirectory: "WebBundle") {
+      return bundledIndex.deletingLastPathComponent()
+    }
     if let distBundle = Bundle.main.resourceURL?.appendingPathComponent("dist"),
        FileManager.default.fileExists(atPath: distBundle.appendingPathComponent("index.html").path) {
       return distBundle
@@ -271,7 +353,73 @@ final class BundleSchemeHandler: NSObject, WKURLSchemeHandler {
        FileManager.default.fileExists(atPath: res.appendingPathComponent("index.html").path) {
       return res
     }
+    if let flatIndex = Bundle.main.url(forResource: "index", withExtension: "html") {
+      return flatIndex.deletingLastPathComponent()
+    }
     return nil
+  }
+
+  /// Erzeugt eine komplett autarke Offline-HTML-Variante (CSS + JS direkt eingebettet),
+  /// falls `http://127.0.0.1` auf einem Gerät durch Profile/VPN/Sockets blockiert wird.
+  static func buildInlinedAppHTML(webRoot: URL) -> String? {
+    let indexURL = webRoot.appendingPathComponent("index.html")
+    guard var html = try? String(contentsOf: indexURL, encoding: .utf8) else {
+      return nil
+    }
+
+    // Externe Google Fonts im Offline-Fallback entfernen, damit WebKit sofort rendert
+    if let fontRegex = try? NSRegularExpression(
+      pattern: #"<link[^>]*fonts\.googleapis\.com[^>]*>"#,
+      options: [.caseInsensitive]
+    ) {
+      let range = NSRange(html.startIndex..<html.endIndex, in: html)
+      html = fontRegex.stringByReplacingMatches(in: html, range: range, withTemplate: "")
+    }
+
+    // Lokales Stylesheet (<link rel="stylesheet" ... href="./assets/...">) direkt einbetten
+    if let cssRegex = try? NSRegularExpression(
+      pattern: #"<link[^>]*rel=["']stylesheet["'][^>]*href=["']([^"']+)["'][^>]*>"#,
+      options: [.caseInsensitive]
+    ) {
+      let matches = cssRegex.matches(in: html, range: NSRange(html.startIndex..<html.endIndex, in: html))
+      for match in matches.reversed() {
+        guard match.numberOfRanges >= 2,
+              let fullRange = Range(match.range(at: 0), in: html),
+              let hrefRange = Range(match.range(at: 1), in: html) else { continue }
+        var rel = String(html[hrefRange])
+        while rel.hasPrefix("./") || rel.hasPrefix("/") {
+          rel = String(rel.dropFirst(rel.hasPrefix("./") ? 2 : 1))
+        }
+        let cssURL = webRoot.appendingPathComponent(rel).standardizedFileURL
+        if let cssText = try? String(contentsOf: cssURL, encoding: .utf8) {
+          html.replaceSubrange(fullRange, with: "<style>\n\(cssText)\n</style>")
+        }
+      }
+    }
+
+    // Lokales ES-Modul (<script type="module" ... src="./assets/...">) direkt einbetten
+    if let jsRegex = try? NSRegularExpression(
+      pattern: #"<script[^>]*src=["']([^"']+)["'][^>]*>\s*</script>"#,
+      options: [.caseInsensitive]
+    ) {
+      let matches = jsRegex.matches(in: html, range: NSRange(html.startIndex..<html.endIndex, in: html))
+      for match in matches.reversed() {
+        guard match.numberOfRanges >= 2,
+              let fullRange = Range(match.range(at: 0), in: html),
+              let srcRange = Range(match.range(at: 1), in: html) else { continue }
+        var rel = String(html[srcRange])
+        while rel.hasPrefix("./") || rel.hasPrefix("/") {
+          rel = String(rel.dropFirst(rel.hasPrefix("./") ? 2 : 1))
+        }
+        let jsURL = webRoot.appendingPathComponent(rel).standardizedFileURL
+        if let jsText = try? String(contentsOf: jsURL, encoding: .utf8) {
+          let safeJS = jsText.replacingOccurrences(of: "</script", with: "<\\/script", options: .caseInsensitive)
+          html.replaceSubrange(fullRange, with: "<script type=\"module\">\n\(safeJS)\n</script>")
+        }
+      }
+    }
+
+    return html
   }
 
   var hasBundledApp: Bool {
@@ -374,6 +522,10 @@ final class BundleSchemeHandler: NSObject, WKURLSchemeHandler {
   }
 
   static func fallbackHTML(reason: String) -> String {
+    let safeReason = reason
+      .replacingOccurrences(of: "&", with: "&amp;")
+      .replacingOccurrences(of: "<", with: "&lt;")
+      .replacingOccurrences(of: ">", with: "&gt;")
     return """
     <!doctype html>
     <html lang="de">
@@ -390,7 +542,7 @@ final class BundleSchemeHandler: NSObject, WKURLSchemeHandler {
     <body>
       <div class="card">
         <h1>Generation Zukunft</h1>
-        <p>\(reason)</p>
+        <p>\(safeReason)</p>
       </div>
     </body>
     </html>
@@ -414,18 +566,28 @@ final class BundleSchemeHandler: NSObject, WKURLSchemeHandler {
         var ts = now.toTimeString().slice(0, 8) + '.' + String(now.getMilliseconds()).padStart(3, '0');
         window.__EARLY_LOGS__.push({ timestamp: ts, level: level, source: source, message: String(msg) });
       }
+      function escapeHtml(str) {
+        return String(str)
+          .replace(/&/g, '&amp;')
+          .replace(/</g, '&lt;')
+          .replace(/>/g, '&gt;');
+      }
       function showErr(msg) {
         var root = document.getElementById('root');
         if (!root || root.childElementCount > 0) return;
-        root.innerHTML = '<div style="min-height:100vh;background:#000;color:#f5f5f7;font-family:-apple-system,sans-serif;display:flex;align-items:center;justify-content:center;padding:24px;text-align:center"><div style="max-width:460px;background:#161617;border:1px solid rgba(255,255,255,0.12);border-radius:16px;padding:24px"><h2 style="color:#f59e0b;margin:0 0 8px;font-size:18px">Generation Zukunft</h2><p style="color:#86868b;font-size:13px;margin:0">' + String(msg) + '</p></div></div>';
+        root.innerHTML = '<div style="min-height:100vh;background:#000;color:#f5f5f7;font-family:-apple-system,sans-serif;display:flex;align-items:center;justify-content:center;padding:24px;text-align:center"><div style="max-width:460px;background:#161617;border:1px solid rgba(255,255,255,0.12);border-radius:16px;padding:24px"><h2 style="color:#f59e0b;margin:0 0 8px;font-size:18px">Generation Zukunft</h2><p style="color:#86868b;font-size:13px;margin:0">' + escapeHtml(msg) + '</p></div></div>';
       }
       window.addEventListener('error', function(e) {
         if (e && e.message) {
           pushEarly('error', 'early-onerror', e.message + (e.filename ? ' (' + e.filename + ':' + e.lineno + ')' : ''));
           showErr(e.message);
         } else if (e && e.target && e.target.tagName) {
+          var tag = String(e.target.tagName).toLowerCase();
           var src = e.target.src || e.target.href || '';
-          pushEarly('error', 'early-resource', '<' + e.target.tagName.toLowerCase() + '> Ladefehler: ' + src);
+          pushEarly('error', 'early-resource', '<' + tag + '> Ladefehler: ' + src);
+          if (tag === 'script') {
+            showErr('Skript konnte nicht geladen werden: ' + src);
+          }
         }
       }, true);
       window.addEventListener('unhandledrejection', function(e) {
