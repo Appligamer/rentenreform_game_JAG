@@ -4,37 +4,7 @@
 **Repository:** `https://github.com/Appligamer/rentenreform_game_JAG`  
 **Protokollregel:** Für jeden Kalendertag existiert **genau ein Abschnitt** (`## YYYY-MM-DD`). Alle Änderungen am selben Tag werden direkt in den bestehenden Abschnitt des jeweiligen Tages eingepflegt; erst an einem neuen Kalendertag wird oben ein neuer Tagesabschnitt angelegt.
 
----
-
-## Projekt-System-Prompt & Arbeitsregeln (Chat-Vorgabe)
-
-Dieser Abschnitt dokumentiert den im Chat aktiven Projekt-System-Prompt von **Jacob Glathe & Team** sowie die verbindlichen Leitplanken für alle Änderungen im Repository:
-
-### 1. Mission & Projektziel
-- Entwicklung und kontinuierliche Bereitstellung der Simulations-, Gameplay- und Engine-Grundlage für das plattformübergreifende Videospiel **`pension_game_simulation` / `Generation Zukunft`** (Flutter für macOS/Xcode und Windows sowie TypeScript/React/Web).
-- Didaktisch fundierte und visuell immersive Vermittlung der deutschen Rentenversicherung, des **Rentenpakets II (Haltelinie 48 %)**, des **Generationenkapitals (Aktienrente)** und der demografischen Transformation für **econo=me (*„Rente gut, alles gut?“*)**.
-
-### 2. Code- & Architektur-Standards
-- **Technologie-Stack:** Flutter/Dart (macOS Xcode Runner `macos/Runner.xcodeproj` & Windows C++ Runner `windows/`) sowie parallel die TypeScript-/React-/Vite-Engine (`src/`) für Web-Vorschau, Browser-Demo und natives `WKWebView`-WebBundle.
-- **Sauberkeit & Modularität:** Trennung in mathematischen Simulationskern (`lib/simulation/` bzw. `src/simulation/`), typsichere Datenmodelle (`lib/models/`, `src/types.ts`), UI-Komponenten (`lib/ui/`, `src/components/`) und Konfigurationen (`src/data/`). Strikte Typisierung ohne unsichere `any`/`dynamic`-Typen.
-- **Performance & Stabilität:** Instantane Rundenberechnung (`< 50 ms`), ruckelfreie Simulation von 35-Jahres-Zeitstrahlen (`2026–2060` bzw. Kampagne `2026–2045`), keine unnötigen Drittanbieter-Abhängigkeiten.
-
-### 3. Mathematische & Ökonomische Realität (econo=me)
-- **Umlageverfahren (Generationenvertrag):** Altenquotient sinkt durch Verrentung der Babyboomer-Jahrgänge (1955–1969) drastisch von `2,1:1` (2024) auf unter `1,5:1` ab 2035. Rentenformel: `Monatliche Rente = Entgeltpunkte (EP) × Zugangsfaktor (ZF) × Aktueller Rentenwert (AR) × Rentenartfaktor (RAF)`.
-- **Rentenpaket II & Generationenkapital:** Gesetzliche Haltelinie von mindestens `48,0 %` bis mind. `2039`; Beitragssatzanstieg von `18,6 %` Richtung `22,3 %` Mitte der 2030er Jahre ohne Gegenmaßnahmen; Generationenkapital-Fonds mit `12 Mrd. €` jährlichem Bundesdarlehen (`+3 % p. a.`, Zielvolumen `~200 Mrd. €`), Erträge dämpfen ab `2035` den Beitragssatz.
-- **Mikroökonomie (Bürger-Lebenslauf):** Gesetzliche Rente vs. Rentenlücke (`70–80 %` Nettoziel) über das 3-Säulen-Modell (GRV + Betriebliche Altersvorsorge + Private ETF-Vorsorge).
-
-### 4. Design-System & Corporate Identity
-- **Ästhetik:** Dark Mode (`#000000` Hintergrund, `#161617` Cards/Bento, `#f5f5f7` Primärtext, `#86868b` Sekundärtext), `1px` Hairline-Borders (`rgba(255, 255, 255, 0.1)`), moderne Neo-Grotesque-Typografie (`Plus Jakarta Sans` / SF Pro) mit `tabular-nums` für Finanzmetriken.
-- **Grafik & Asset-Slots:** Dedizierte Slots (`HandDrawnFrame` / `artworks/`) nach `graphic_designer_briefing.md` mit eingebauten Vektor-/Blueprint-Fallbacks.
-
-### 5. Aktive Chat-Regeln für Änderungen & Git-Sync
-- **Protokollpflicht:** Jede künftige Code- oder Projektänderung aktualisiert den Abschnitt des aktuellen Kalendertags in `Protocoll.md` (neuer Abschnitt erst bei einem neuen Datum).
-- **Quellcode-Schutz:** Bestehende Spiellogik und visuelle Gestaltung in `src/` und `lib/` bleiben unverändert; Eingriffe dort erfolgen ausschließlich bei konkreten Laufzeit- oder Kompilierungsfehlern.
-- **Terminal-Sync-Hinweis:** Jede Antwort im Chat schließt direkt mit dem vollständigen GitHub-Clone-/Bereinigungs-/Xcode-Befehl ab.
-
----
-
+--
 ## 2026-11-27
 
 ### GitHub-Commits (Chronologisch)
