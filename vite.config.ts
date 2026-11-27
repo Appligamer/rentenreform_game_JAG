@@ -68,12 +68,12 @@ function artworksManifestPlugin(rootDir: string): Plugin {
       });
     },
     closeBundle() {
-      const distArtworks = path.join(rootDir, 'dist', 'artworks');
+      const distArtworks = path.join(rootDir, 'web', 'dist', 'artworks');
       const list = collectArtworks(rootDir);
       if (list.length === 0) return;
       for (const rel of list) {
         const src = path.join(rootDir, rel);
-        const dest = path.join(rootDir, 'dist', rel);
+        const dest = path.join(rootDir, 'web', 'dist', rel);
         fs.mkdirSync(path.dirname(dest), { recursive: true });
         fs.copyFileSync(src, dest);
       }
@@ -90,9 +90,13 @@ export default defineConfig(() => {
     base: './',
     publicDir: false as const,
     plugins: [react(), tailwindcss(), artworksManifestPlugin(rootDir)],
+    build: {
+      outDir: 'web/dist',
+      emptyOutDir: true,
+    },
     resolve: {
       alias: {
-        '@': path.resolve(rootDir, '.'),
+        '@': path.resolve(rootDir, 'web'),
       },
     },
     server: {

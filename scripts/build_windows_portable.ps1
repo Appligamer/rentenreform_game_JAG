@@ -12,7 +12,7 @@ param(
 $ErrorActionPreference = "Stop"
 
 $RootDir = Split-Path -Parent $PSScriptRoot
-$FlutterDir = $RootDir
+$FlutterDir = Join-Path $RootDir "platforms\flutter"
 $OutDir = Join-Path $RootDir "dist_windows"
 $BundleDir = Join-Path $OutDir "GenerationZukunft_Windows"
 
@@ -77,9 +77,9 @@ if (-not $BuiltNative) {
             Pop-Location
         }
     }
-    $WebSource = Join-Path $RootDir "macos\Runner\WebBundle"
-    if (Test-Path (Join-Path $RootDir "dist\index.html")) {
-        $WebSource = Join-Path $RootDir "dist"
+    $WebSource = Join-Path $RootDir "platforms\macos\Runner\WebBundle"
+    if (Test-Path (Join-Path $RootDir "web\dist\index.html")) {
+        $WebSource = Join-Path $RootDir "web\dist"
     }
     if (-not (Test-Path (Join-Path $WebSource "index.html"))) {
         throw "Kein WebBundle gefunden. Bitte zuerst 'npm run build' ausfuehren."
@@ -108,12 +108,12 @@ if (-not $BuiltNative) {
             Copy-Item -Path $_.FullName -Destination $dest -Force
         }
     }
-    Copy-Item -Path (Join-Path $RootDir "START_GAME_WINDOWS.bat") -Destination $BundleDir -Force
+    Copy-Item -Path (Join-Path $RootDir "GenerationZukunft_Windows.bat") -Destination $BundleDir -Force
 }
 
 # 3. EINE EINZIGE eigenstaendige .exe mit Windows-Bordmitteln (.NET csc.exe) erzeugen
 $SingleExePath = Join-Path $OutDir "GenerationZukunft.exe"
-$IconPath = Join-Path $RootDir "windows\runner\resources\app_icon.ico"
+$IconPath = Join-Path $RootDir "platforms\windows\runner\resources\app_icon.ico"
 $CscCandidates = @(
     (Join-Path $env:WINDIR "Microsoft.NET\Framework64\v4.0.30319\csc.exe"),
     (Join-Path $env:WINDIR "Microsoft.NET\Framework\v4.0.30319\csc.exe")
@@ -121,10 +121,10 @@ $CscCandidates = @(
 $CscExe = $CscCandidates | Where-Object { Test-Path $_ } | Select-Object -First 1
 $WebSourceForSingle = Join-Path $BundleDir "WebBundle"
 if (-not (Test-Path (Join-Path $WebSourceForSingle "index.html"))) {
-    if (Test-Path (Join-Path $RootDir "dist\index.html")) {
-        $WebSourceForSingle = Join-Path $RootDir "dist"
-    } elseif (Test-Path (Join-Path $RootDir "macos\Runner\WebBundle\index.html")) {
-        $WebSourceForSingle = Join-Path $RootDir "macos\Runner\WebBundle"
+    if (Test-Path (Join-Path $RootDir "web\dist\index.html")) {
+        $WebSourceForSingle = Join-Path $RootDir "web\dist"
+    } elseif (Test-Path (Join-Path $RootDir "platforms\macos\Runner\WebBundle\index.html")) {
+        $WebSourceForSingle = Join-Path $RootDir "platforms\macos\Runner\WebBundle"
     }
 }
 

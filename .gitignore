@@ -1,6 +1,8 @@
 node_modules/
 build/
 dist/
+web/dist/
+dist_windows/
 coverage/
 .DS_Store
 *.log
@@ -9,4 +11,3 @@ coverage/
 .aistudio/
 **/xcuserdata/
 **/project.xcworkspace/
-
