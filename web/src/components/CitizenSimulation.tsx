@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { MacroState, CitizenProfile } from '../types';
 import { PensionMathEngine } from '../simulation/pensionEngine';
 import { HandDrawnFrame } from './HandDrawnFrame';
+import { hapticEngine } from '../utils/haptics';
 import { User, Wallet, PiggyBank, ArrowRight, ShieldCheck } from 'lucide-react';
 
 interface CitizenSimulationProps {
@@ -169,9 +170,10 @@ export const CitizenSimulation: React.FC<CitizenSimulationProps> = ({ macro }) =
               max="120000"
               step="2000"
               value={profile.grossIncome}
-              onChange={(e) =>
-                setProfile({ ...profile, grossIncome: Number(e.target.value) })
-              }
+              onChange={(e) => {
+                hapticEngine.triggerThrottled('selection', 80);
+                setProfile({ ...profile, grossIncome: Number(e.target.value) });
+              }}
               className="w-full accent-white cursor-pointer"
             />
             <p className="text-[11px] text-[#86868b] mt-1">
@@ -193,12 +195,13 @@ export const CitizenSimulation: React.FC<CitizenSimulationProps> = ({ macro }) =
               max="1000"
               step="25"
               value={profile.monthlyEtfSavings}
-              onChange={(e) =>
+              onChange={(e) => {
+                hapticEngine.triggerThrottled('selection', 80);
                 setProfile({
                   ...profile,
                   monthlyEtfSavings: Number(e.target.value),
-                })
-              }
+                });
+              }}
               className="w-full accent-amber-400 cursor-pointer"
             />
             <p className="text-[11px] text-[#86868b] mt-1">
@@ -220,7 +223,10 @@ export const CitizenSimulation: React.FC<CitizenSimulationProps> = ({ macro }) =
               max="50"
               step="1"
               value={careerYears}
-              onChange={(e) => setCareerYears(Number(e.target.value))}
+              onChange={(e) => {
+                hapticEngine.triggerThrottled('selection', 80);
+                setCareerYears(Number(e.target.value));
+              }}
               className="w-full accent-white cursor-pointer"
             />
             <p className="text-[11px] text-[#86868b] mt-1">

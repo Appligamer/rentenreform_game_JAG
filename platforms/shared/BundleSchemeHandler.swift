@@ -1,6 +1,11 @@
 import Darwin
 import Foundation
 import WebKit
+#if os(iOS)
+import UIKit
+#elseif os(macOS)
+import AppKit
+#endif
 
 /// Synchron bindender Loopback-HTTP-Server (`http://127.0.0.1:<port>/`) auf Basis von
 /// POSIX BSD-Sockets (`127.0.0.1` only — keine Firewall-Abfrage, kein Async-Timeout).
@@ -400,6 +405,7 @@ final class BundleSchemeHandler: NSObject, WKURLSchemeHandler {
     if #available(macOS 11.3, iOS 14.5, *) {
       config.preferences.isFraudulentWebsiteWarningEnabled = false
     }
+    config.userContentController.add(HapticBridge(), name: HapticBridge.handlerName)
     let errorGuardJS = """
     (function() {
       window.__EARLY_LOGS__ = window.__EARLY_LOGS__ || [];
@@ -453,6 +459,82 @@ final class BundleSchemeHandler: NSObject, WKURLSchemeHandler {
     case "woff": return "font/woff"
     case "ico": return "image/x-icon"
     default: return "application/octet-stream"
+    }
+  }
+}
+
+/// Natives haptisches Feedback über `window.webkit.messageHandlers.haptics.postMessage({ style })`.
+/// - iOS/iPadOS: Taptic Engine via `UIImpactFeedbackGenerator`, `UISelectionFeedbackGenerator` und `UINotificationFeedbackGenerator`
+/// - macOS: Force-Touch-Trackpad via `NSHapticFeedbackManager`
+final class HapticBridge: NSObject, WKScriptMessageHandler {
+  static let handlerName = "haptics"
+
+  func userContentController(
+    _ userContentController: WKUserContentController,
+    didReceive message: WKScriptMessage
+  ) {
+    let rawStyle: String?
+    if let dict = message.body as? [String: Any], let s = dict["style"] as? String {
+      rawStyle = s
+    } else if let s = message.body as? String {
+      rawStyle = s
+    } else {
+      rawStyle = nil
+    }
+
+    guard let style = rawStyle else { return }
+    trigger(style: style)
+  }
+
+  private func trigger(style: String) {
+    DispatchQueue.main.async {
+      #if os(iOS)
+      switch style {
+      case "selection":
+        let generator = UISelectionFeedbackGenerator()
+        generator.prepare()
+        generator.selectionChanged()
+      case "light":
+        let generator = UIImpactFeedbackGenerator(style: .light)
+        generator.prepare()
+        generator.impactOccurred()
+      case "medium":
+        let generator = UIImpactFeedbackGenerator(style: .medium)
+        generator.prepare()
+        generator.impactOccurred()
+      case "heavy":
+        let generator = UIImpactFeedbackGenerator(style: .heavy)
+        generator.prepare()
+        generator.impactOccurred()
+      case "success":
+        let generator = UINotificationFeedbackGenerator()
+        generator.prepare()
+        generator.notificationOccurred(.success)
+      case "warning":
+        let generator = UINotificationFeedbackGenerator()
+        generator.prepare()
+        generator.notificationOccurred(.warning)
+      case "error":
+        let generator = UINotificationFeedbackGenerator()
+        generator.prepare()
+        generator.notificationOccurred(.error)
+      default:
+        break
+      }
+      #elseif os(macOS)
+      let pattern: NSHapticFeedbackManager.FeedbackPattern
+      switch style {
+      case "selection", "light":
+        pattern = .alignment
+      case "medium", "success", "warning":
+        pattern = .levelChange
+      case "heavy", "error":
+        pattern = .generic
+      default:
+        return
+      }
+      NSHapticFeedbackManager.defaultPerformer.perform(pattern, performanceTime: .now)
+      #endif
     }
   }
 }

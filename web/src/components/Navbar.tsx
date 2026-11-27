@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Volume2, VolumeX, Shield, Lock, Terminal } from 'lucide-react';
 import { soundEngine } from '../utils/soundEffects';
+import { hapticEngine } from '../utils/haptics';
 
 export type AppTab = 'game' | 'citizen' | 'rules' | 'briefing' | 'export' | 'console';
 
@@ -33,9 +34,11 @@ export const Navbar: React.FC<NavbarProps> = ({
 
   const handleLogoClick = () => {
     soundEngine.playClick();
+    hapticEngine.light();
     const next = logoClicks + 1;
     if (next >= 5) {
       soundEngine.playVictory();
+      hapticEngine.success();
       onToggleDevMode();
       setLogoClicks(0);
     } else {
@@ -49,6 +52,7 @@ export const Navbar: React.FC<NavbarProps> = ({
       if ((e.metaKey || e.ctrlKey) && e.shiftKey && e.key.toLowerCase() === 'd') {
         e.preventDefault();
         soundEngine.playVictory();
+        hapticEngine.success();
         onToggleDevMode();
       }
     };
@@ -57,6 +61,7 @@ export const Navbar: React.FC<NavbarProps> = ({
   }, [onToggleDevMode]);
 
   const toggleSound = () => {
+    hapticEngine.selection();
     const isNowMuted = soundEngine.toggleMute();
     setMuted(isNowMuted);
     if (!isNowMuted) soundEngine.playClick();
@@ -66,14 +71,21 @@ export const Navbar: React.FC<NavbarProps> = ({
     e.preventDefault();
     if (passcodeInput.trim().toUpperCase() === 'ECONOME2026') {
       soundEngine.playVictory();
+      hapticEngine.success();
       onToggleDevMode();
       setShowSecretModal(false);
       setPasscodeInput('');
       setPasscodeError(false);
     } else {
       soundEngine.playAlert();
+      hapticEngine.error();
       setPasscodeError(true);
     }
+  };
+
+  const handleNavTab = (tab: AppTab) => {
+    hapticEngine.selection();
+    onSelectTab(tab);
   };
 
   return (
@@ -102,7 +114,10 @@ export const Navbar: React.FC<NavbarProps> = ({
           <nav className="flex items-center gap-6 text-xs font-medium text-[#86868b] overflow-x-auto">
             {onOpenWelcome && (
               <button
-                onClick={onOpenWelcome}
+                onClick={() => {
+                  hapticEngine.selection();
+                  onOpenWelcome();
+                }}
                 className="hover:text-white transition-colors whitespace-nowrap shrink-0 pb-1 cursor-pointer"
               >
                 Start
@@ -110,7 +125,7 @@ export const Navbar: React.FC<NavbarProps> = ({
             )}
 
             <button
-              onClick={() => onSelectTab('game')}
+              onClick={() => handleNavTab('game')}
               className={`hover:text-white transition-colors whitespace-nowrap shrink-0 pb-1 cursor-pointer ${
                 currentTab === 'game'
                   ? 'text-white border-b border-amber-400 font-semibold'
@@ -121,7 +136,7 @@ export const Navbar: React.FC<NavbarProps> = ({
             </button>
 
             <button
-              onClick={() => onSelectTab('citizen')}
+              onClick={() => handleNavTab('citizen')}
               className={`hover:text-white transition-colors whitespace-nowrap shrink-0 pb-1 cursor-pointer ${
                 currentTab === 'citizen'
                   ? 'text-white border-b border-amber-400 font-semibold'
@@ -132,7 +147,7 @@ export const Navbar: React.FC<NavbarProps> = ({
             </button>
 
             <button
-              onClick={() => onSelectTab('rules')}
+              onClick={() => handleNavTab('rules')}
               className={`hover:text-white transition-colors whitespace-nowrap shrink-0 pb-1 cursor-pointer ${
                 currentTab === 'rules'
                   ? 'text-white border-b border-amber-400 font-semibold'
@@ -145,7 +160,7 @@ export const Navbar: React.FC<NavbarProps> = ({
             {devMode && (
               <>
                 <button
-                  onClick={() => onSelectTab('briefing')}
+                  onClick={() => handleNavTab('briefing')}
                   className={`hover:text-amber-400 transition-colors whitespace-nowrap shrink-0 pb-1 cursor-pointer ${
                     currentTab === 'briefing'
                       ? 'text-amber-400 border-b border-amber-400 font-semibold'
@@ -155,7 +170,7 @@ export const Navbar: React.FC<NavbarProps> = ({
                   Grafik-Briefing
                 </button>
                 <button
-                  onClick={() => onSelectTab('export')}
+                  onClick={() => handleNavTab('export')}
                   className={`hover:text-amber-400 transition-colors whitespace-nowrap shrink-0 pb-1 cursor-pointer ${
                     currentTab === 'export'
                       ? 'text-amber-400 border-b border-amber-400 font-semibold'
@@ -165,7 +180,7 @@ export const Navbar: React.FC<NavbarProps> = ({
                   Multiplattform
                 </button>
                 <button
-                  onClick={() => onSelectTab('console')}
+                  onClick={() => handleNavTab('console')}
                   className={`hover:text-amber-400 transition-colors whitespace-nowrap shrink-0 pb-1 cursor-pointer inline-flex items-center gap-1.5 ${
                     currentTab === 'console'
                       ? 'text-amber-400 border-b border-amber-400 font-semibold'

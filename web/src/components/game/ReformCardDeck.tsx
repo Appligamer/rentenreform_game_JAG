@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { CardCategory, DecisionCard } from '../../types';
 import { HandDrawnFrame } from '../HandDrawnFrame';
+import { hapticEngine } from '../../utils/haptics';
 import { Check, Layers } from 'lucide-react';
 
 interface ReformCardDeckProps {
@@ -46,7 +47,10 @@ export const ReformCardDeck: React.FC<ReformCardDeckProps> = ({
           {FILTER_TABS.map((tab) => (
             <button
               key={tab.id}
-              onClick={() => setFilter(tab.id)}
+              onClick={() => {
+                hapticEngine.selection();
+                setFilter(tab.id);
+              }}
               className={`px-3 py-1.5 text-xs font-medium rounded-lg transition-colors whitespace-nowrap shrink-0 cursor-pointer ${
                 filter === tab.id
                   ? 'bg-white text-black font-semibold'

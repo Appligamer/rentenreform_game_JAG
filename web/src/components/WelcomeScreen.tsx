@@ -12,6 +12,7 @@ import {
   Zap,
 } from 'lucide-react';
 import { SavedRunScore } from '../utils/scoreHistory';
+import { hapticEngine } from '../utils/haptics';
 
 interface WelcomeScreenProps {
   scores: SavedRunScore[];
@@ -194,7 +195,10 @@ export const WelcomeScreen: React.FC<WelcomeScreenProps> = ({
             </div>
             <button
               type="button"
-              onClick={onStartGame}
+              onClick={() => {
+                hapticEngine.medium();
+                onStartGame();
+              }}
               className="text-xs text-[#86868b] hover:text-white transition-colors whitespace-nowrap shrink-0 cursor-pointer"
             >
               Überspringen &amp; direkt starten →
@@ -243,6 +247,7 @@ export const WelcomeScreen: React.FC<WelcomeScreenProps> = ({
               <button
                 type="button"
                 onClick={() => {
+                  hapticEngine.selection();
                   if (tutorialStep === 0) {
                     setMode('landing');
                   } else {
@@ -259,7 +264,10 @@ export const WelcomeScreen: React.FC<WelcomeScreenProps> = ({
             {isLast ? (
               <button
                 type="button"
-                onClick={onStartGame}
+                onClick={() => {
+                  hapticEngine.medium();
+                  onStartGame();
+                }}
                 className="px-6 py-3 rounded-xl bg-amber-400 text-black text-sm font-extrabold hover:bg-amber-300 transition-colors inline-flex items-center justify-center gap-2 whitespace-nowrap shrink-0 cursor-pointer"
               >
                 <Play className="w-4 h-4 fill-current" />
@@ -268,7 +276,10 @@ export const WelcomeScreen: React.FC<WelcomeScreenProps> = ({
             ) : (
               <button
                 type="button"
-                onClick={() => setTutorialStep((prev) => prev + 1)}
+                onClick={() => {
+                  hapticEngine.selection();
+                  setTutorialStep((prev) => prev + 1);
+                }}
                 className="px-6 py-3 rounded-xl bg-amber-400 text-black text-sm font-extrabold hover:bg-amber-300 transition-colors inline-flex items-center justify-center gap-2 whitespace-nowrap shrink-0 cursor-pointer"
               >
                 <span>Weiter zu Schritt {tutorialStep + 2}</span>
@@ -309,7 +320,10 @@ export const WelcomeScreen: React.FC<WelcomeScreenProps> = ({
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
           <button
             type="button"
-            onClick={onStartGame}
+            onClick={() => {
+              hapticEngine.medium();
+              onStartGame();
+            }}
             className="group p-6 rounded-2xl bg-amber-400 text-black hover:bg-amber-300 transition-all text-left flex flex-col justify-between gap-4 cursor-pointer shadow-lg"
           >
             <div className="flex items-center justify-between w-full">
@@ -329,6 +343,7 @@ export const WelcomeScreen: React.FC<WelcomeScreenProps> = ({
           <button
             type="button"
             onClick={() => {
+              hapticEngine.light();
               setTutorialStep(0);
               setMode('tutorial');
             }}
@@ -381,7 +396,10 @@ export const WelcomeScreen: React.FC<WelcomeScreenProps> = ({
           {scores.length > 0 && (
             <button
               type="button"
-              onClick={onClearScores}
+              onClick={() => {
+                hapticEngine.warning();
+                onClearScores();
+              }}
               className="inline-flex items-center gap-1.5 text-xs text-[#86868b] hover:text-rose-400 transition-colors cursor-pointer"
             >
               <Trash2 className="w-3.5 h-3.5" />

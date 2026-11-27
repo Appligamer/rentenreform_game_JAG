@@ -20,6 +20,7 @@ import {
   resolveTurn,
 } from '../simulation/gameBalanceEngine';
 import { soundEngine } from '../utils/soundEffects';
+import { hapticEngine } from '../utils/haptics';
 
 export function usePensionGame() {
   const [difficulty, setDifficulty] = useState<DifficultyLevel>('hard');
@@ -69,6 +70,7 @@ export function usePensionGame() {
 
   const handleRestartGame = useCallback(() => {
     soundEngine.playClick();
+    hapticEngine.light();
     resetWithDifficulty(difficulty);
     pushToast('Kampagne 2026 neu gestartet.', 'info');
   }, [difficulty, pushToast, resetWithDifficulty]);
@@ -77,6 +79,7 @@ export function usePensionGame() {
     (newDiff: DifficultyLevel) => {
       if (newDiff === difficulty) return;
       soundEngine.playClick();
+      hapticEngine.selection();
       resetWithDifficulty(newDiff);
       const label =
         newDiff === 'hardcore' ? 'Hardcore' : newDiff === 'hard' ? 'Schwer' : 'Normal';
@@ -92,6 +95,7 @@ export function usePensionGame() {
       const cost = option?.consequences.capitalCost ?? 0;
       if (cost > metrics.politicalCapital) {
         soundEngine.playAlert();
+        hapticEngine.warning();
         pushToast(
           `Nicht genügend Politisches Kapital (${metrics.politicalCapital} von ${cost} benötigt).`,
           'warning'
@@ -101,8 +105,10 @@ export function usePensionGame() {
 
       if (option) {
         soundEngine.playCard();
+        hapticEngine.medium();
       } else {
         soundEngine.playYearTick();
+        hapticEngine.light();
       }
 
       const result = resolveTurn({
@@ -121,10 +127,12 @@ export function usePensionGame() {
 
       if (result.nextStatus === 'game_over') {
         soundEngine.playAlert();
+        hapticEngine.error();
         setGameStatus('game_over');
         setGameOverReason(result.gameOverReason);
       } else if (result.nextStatus === 'victory') {
         soundEngine.playVictory();
+        hapticEngine.success();
         setGameStatus('victory');
         setGameOverReason(null);
       }
@@ -139,6 +147,7 @@ export function usePensionGame() {
 
       if (metrics.politicalCapital < card.politicalCapitalCost) {
         soundEngine.playAlert();
+        hapticEngine.warning();
         pushToast(
           `Für „${card.title}“ werden ${card.politicalCapitalCost} Kapitalpunkte benötigt (verfügbar: ${metrics.politicalCapital}).`,
           'warning'
@@ -147,6 +156,7 @@ export function usePensionGame() {
       }
 
       soundEngine.playCard();
+      hapticEngine.heavy();
       const { nextModifiers, nextMetrics } = applyDecisionCardModifiers(
         card,
         modifiers,

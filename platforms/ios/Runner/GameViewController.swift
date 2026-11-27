@@ -7,6 +7,7 @@ final class GameViewController: UIViewController, WKNavigationDelegate, WKUIDele
   private var localServer: LocalBundleHTTPServer?
 
   deinit {
+    webView?.configuration.userContentController.removeScriptMessageHandler(forName: HapticBridge.handlerName)
     localServer?.stop()
   }
 

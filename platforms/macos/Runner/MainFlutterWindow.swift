@@ -25,6 +25,7 @@ final class MacGameViewController: NSViewController, WKNavigationDelegate, WKUID
   private var localServer: LocalBundleHTTPServer?
 
   deinit {
+    webView?.configuration.userContentController.removeScriptMessageHandler(forName: HapticBridge.handlerName)
     localServer?.stop()
   }
 
