@@ -2,14 +2,43 @@
 
 Plattformübergreifendes Simulations- und Strategiespiel zur deutschen Rentenversicherung, dem **Rentenpaket II (Haltelinie 48 %)** und dem **Generationenkapital (Aktienrente)** — entwickelt von **Jacob Glathe & Team** für **macOS**, **iOS/iPadOS**, **Windows** und **Web**.
 
-[![Entwicklungsprotokoll (Protocoll.md)](https://img.shields.io/badge/Protokoll-Protocoll.md_%C3%B6ffnen-f59e0b?style=for-the-badge&logo=readthedocs&logoColor=000000)](Protocoll.md)
-[![Lizenz: PolyForm Noncommercial 1.0.0](https://img.shields.io/badge/Lizenz-PolyForm_Noncommercial_1.0.0-2563eb?style=for-the-badge&logo=opensourceinitiative&logoColor=ffffff)](LICENSE.md)
-[![macOS Xcode](https://img.shields.io/badge/macOS-GenerationZukunft__macOS.xcodeproj-111827?style=for-the-badge&logo=apple&logoColor=ffffff)](#macos--ios--ipados-xcode)
-[![iOS & iPadOS Xcode](https://img.shields.io/badge/iOS_%2F_iPadOS-GenerationZukunft__iOS.xcodeproj-0284c7?style=for-the-badge&logo=apple&logoColor=ffffff)](GenerationZukunft_iOS.xcodeproj)
-[![Windows .exe Build](https://img.shields.io/badge/Windows-GenerationZukunft__Windows.bat-059669?style=for-the-badge&logo=windows&logoColor=ffffff)](#windows-eine-versandfertige-signierte-exe-erstellen-schritt-für-schritt)
-[![Web Quellcode](https://img.shields.io/badge/Web--App-web%2Fsrc-7c3aed?style=for-the-badge&logo=react&logoColor=ffffff)](web/src)
-[![Grafik-Briefing](https://img.shields.io/badge/Design-Grafik--Briefing-db2777?style=for-the-badge&logo=figma&logoColor=ffffff)](docs/graphic_designer_briefing.md)
-[![GitHub Actions CI/CD](https://img.shields.io/badge/CI%2FCD-Workflows-374151?style=for-the-badge&logo=githubactions&logoColor=ffffff)](.github/workflows/main.yml)
+<p>
+  <a href="Protocoll.md">
+    <img src="https://img.shields.io/badge/Entwicklungsprotokoll-Protocoll.md-f59e0b?style=for-the-badge&labelColor=18181b&logo=readthedocs&logoColor=f59e0b" height="32" alt="Entwicklungsprotokoll (Protocoll.md)" />
+  </a>
+  &nbsp;&nbsp;&nbsp;
+  <a href="LICENSE.md">
+    <img src="https://img.shields.io/badge/Lizenz-PolyForm_Noncommercial_1.0.0-2563eb?style=for-the-badge&labelColor=18181b&logo=opensourceinitiative&logoColor=ffffff" height="32" alt="Lizenz: PolyForm Noncommercial 1.0.0" />
+  </a>
+</p>
+
+<p>
+  <a href="#macos--ios--ipados-xcode">
+    <img src="https://img.shields.io/badge/macOS-Xcode-27272a?style=for-the-badge&labelColor=18181b&logo=apple&logoColor=ffffff" height="28" alt="macOS Xcode" />
+  </a>
+  &nbsp;&nbsp;&nbsp;
+  <a href="GenerationZukunft_iOS.xcodeproj">
+    <img src="https://img.shields.io/badge/iOS_%26_iPadOS-Xcode-27272a?style=for-the-badge&labelColor=18181b&logo=apple&logoColor=ffffff" height="28" alt="iOS und iPadOS Xcode" />
+  </a>
+  &nbsp;&nbsp;&nbsp;
+  <a href="#windows-eine-versandfertige-signierte-exe-erstellen-schritt-für-schritt">
+    <img src="https://img.shields.io/badge/Windows-.exe_%2F_.bat-27272a?style=for-the-badge&labelColor=18181b&logo=windows&logoColor=ffffff" height="28" alt="Windows .exe Build" />
+  </a>
+  &nbsp;&nbsp;&nbsp;
+  <a href="web/src">
+    <img src="https://img.shields.io/badge/Web--App-web%2Fsrc-27272a?style=for-the-badge&labelColor=18181b&logo=react&logoColor=61dafb" height="28" alt="Web-App Quellcode" />
+  </a>
+</p>
+
+<p>
+  <a href="docs/graphic_designer_briefing.md">
+    <img src="https://img.shields.io/badge/Design-Grafik--Briefing-27272a?style=for-the-badge&labelColor=18181b&logo=figma&logoColor=ffffff" height="28" alt="Grafik-Briefing" />
+  </a>
+  &nbsp;&nbsp;&nbsp;
+  <a href=".github/workflows/main.yml">
+    <img src="https://img.shields.io/badge/CI_%2F_CD-GitHub_Actions-27272a?style=for-the-badge&labelColor=18181b&logo=githubactions&logoColor=ffffff" height="28" alt="GitHub Actions CI/CD" />
+  </a>
+</p>
 
 ---
 
