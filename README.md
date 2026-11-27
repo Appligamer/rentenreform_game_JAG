@@ -17,8 +17,19 @@ Das Projekt enthält ein vorkompiliertes Offline-`WebBundle` und einen lokalen L
 
 ## Entwicklungsprotokoll (`Protocoll.md`)
 
-Alle Architektur-, Build-, Bugfix- und Commit-Änderungen werden fortlaufend tagesaktuell dokumentiert in:
-👉 **[Aktuelles Entwicklungsprotokoll öffnen (`Protocoll.md`)](Protocoll.md)**
+> **Hinweis zu GitHub:** GitHub erlaubt in der Reiterleiste neben `README` und `PolyForm Noncommercial 1.0.0 license` technisch keine eigenen benutzerdefinierten Datei-Reiter. Daher wird der aktuelle Stand hier direkt im `README`-Reiter eingeblendet und vollständig in [`Protocoll.md`](Protocoll.md) geführt.
+
+<details open>
+<summary><strong>Aktueller Stand (2026-11-27) — Vollständiges Protokoll öffnen: <a href="Protocoll.md">Protocoll.md</a></strong></summary>
+
+- **Xcode-Projekte strikt getrennt:** `GenerationZukunft_macOS.xcodeproj` (macOS-only, Schema `Runner`) und `GenerationZukunft_iOS.xcodeproj` (iOS & iPadOS 15.0+, Schema `GenerationZukunft_iOS`).
+- **iPhone-11- & Watchdog-/SIGKILL-Fix:** `WKWebView`-Start und `LocalBundleHTTPServer` aus `viewDidLoad()`/`scene(_:willConnectTo:)` auf `viewDidAppear` + Hintergrund-GCD-Queue verlagert; natives Lade-/Retry-Overlay ergänzt; ATS-Ausnahmen (`127.0.0.1`, `localhost`), `es2020`/`safari15`-Build-Target, `EINTR`/`EAGAIN`-Socket-Härtung, Offline-Inline-Fallback (`buildInlinedAppHTML`) und explizites `WebKit.framework`-Linking integriert.
+- **Haptisches Feedback:** Web (`Navigator.vibrate` in `web/src/utils/haptics.ts`) + native Swift-`HapticBridge` (iOS Taptic Engine / macOS Trackpad).
+- **Root-Dateien:** `LICENSE.md` (PolyForm Noncommercial License 1.0.0), `README.md` und `Protocoll.md` liegen wieder direkt im Hauptverzeichnis.
+
+👉 **[Komplette Historie ab 2026-10-20 in `Protocoll.md` lesen](Protocoll.md)**
+
+</details>
 
 ---
 
