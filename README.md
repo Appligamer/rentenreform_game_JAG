@@ -31,7 +31,7 @@ Plattformübergreifendes Simulations- und Strategiespiel zur deutschen Rentenver
 
 ## Entwicklungsprotokoll (`Protocoll.md`)
 
-> **Hinweis zu GitHub:** GitHub erlaubt in der Reiterleiste neben `README` und `PolyForm Noncommercial 1.0.0 license` technisch keine eigenen benutzerdefinierten Datei-Reiter. Über den Button oben sowie die Live-Übersicht hier siehst du das Protokoll direkt im `README`-Reiter.
+
 
 <details open>
 <summary><strong>Aktueller Stand (2026-11-27) — Vollständiges Protokoll öffnen: <a href="Protocoll.md">Protocoll.md</a></strong></summary>
