@@ -1,4 +1,4 @@
-name: Build Web & macOS
+name: Build Web, macOS, iOS & Windows
 
 on:
   push:
@@ -26,12 +26,12 @@ jobs:
       - name: Install dependencies
         run: npm install --no-audit --no-fund
 
-      - name: Validate macOS shell scripts
+      - name: Validate macOS & iOS shell scripts
         run: |
-          bash -n START_GAME_MAC.command
-          bash -n START_GAME_IOS.command
-          bash -n run_game_mac.sh
-          bash -n GenerationZukunft.app/Contents/MacOS/GenerationZukunft
+          bash -n launchers/START_GAME_MAC.command
+          bash -n launchers/START_GAME_IOS.command
+          bash -n launchers/run_game_mac.sh
+          bash -n launchers/GenerationZukunft.app/Contents/MacOS/GenerationZukunft
 
       - name: TypeScript lint check
         run: npm run lint
@@ -43,11 +43,11 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: generation-zukunft-web-dist
-          path: dist/
+          path: web/dist/
           retention-days: 14
 
-  macos:
-    name: macOS Native Xcode Build
+  apple:
+    name: Apple macOS & iOS/iPadOS Xcode Builds
     runs-on: macos-latest
     needs: web
 
@@ -59,19 +59,19 @@ jobs:
         uses: actions/download-artifact@v4
         with:
           name: generation-zukunft-web-dist
-          path: dist
+          path: web/dist
 
-      - name: Sync WebBundle into macOS and iOS Runner
+      - name: Sync WebBundle into macOS and iOS Runners
         run: |
-          rm -rf macos/Runner/WebBundle ios/Runner/WebBundle
-          mkdir -p macos/Runner/WebBundle ios/Runner/WebBundle
-          cp -R dist/. macos/Runner/WebBundle/
-          cp -R dist/. ios/Runner/WebBundle/
+          rm -rf platforms/macos/Runner/WebBundle platforms/ios/Runner/WebBundle
+          mkdir -p platforms/macos/Runner/WebBundle platforms/ios/Runner/WebBundle
+          cp -R web/dist/. platforms/macos/Runner/WebBundle/
+          cp -R web/dist/. platforms/ios/Runner/WebBundle/
 
-      - name: Build macOS app with Xcode
+      - name: Build macOS app with Xcode (macOS-only)
         run: |
           xcodebuild \
-            -project macos/Runner.xcodeproj \
+            -project GenerationZukunft_macOS.xcodeproj \
             -scheme Runner \
             -configuration Release \
             -derivedDataPath build/macos-derived \
@@ -80,11 +80,11 @@ jobs:
             CODE_SIGNING_ALLOWED=NO \
             clean build
 
-      - name: Build iOS Simulator app with Xcode
+      - name: Build iOS & iPadOS Simulator app with Xcode
         run: |
           xcodebuild \
-            -project macos/Runner.xcodeproj \
-            -scheme Runner-iOS \
+            -project GenerationZukunft_iOS.xcodeproj \
+            -scheme GenerationZukunft_iOS \
             -configuration Debug \
             -sdk iphonesimulator \
             -derivedDataPath build/ios-derived \
@@ -97,10 +97,9 @@ jobs:
         run: |
           APP_PATH="$(find build/macos-derived/Build/Products/Release -maxdepth 1 -name '*.app' | head -n 1)"
           if [ -z "$APP_PATH" ] || [ ! -d "$APP_PATH" ]; then
-            echo "Error: Built .app bundle not found in Release products."
+            echo "Error: Built macOS .app bundle not found."
             exit 1
           fi
-          echo "Packaging: $APP_PATH"
           mkdir -p artifacts
           ditto -c -k --sequesterRsrc --keepParent "$APP_PATH" artifacts/GenerationZukunft_macOS.app.zip
 
@@ -109,4 +108,33 @@ jobs:
         with:
           name: generation-zukunft-macos-app
           path: artifacts/GenerationZukunft_macOS.app.zip
+          retention-days: 14
+
+  windows:
+    name: Windows Standalone EXE Build
+    runs-on: windows-latest
+    needs: web
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Download built web bundle
+        uses: actions/download-artifact@v4
+        with:
+          name: generation-zukunft-web-dist
+          path: web/dist
+
+      - name: Build GenerationZukunft.exe
+        shell: powershell
+        run: |
+          .\scripts\build_windows_portable.ps1 -SkipSign
+
+      - name: Upload Windows .exe & Portable ZIP
+        uses: actions/upload-artifact@v4
+        with:
+          name: generation-zukunft-windows-exe
+          path: |
+            dist_windows/GenerationZukunft.exe
+            dist_windows/GenerationZukunft_Windows_Portable.zip
           retention-days: 14

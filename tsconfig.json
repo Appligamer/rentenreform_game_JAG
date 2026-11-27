@@ -18,12 +18,12 @@
     "jsx": "react-jsx",
     "paths": {
       "@/*": [
-        "./*"
+        "./web/*"
       ]
     },
     "allowImportingTsExtensions": true,
     "strict": true,
     "noEmit": true
   },
-  "exclude": ["dist"]
+  "exclude": ["web/dist", "dist"]
 }

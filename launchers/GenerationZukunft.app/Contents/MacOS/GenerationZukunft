@@ -1,0 +1,29 @@
+#!/bin/bash
+# Native macOS App Launcher für Generation Zukunft
+set -u
+
+export PATH="/opt/homebrew/bin:/opt/homebrew/sbin:/usr/local/bin:/usr/bin:/bin:/usr/sbin:/sbin:$PATH"
+ROOT_DIR="$(cd "$(dirname "$0")/../../../.." && pwd)"
+cd "$ROOT_DIR" || exit 1
+
+for candidate in \
+    "build/macos-derived/Build/Products/Release/Runner.app" \
+    "build/macos/Build/Products/Release/Runner.app" \
+    "build/Build/Products/Release/Runner.app"
+do
+    if [ -d "$candidate" ]; then
+        open "$candidate"
+        exit 0
+    fi
+done
+
+if [ -f "$ROOT_DIR/launchers/START_GAME_MAC.command" ]; then
+    chmod +x "$ROOT_DIR/launchers/START_GAME_MAC.command" 2>/dev/null || true
+    open -a Terminal "$ROOT_DIR/launchers/START_GAME_MAC.command"
+    exit 0
+fi
+
+if [ -d "GenerationZukunft_macOS.xcodeproj" ]; then
+    open "GenerationZukunft_macOS.xcodeproj"
+    exit 0
+fi
