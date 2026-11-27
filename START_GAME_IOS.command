@@ -16,8 +16,16 @@ echo "   Apple iOS / Simulator Launcher"
 echo "====================================================================="
 echo ""
 
-if [ ! -d "ios/Runner.xcodeproj" ]; then
-    echo "[FEHLER] ios/Runner.xcodeproj wurde nicht gefunden."
+XCODE_PROJ=""
+XCODE_SCHEME=""
+if [ -d "macos/Runner.xcodeproj" ]; then
+    XCODE_PROJ="macos/Runner.xcodeproj"
+    XCODE_SCHEME="Runner-iOS"
+elif [ -d "ios/Runner.xcodeproj" ]; then
+    XCODE_PROJ="ios/Runner.xcodeproj"
+    XCODE_SCHEME="Runner"
+else
+    echo "[FEHLER] Weder macos/Runner.xcodeproj noch ios/Runner.xcodeproj gefunden."
     read -r -p "Drücke Enter zum Schließen..."
     exit 1
 fi
@@ -29,9 +37,9 @@ if [ ! -d "/Applications/Xcode.app" ]; then
     exit 0
 fi
 
-# 1. Xcode öffnen (für iPhone / iPad Deployment direkt bereit)
-echo "[1/3] Öffne ios/Runner.xcodeproj in Xcode..."
-open "ios/Runner.xcodeproj"
+# 1. Xcode öffnen (Target Runner-iOS wählen -> Cmd+R)
+echo "[1/3] Öffne $XCODE_PROJ (Scheme: $XCODE_SCHEME) in Xcode..."
+open "$XCODE_PROJ"
 
 # 2. Verfügbaren iPhone/iPad Simulator suchen und automatisch bauen & starten
 if command -v xcrun >/dev/null 2>&1 && command -v xcodebuild >/dev/null 2>&1; then
@@ -42,8 +50,8 @@ if command -v xcrun >/dev/null 2>&1 && command -v xcodebuild >/dev/null 2>&1; th
         xcrun simctl boot "$SIM_UDID" >/dev/null 2>&1 || true
 
         if xcodebuild \
-            -project ios/Runner.xcodeproj \
-            -scheme Runner \
+            -project "$XCODE_PROJ" \
+            -scheme "$XCODE_SCHEME" \
             -configuration Debug \
             -sdk iphonesimulator \
             -destination "id=$SIM_UDID" \

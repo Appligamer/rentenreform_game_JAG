@@ -19,7 +19,7 @@ class MainFlutterWindow: NSWindow {
   }
 }
 #else
-class MainFlutterWindow: NSWindow, WKNavigationDelegate {
+final class MacGameViewController: NSViewController, WKNavigationDelegate {
   private var webView: WKWebView!
   private let schemeHandler = BundleSchemeHandler()
   private var localServer: LocalBundleHTTPServer?
@@ -28,45 +28,24 @@ class MainFlutterWindow: NSWindow, WKNavigationDelegate {
     localServer?.stop()
   }
 
-  override func awakeFromNib() {
+  override func loadView() {
     let config = BundleSchemeHandler.makeConfiguration(schemeHandler: schemeHandler)
     #if DEBUG
     config.preferences.setValue(true, forKey: "developerExtrasEnabled")
     #endif
 
-    if self.frame.width < 400 || self.frame.height < 300 {
-      self.setContentSize(NSSize(width: 1280, height: 820))
-      self.center()
-    }
-
-    self.title = "Generation Zukunft — Renten-Simulation (econo=me)"
-    self.styleMask.insert([.titled, .closable, .miniaturizable, .resizable])
-    self.titlebarAppearsTransparent = true
-    self.appearance = NSAppearance(named: .darkAqua)
-    self.backgroundColor = NSColor(red: 0.0, green: 0.0, blue: 0.0, alpha: 1.0)
-    self.isOpaque = true
-
-    let container = self.contentView ?? NSView(frame: self.contentRect(forFrameRect: self.frame))
-    self.contentView = container
-
-    webView = WKWebView(frame: container.bounds, configuration: config)
-    webView.translatesAutoresizingMaskIntoConstraints = false
-    webView.navigationDelegate = self
+    let wv = WKWebView(frame: NSRect(x: 0, y: 0, width: 1280, height: 820), configuration: config)
+    wv.navigationDelegate = self
     if #available(macOS 12.0, *) {
-      webView.underPageBackgroundColor = NSColor.black
+      wv.underPageBackgroundColor = NSColor.black
     }
+    self.webView = wv
+    self.view = wv
+  }
 
-    container.addSubview(webView)
-    NSLayoutConstraint.activate([
-      webView.topAnchor.constraint(equalTo: container.topAnchor),
-      webView.bottomAnchor.constraint(equalTo: container.bottomAnchor),
-      webView.leadingAnchor.constraint(equalTo: container.leadingAnchor),
-      webView.trailingAnchor.constraint(equalTo: container.trailingAnchor),
-    ])
-
+  override func viewDidLoad() {
+    super.viewDidLoad()
     loadApp()
-
-    super.awakeFromNib()
   }
 
   private func loadApp() {
@@ -131,6 +110,28 @@ class MainFlutterWindow: NSWindow, WKNavigationDelegate {
       BundleSchemeHandler.fallbackHTML(reason: "Ladefehler: \(error.localizedDescription)"),
       baseURL: nil
     )
+  }
+}
+
+class MainFlutterWindow: NSWindow {
+  override func awakeFromNib() {
+    let windowFrame = (self.frame.width >= 400 && self.frame.height >= 300)
+      ? self.frame
+      : NSRect(x: 0, y: 0, width: 1280, height: 820)
+
+    self.title = "Generation Zukunft — Renten-Simulation (econo=me)"
+    self.styleMask.insert([.titled, .closable, .miniaturizable, .resizable])
+    self.titlebarAppearsTransparent = true
+    self.appearance = NSAppearance(named: .darkAqua)
+    self.backgroundColor = NSColor.black
+    self.isOpaque = true
+
+    let gameViewController = MacGameViewController()
+    self.contentViewController = gameViewController
+    self.setFrame(windowFrame, display: true)
+    self.center()
+
+    super.awakeFromNib()
   }
 }
 #endif
