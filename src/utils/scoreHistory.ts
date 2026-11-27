@@ -21,11 +21,13 @@ export function createRunId(): string {
 }
 
 export function loadScoreHistory(): SavedRunScore[] {
-  if (typeof window === 'undefined' || !window.localStorage) {
+  if (typeof window === 'undefined') {
     return [];
   }
   try {
-    const raw = window.localStorage.getItem(STORAGE_KEY);
+    const storage = window.localStorage;
+    if (!storage) return [];
+    const raw = storage.getItem(STORAGE_KEY);
     if (!raw) return [];
     const parsed = JSON.parse(raw);
     if (!Array.isArray(parsed)) return [];
@@ -48,20 +50,20 @@ export function upsertRunScore(entry: SavedRunScore): SavedRunScore[] {
     .sort((a, b) => new Date(b.updatedAt).getTime() - new Date(a.updatedAt).getTime())
     .slice(0, MAX_ENTRIES);
 
-  if (typeof window !== 'undefined' && window.localStorage) {
+  if (typeof window !== 'undefined') {
     try {
-      window.localStorage.setItem(STORAGE_KEY, JSON.stringify(next));
+      window.localStorage?.setItem(STORAGE_KEY, JSON.stringify(next));
     } catch {
-      // Ignore storage quota / private mode restrictions
+      // Ignore storage quota / private mode / WebView restrictions
     }
   }
   return next;
 }
 
 export function clearScoreHistory(): SavedRunScore[] {
-  if (typeof window !== 'undefined' && window.localStorage) {
+  if (typeof window !== 'undefined') {
     try {
-      window.localStorage.removeItem(STORAGE_KEY);
+      window.localStorage?.removeItem(STORAGE_KEY);
     } catch {
       // Ignore storage errors
     }

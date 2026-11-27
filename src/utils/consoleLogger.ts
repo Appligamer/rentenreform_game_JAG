@@ -50,6 +50,7 @@ class ConsoleLoggerStore {
   private listeners = new Set<LogListener>();
   private nextId = 1;
   private initialized = false;
+  private isNotifying = false;
 
   init(): void {
     if (this.initialized || typeof window === 'undefined') return;
@@ -97,7 +98,7 @@ class ConsoleLoggerStore {
     window.addEventListener(
       'error',
       (event: Event) => {
-        if (event instanceof ErrorEvent) {
+        if (typeof ErrorEvent !== 'undefined' && event instanceof ErrorEvent) {
           const loc = event.filename ? ` (${event.filename}:${event.lineno}:${event.colno})` : '';
           const errDetail = event.error instanceof Error ? `\n${event.error.stack ?? event.error.message}` : '';
           this.pushEntry('error', 'window.onerror', `${event.message || 'Unbekannter Script-Fehler'}${loc}${errDetail}`);
@@ -132,8 +133,14 @@ class ConsoleLoggerStore {
       message,
     };
     this.entries = [...this.entries.slice(-(MAX_LOG_ENTRIES - 1)), entry];
-    for (const listener of this.listeners) {
-      listener(this.entries);
+    if (this.isNotifying) return;
+    this.isNotifying = true;
+    try {
+      for (const listener of this.listeners) {
+        listener(this.entries);
+      }
+    } finally {
+      this.isNotifying = false;
     }
   }
 

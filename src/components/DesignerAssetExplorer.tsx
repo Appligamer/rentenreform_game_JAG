@@ -13,7 +13,22 @@ export const DesignerAssetExplorer: React.FC = () => {
       : DESIGNER_ASSET_SPECS.filter((a) => a.category === filter);
 
   const copyToClipboard = (text: string, id: string) => {
-    navigator.clipboard.writeText(text);
+    try {
+      if (navigator.clipboard?.writeText) {
+        navigator.clipboard.writeText(text).catch(() => {});
+      } else {
+        const ta = document.createElement('textarea');
+        ta.value = text;
+        ta.style.position = 'fixed';
+        ta.style.opacity = '0';
+        document.body.appendChild(ta);
+        ta.select();
+        document.execCommand('copy');
+        document.body.removeChild(ta);
+      }
+    } catch {
+      // Ignore clipboard restrictions
+    }
     setCopiedId(id);
     setTimeout(() => setCopiedId(null), 2000);
   };
